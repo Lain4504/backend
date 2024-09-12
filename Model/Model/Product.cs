@@ -1,6 +1,6 @@
 ﻿namespace Model.Model
 {
-    public class Class
+    public class Product
     {
     }
 }

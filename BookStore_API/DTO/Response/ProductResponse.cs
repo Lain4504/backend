@@ -1,6 +1,6 @@
 ﻿namespace BookStore_API.DTO.Request
 {
-    public class Class
+    public class ProductResponse
     {
     }
 }
