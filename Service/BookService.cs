@@ -1,6 +1,6 @@
 ﻿namespace BackEnd.Service
 {
-    public class ProductService
+    public class BookService
     {
     }
 }
