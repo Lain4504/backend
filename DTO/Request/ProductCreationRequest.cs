@@ -1,4 +1,4 @@
-﻿namespace BookStore_API.DTO.Request
+﻿namespace BackEnd.DTO.Request
 {
     public class ProductCreationRequest
     {

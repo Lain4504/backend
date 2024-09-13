@@ -1,4 +1,4 @@
-﻿namespace BookStore_API.Service
+﻿namespace BackEnd.Service
 {
     public class ProductService
     {

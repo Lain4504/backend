@@ -1,4 +1,4 @@
-﻿namespace Model.Model
+﻿namespace BackEnd.Model
 {
     public class Product
     {
