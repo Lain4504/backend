@@ -1,6 +1,6 @@
 ﻿namespace BackEnd.DTO.Request
 {
-    public class CollectionRequest
+    public class Temp
     {
     }
 }
