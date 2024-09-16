@@ -39,8 +39,8 @@ namespace BackEnd.Repository
         public async Task<Collection> GetCollectionByIdAsync(int id)
         {
             var collection = await _context.Collections
-                .Include(c => c.Books)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .Include(collection => collection.Books)
+                .FirstOrDefaultAsync(collection => collection.Id == id);
 
             if (collection == null)
             {
