@@ -58,5 +58,8 @@ app.MapControllers();
 
 app.Run();
 
+<<<<<<< Updated upstream
 
 // dotnet ef dbcontext scaffold "Data Source=127.0.0.1,1433; Database="website"; UserId ="thanhphuong"; Password ="123456""  Microsoft.EntityFrameworkCore.SqlServer -o Models
+=======
+>>>>>>> Stashed changes
