@@ -57,3 +57,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+// dotnet ef dbcontext scaffold "Data Source=127.0.0.1,1433; Database="website"; UserId ="thanhphuong"; Password ="123456""  Microsoft.EntityFrameworkCore.SqlServer -o Models
