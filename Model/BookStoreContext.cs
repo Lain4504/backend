@@ -5,8 +5,8 @@ namespace BackEnd.Model
 {
     public class BookStoreContext : DbContext
     {
-        public DbSet<Collection> Collections { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<Collection> Collections { get; set; }
         public DbSet<Author> Authors { get; set; }
 
         public DbSet<BookCategory> BookCategories { get; set; }

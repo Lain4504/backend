@@ -1,6 +1,4 @@
-﻿using BackEnd.Model.OnlineBookShop.Models;
-using System;
-using System.Collections.Generic;
+﻿
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -69,18 +67,7 @@ namespace BackEnd.Model
         public BookState State { get; set; }
 
         // Calculate sale price after discount
-        [NotMapped]
-        public long? SalePrice
-        {
-            get
-            {
-                if (Price != 0 && Discount > 0)
-                {
-                    return (long)(Price - (Price * Discount));
-                }
-                return null;
-            }
-        }
+        
     }
 
     public enum BookState
