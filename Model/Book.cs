@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using BackEnd.Model.OnlineBookShop.Models;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using static System.Net.Mime.MediaTypeNames;
-using Microsoft.Identity.Client;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.Model
 {
@@ -14,27 +14,27 @@ namespace BackEnd.Model
         public long Id { get; set; }
 
         [Required(ErrorMessage = "The title of the book is required")]
-        public required string Title { get; set; }
+        public string Title { get; set; }
 
-        //[ForeignKey("PublisherId")]
-        //public virtual Publisher Publisher { get; set; }
-        //public long? PublisherId { get; set; }
+        [ForeignKey("PublisherId")]
+        public virtual Publisher Publisher { get; set; }
+        public long? PublisherId { get; set; }
 
-
-        //[ForeignKey("CategoryId")]
-        //public virtual BookCategory Category { get; set; }
-        //public long? CategoryId { get; set; }
+        [ForeignKey("CategoryId")]
+        public virtual BookCategory Category { get; set; }
+        public long? CategoryId { get; set; }
 
         // Many-to-many relationship with Author
-        //public virtual ICollection<Author> Authors { get; set; } = new HashSet<Author>();
+        public virtual ICollection<Author> Authors { get; set; } = new HashSet<Author>();
 
         // Many-to-many relationship with BookCollection
         public virtual ICollection<Collection> Collections { get; set; } = new HashSet<Collection>();
-        
-        [Column(TypeName = "text")]
-        public required string Description { get; set; }
 
-        [Range(0, int.MaxValue, ErrorMessage = "stock must be at least 0")]
+        [Column(TypeName = "text")]
+        [Required(ErrorMessage = "The description of the book is required")]
+        public string Description { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "Stock must be at least 0")]
         public int? Stock { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Sold must be at least 0")]
@@ -42,8 +42,8 @@ namespace BackEnd.Model
 
         public DateTime? PublicationDate { get; set; }
 
-        public required string Size { get; set; }
-
+        [Required(ErrorMessage = "The size of the book is required")]
+        public string Size { get; set; }
 
         [Range(1, long.MaxValue, ErrorMessage = "The price must be at least 1")]
         public long? Price { get; set; }
@@ -51,15 +51,16 @@ namespace BackEnd.Model
         [Range(0.0, 1.0, ErrorMessage = "The discount must be between 0 and 1")]
         public float? Discount { get; set; }
 
-        public required string ISBN { get; set; }
+        [Required(ErrorMessage = "The ISBN of the book is required")]
+        public string ISBN { get; set; }
 
         public BookState? State { get; set; }
 
         // One-to-many relationships
-        //public virtual ICollection<Feedback> Feedbacks { get; set; } = new HashSet<Feedback>();
-        //public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new HashSet<OrderDetail>();
-        //public virtual ICollection<Wishlist> Wishlists { get; set; } = new HashSet<Wishlist>();
-        //public virtual ICollection<Image> Images { get; set; } = new HashSet<Image>();
+        public virtual ICollection<Feedback> Feedbacks { get; set; } = new HashSet<Feedback>();
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new HashSet<OrderDetail>();
+        public virtual ICollection<Wishlist> Wishlists { get; set; } = new HashSet<Wishlist>();
+        public virtual ICollection<Image> Images { get; set; } = new HashSet<Image>();
 
         [NotMapped]
         public long? SalePrice
@@ -73,7 +74,13 @@ namespace BackEnd.Model
                 return null;
             }
         }
+
+        internal void Update(Book book)
+        {
+            throw new NotImplementedException();
+        }
     }
+
     public enum BookState
     {
         Active,

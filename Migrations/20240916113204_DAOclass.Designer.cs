@@ -4,6 +4,7 @@ using BackEnd.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
-    partial class BookStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20240916113204_DAOclass")]
+    partial class DAOclass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("BooksId");
 
-                    b.ToTable("AuthorBook", (string)null);
+                    b.ToTable("AuthorBook");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Author", b =>
@@ -55,7 +58,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Author", (string)null);
+                    b.ToTable("Author");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Book", b =>
@@ -112,7 +115,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("Book", (string)null);
+                    b.ToTable("Book");
                 });
 
             modelBuilder.Entity("BackEnd.Model.BookCategory", b =>
@@ -129,7 +132,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BookCategory", (string)null);
+                    b.ToTable("BookCategory");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Collection", b =>
@@ -152,7 +155,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collection", (string)null);
+                    b.ToTable("Collection");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Image", b =>
@@ -178,7 +181,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("Image", (string)null);
+                    b.ToTable("Image");
                 });
 
             modelBuilder.Entity("BackEnd.Model.OnlineBookShop.Models.Feedback", b =>
@@ -215,7 +218,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback", (string)null);
+                    b.ToTable("Feedback");
                 });
 
             modelBuilder.Entity("BackEnd.Model.OnlineBookShop.Models.PostCategory", b =>
@@ -232,7 +235,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PostCategory", (string)null);
+                    b.ToTable("PostCategory");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Order", b =>
@@ -301,7 +304,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Order", (string)null);
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("BackEnd.Model.OrderDetail", b =>
@@ -334,7 +337,7 @@ namespace BackEnd.Migrations
                     b.HasIndex("BookId", "OrderId")
                         .IsUnique();
 
-                    b.ToTable("OrderDetail", (string)null);
+                    b.ToTable("OrderDetail");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Post", b =>
@@ -379,7 +382,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Post", (string)null);
+                    b.ToTable("Post");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Publisher", b =>
@@ -402,7 +405,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("publisher", (string)null);
+                    b.ToTable("publisher");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Slider", b =>
@@ -433,7 +436,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("slider", (string)null);
+                    b.ToTable("slider");
                 });
 
             modelBuilder.Entity("BackEnd.Model.User", b =>
@@ -530,7 +533,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("user", (string)null);
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Wishlist", b =>
@@ -553,7 +556,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("wishlist", (string)null);
+                    b.ToTable("wishlist");
                 });
 
             modelBuilder.Entity("BookCollection", b =>
@@ -568,7 +571,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("CollectionsId");
 
-                    b.ToTable("BookCollection", (string)null);
+                    b.ToTable("BookCollection");
                 });
 
             modelBuilder.Entity("AuthorBook", b =>
