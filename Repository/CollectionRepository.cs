@@ -38,10 +38,18 @@ namespace BackEnd.Repository
 
         public async Task<Collection> GetCollectionByIdAsync(int id)
         {
-            return await _context.Collections
-                .Include(collection => collection.Books)
-                .FirstOrDefaultAsync(collection => collection.Id == id);
+            var collection = await _context.Collections
+                .Include(c => c.Books)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (collection == null)
+            {
+                throw new KeyNotFoundException($"Collection with id {id} not found.");
+            }
+
+            return collection;
         }
+
 
         public async Task<Collection> SaveCollectionAsync(Collection collection)
         {
