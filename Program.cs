@@ -18,10 +18,11 @@ builder.Services.AddDbContext<BookStoreContext>(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins",
-        builder => builder.WithOrigins("http://localhost:5173")
+        builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5175")
                     .AllowAnyHeader()
-                   .AllowAnyMethod());
+                    .AllowAnyMethod());
 });
+
 
 // Dependency Injection for Repositories and Services
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
