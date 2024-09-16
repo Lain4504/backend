@@ -4,6 +4,7 @@ using BackEnd.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
-    partial class BookStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20240916113204_DAOclass")]
+    partial class DAOclass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,21 @@ namespace BackEnd.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AuthorBook", b =>
+                {
+                    b.Property<long>("AuthorsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("BooksId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AuthorsId", "BooksId");
+
+                    b.HasIndex("BooksId");
+
+                    b.ToTable("AuthorBook");
+                });
 
             modelBuilder.Entity("BackEnd.Model.Author", b =>
                 {
@@ -51,48 +69,25 @@ namespace BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("AuthorId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Authors")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long?>("CategoryId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Cover")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<float>("Discount")
+                    b.Property<float?>("Discount")
                         .HasColumnType("real");
 
                     b.Property<string>("ISBN")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
-                    b.Property<string>("Language")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Page")
-                        .HasColumnType("int");
-
-                    b.Property<long>("Price")
+                    b.Property<long?>("Price")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("PublicationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Publisher")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("PublisherId")
                         .HasColumnType("bigint");
@@ -101,25 +96,20 @@ namespace BackEnd.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Sold")
+                    b.Property<int?>("Sold")
                         .HasColumnType("int");
 
-                    b.Property<int>("State")
+                    b.Property<int?>("State")
                         .HasColumnType("int");
 
-                    b.Property<int>("Stock")
+                    b.Property<int?>("Stock")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Weight")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
 
                     b.HasIndex("CategoryId");
 
@@ -415,7 +405,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Publisher");
+                    b.ToTable("publisher");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Slider", b =>
@@ -446,7 +436,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Slider");
+                    b.ToTable("slider");
                 });
 
             modelBuilder.Entity("BackEnd.Model.User", b =>
@@ -457,17 +447,93 @@ namespace BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ward")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Wishlist", b =>
@@ -490,7 +556,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Wishlist");
+                    b.ToTable("wishlist");
                 });
 
             modelBuilder.Entity("BookCollection", b =>
@@ -508,21 +574,34 @@ namespace BackEnd.Migrations
                     b.ToTable("BookCollection");
                 });
 
-            modelBuilder.Entity("BackEnd.Model.Book", b =>
+            modelBuilder.Entity("AuthorBook", b =>
                 {
                     b.HasOne("BackEnd.Model.Author", null)
-                        .WithMany("Books")
-                        .HasForeignKey("AuthorId");
+                        .WithMany()
+                        .HasForeignKey("AuthorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
+                    b.HasOne("BackEnd.Model.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BackEnd.Model.Book", b =>
+                {
                     b.HasOne("BackEnd.Model.BookCategory", "Category")
                         .WithMany("Books")
                         .HasForeignKey("CategoryId");
 
-                    b.HasOne("BackEnd.Model.Publisher", null)
+                    b.HasOne("BackEnd.Model.Publisher", "Publisher")
                         .WithMany("Books")
                         .HasForeignKey("PublisherId");
 
                     b.Navigation("Category");
+
+                    b.Navigation("Publisher");
                 });
 
             modelBuilder.Entity("BackEnd.Model.Image", b =>
@@ -539,11 +618,11 @@ namespace BackEnd.Migrations
             modelBuilder.Entity("BackEnd.Model.OnlineBookShop.Models.Feedback", b =>
                 {
                     b.HasOne("BackEnd.Model.Book", "Book")
-                        .WithMany()
+                        .WithMany("Feedbacks")
                         .HasForeignKey("BookId");
 
                     b.HasOne("BackEnd.Model.User", "User")
-                        .WithMany()
+                        .WithMany("Feedbacks")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Book");
@@ -554,7 +633,7 @@ namespace BackEnd.Migrations
             modelBuilder.Entity("BackEnd.Model.Order", b =>
                 {
                     b.HasOne("BackEnd.Model.User", "User")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -565,7 +644,7 @@ namespace BackEnd.Migrations
             modelBuilder.Entity("BackEnd.Model.OrderDetail", b =>
                 {
                     b.HasOne("BackEnd.Model.Book", "Book")
-                        .WithMany()
+                        .WithMany("OrderDetails")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -588,7 +667,7 @@ namespace BackEnd.Migrations
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("BackEnd.Model.User", "User")
-                        .WithMany()
+                        .WithMany("Posts")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Category");
@@ -599,13 +678,13 @@ namespace BackEnd.Migrations
             modelBuilder.Entity("BackEnd.Model.Wishlist", b =>
                 {
                     b.HasOne("BackEnd.Model.Book", "Book")
-                        .WithMany()
+                        .WithMany("Wishlists")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BackEnd.Model.User", "User")
-                        .WithMany()
+                        .WithMany("Wishlists")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -630,14 +709,15 @@ namespace BackEnd.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BackEnd.Model.Author", b =>
-                {
-                    b.Navigation("Books");
-                });
-
             modelBuilder.Entity("BackEnd.Model.Book", b =>
                 {
+                    b.Navigation("Feedbacks");
+
                     b.Navigation("Images");
+
+                    b.Navigation("OrderDetails");
+
+                    b.Navigation("Wishlists");
                 });
 
             modelBuilder.Entity("BackEnd.Model.BookCategory", b =>
@@ -658,6 +738,17 @@ namespace BackEnd.Migrations
             modelBuilder.Entity("BackEnd.Model.Publisher", b =>
                 {
                     b.Navigation("Books");
+                });
+
+            modelBuilder.Entity("BackEnd.Model.User", b =>
+                {
+                    b.Navigation("Feedbacks");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("Posts");
+
+                    b.Navigation("Wishlists");
                 });
 #pragma warning restore 612, 618
         }
