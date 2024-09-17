@@ -1,21 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BackEnd.Model
+﻿using System;
+using System.Collections.Generic;
+using BackEnd.Model;
+
+namespace BackEnd.Model;
+
+public partial class User
 {
-    [Table("User")]
-    public class User
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+    public long id { get; set; }
 
-        [Required]
-        [EmailAddress]
-        public string Email{ get; set; }
+    public string? email { get; set; }
 
-        [Required]
-        public string Password { get; set; }
+    public string? full_name { get; set; }
 
-    }
+    public string? password { get; set; }
+
+    public string? role { get; set; }
 }
