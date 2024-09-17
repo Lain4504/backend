@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using BackEnd.Model;
+using BackEnd.Models;
 namespace BackEnd.Service
 {
     public interface IUserService
     {
-        Task<User> AuthenticateAsync(string email, string password);
-        Task<User> RegisterAsync(string email, string password);
-        Task<User> GetUserByEmailAsync(String email);
+        Task<User> AuthenticateAsync(string Email, string Password);
+        Task<User> RegisterAsync(string Email, string Password);
+        Task<User> GetUserByEmailAsync(String Email);
     }
 }

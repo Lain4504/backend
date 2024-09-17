@@ -26,7 +26,6 @@ bld/
 [Oo]bj/
 [Ll]og/
 
-# Visual Studio 2015 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
@@ -270,22 +269,4 @@ __pycache__/
 
 # Cake - Uncomment if you are using it
 # tools/
-
-# End of https://www.toptal.com/developers/gitignore/api/aspnetcore
-.vs/DiamondShopSystem.API/DesignTimeBuild/.dtbcache.v2
-.vs/DiamondShopSystem.API/DesignTimeBuild/.dtbcache.v2
-.vs/DiamondShopSystem.API/v17/.futdcache.v2
-.vs/DiamondShopSystem.API/v17/.suo
-.vs/DiamondShopSystem.API/v17/DocumentLayout.json
-.vs/ProjectEvaluation/diamondshopsystem.api.strings.v8.bin
-.vs/DiamondShopSystem.API/DesignTimeBuild/.dtbcache.v2
-.vs/DiamondShopSystem.API/DesignTimeBuild/.dtbcache.v2
-.vs/DiamondShopSystem.API/v17/.futdcache.v2
-.vs/DiamondShopSystem.API/v17/.suo
-.vs/DiamondShopSystem.API/v17/DocumentLayout.json
-.vs/ProjectEvaluation/diamondshopsystem.api.strings.v8.bin
-.vs/DiamondShopSystem.API/DesignTimeBuild/.dtbcache.v2
-.vs/DiamondShopSystem.API/v17/.futdcache.v2
-.vs/DiamondShopSystem.API/v17/.suo
-.vs/DiamondShopSystem.API/v17/DocumentLayout.json
-.vs/ProjectEvaluation/diamondshopsystem.api.strings.v8.bin
+/Migrations/

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using BackEnd.Model;
+using BackEnd.Models;
 
 namespace BackEnd.Repository
 {
@@ -13,16 +13,16 @@ namespace BackEnd.Repository
             _context = context;
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<User> GetByEmailAsync(string Email)
         {
-            var user = await _context.user
-                .Where(u => u.email == email)
+            var user = await _context.Users
+                .Where(u => u.Email == Email)
                 .Select(u => new
                 {
-                    full_name = u.full_name,
-                    email = u.email,
-                    password = u.password,
-                    role = u.role
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    Password = u.Password,
+                    Role = u.Role
                 })
                 .SingleOrDefaultAsync();
 
@@ -35,9 +35,9 @@ namespace BackEnd.Repository
             // Xử lý các trường có thể null
             return new User
             {
-                email = user.email,
-                password = user.password,
-                role = user.role
+                Email = user.Email,
+                Password = user.Password,
+                Role = user.Role
             };
         }
 
@@ -45,7 +45,7 @@ namespace BackEnd.Repository
 
         public async Task AddAsync(User user)
         {
-            await _context.user.AddAsync(user);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
 

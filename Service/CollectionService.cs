@@ -1,4 +1,4 @@
-﻿using BackEnd.Model;
+﻿using BackEnd.Models;
 using BackEnd.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,36 +12,27 @@ namespace BackEnd.Service
             _repository = repository;
         }
 
-        public async Task<bool> DeleteCollectionAsync(int id)
+        public Task DeleteCollectionAsync(long id)
         {
-            var collection = await _repository.GetCollectionByIdAsync(id);
-            if (collection == null)
-            {
-                return false; // Collection not found
-            }
-
-            await _repository.DeleteCollectionAsync(id);
-            return true; // Deletion successful
+            return _repository.DeleteCollectionAsync(id);
         }
 
-
-
-        public async Task<List<Collection>> GetAllCollectionsAsync()
+        public Task<IEnumerable<Collection>> GetAllCollectionsAsync()
         {
-            return await _repository.GetAllCollectionsAsync();
+            return _repository.GetAllCollectionsAsync();
         }
 
-        public async Task<Collection> GetCollectionByIdAsync(int id)
+        public Task<Collection> GetCollectionByIdAsync(long id)
         {
-            return await _repository.GetCollectionByIdAsync(id);
+            return _repository.GetCollectionByIdAsync(id);
         }
 
-        public async Task<Collection> SaveCollectionAsync(Collection collection)
+        public Task SaveCollectionAsync(Collection collection)
         {
-            return await _repository.SaveCollectionAsync(collection);   
+            return _repository.SaveCollectionAsync(collection);
         }
 
-        public Task<Collection> UpdateCollectionAsync(Collection collection)
+        public Task UpdateCollectionAsync(Collection collection)
         {
             return _repository.UpdateCollectionAsync(collection);
         }
