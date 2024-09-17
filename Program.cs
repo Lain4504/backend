@@ -1,5 +1,5 @@
 
-﻿using BackEnd.Model;
+﻿using BackEnd.Models;
 using BackEnd.Repository;
 using BackEnd.Service;
 using Microsoft.EntityFrameworkCore;
@@ -38,11 +38,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 
 // Dependency Injection for Repositories and Services
-builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
-builder.Services.AddScoped<ICollectionService, CollectionService>();
-builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IImageRepository, ImageRepository>();
+//builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
+//builder.Services.AddScoped<ICollectionService, CollectionService>();
+//builder.Services.AddScoped<IBookRepository, BookRepository>();
+//builder.Services.AddScoped<IBookService, BookService>();
+//builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 

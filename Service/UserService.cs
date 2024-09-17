@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using BackEnd.Model;
+using BackEnd.Models;
 using BackEnd.Repository;
 using BCrypt.Net;
 namespace BackEnd.Service
@@ -13,13 +13,13 @@ namespace BackEnd.Service
             _userRepository = userRepository;
         }
 
-        public async Task<User> AuthenticateAsync(string email, string password)
+        public async Task<User> AuthenticateAsync(string Email, string Password)
         {
             // Lấy người dùng từ cơ sở dữ liệu theo email
-            var user = await _userRepository.GetByEmailAsync(email);
+            var user = await _userRepository.GetByEmailAsync(Email);
 
             // Kiểm tra nếu không tìm thấy người dùng hoặc mật khẩu trong DB là null
-            if (user == null || string.IsNullOrEmpty(user.password))
+            if (user == null || string.IsNullOrEmpty(user.Password))
             {
                 return null; // Trả về null nếu không tìm thấy hoặc mật khẩu rỗng
             }
@@ -28,7 +28,7 @@ namespace BackEnd.Service
             string decryptedPassword;
             try
             {
-                decryptedPassword = EncryptDecryptManager.Decrypt(user.password);
+                decryptedPassword = EncryptDecryptManager.Decrypt(user.Password);
             }
             catch (Exception ex)
             {
@@ -38,7 +38,7 @@ namespace BackEnd.Service
             }
 
             // So sánh mật khẩu đã nhập với mật khẩu đã giải mã
-            if (password == decryptedPassword)
+            if (Password == decryptedPassword)
             {
                 // Mật khẩu hợp lệ, trả về người dùng
                 return user;
@@ -49,18 +49,18 @@ namespace BackEnd.Service
         }
 
 
-        public async Task<User> RegisterAsync(string email, string password)
+        public async Task<User> RegisterAsync(string Email, string Password)
         {
             try
             {
                 // Mã hóa mật khẩu
-                string hashedPassword = EncryptDecryptManager.Encrypt(password);
+                string hashedPassword = EncryptDecryptManager.Encrypt(Password);
 
                 var user = new User
                 {
-                    email = email,
-                    password = hashedPassword,
-                    role = "0"
+                    Email = Email,
+                    Password = hashedPassword,
+                    Role = "0"
                 };
 
                 // Lưu người dùng vào cơ sở dữ liệu

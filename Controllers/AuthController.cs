@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using BackEnd.Model;
+using BackEnd.Models;
 using BackEnd.Service;
 
 namespace BackEnd.Controllers
@@ -39,7 +39,7 @@ namespace BackEnd.Controllers
             }
 
             // Trả về thông báo thành công với thông tin người dùng mới
-            return CreatedAtAction(nameof(Register), new { id = user.id }, new { id = user.id, email = user.email });
+            return CreatedAtAction(nameof(Register), new { Id = user.Id }, new { id = user.Id, email = user.Email });
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] DTO.Request.LoginRequest loginRequest)
@@ -63,8 +63,8 @@ namespace BackEnd.Controllers
                 // Tạo các claim cho người dùng
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.Email, existingUser.email),
-                    new Claim(ClaimTypes.Role, existingUser.role?.ToString())
+                    new Claim(ClaimTypes.Email, existingUser.Email),
+                    new Claim(ClaimTypes.Role, existingUser.Role?.ToString())
                 };
 
 
