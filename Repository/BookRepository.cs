@@ -50,29 +50,6 @@ namespace BackEnd.Repository
             return await _context.Set<Book>().AnyAsync(b => b.ISBN == isbn);
         }
 
-        //public async Task<IEnumerable<Book>> GetBooksByCategoryAndPriceRangeAsync(IEnumerable<BookCategory> categories, decimal min, decimal max)
-        //{
-        //    return await _context.Set<Book>()
-        //        .Where(b => categories.Contains(b.Category) && b.Price >= min && b.Price <= max)
-        //        .ToListAsync();
-        //}
-
-        //public async Task<IEnumerable<Book>> GetBooksByCollectionAndPriceRangesAsync(Collection collection, decimal min, decimal max)
-        //{
-        //    if (collection != null)
-        //    {
-        //        return await _context.Set<Book>()
-        //            .Where(b => b.Collections.Contains(collection) && b.Price >= min && b.Price <= max)
-        //            .ToListAsync();
-        //    }
-        //    else
-        //    {
-        //        return await _context.Set<Book>()
-        //            .Where(b => b.Price >= min && b.Price <= max)
-        //            .ToListAsync();
-        //    }
-        //}
-
         public async Task<IEnumerable<Book>> GetBooksByNameAsync(string name)
         {
             return await _context.Set<Book>()

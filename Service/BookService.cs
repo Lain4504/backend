@@ -46,7 +46,6 @@ namespace BackEnd.Service
             existingBook.Cover = book.Cover;
             existingBook.Price = book.Price;
             existingBook.Discount = book.Discount;
-            existingBook.Language = book.Language;
             existingBook.Publisher = book.Publisher;
             existingBook.Stock = book.Stock;
             existingBook.Weight = book.Weight;
@@ -90,7 +89,7 @@ namespace BackEnd.Service
             return await _bookRepository.GetBooksByNameAsync(name);
         }
 
-        public async Task AddBookToCollectionAsync(long bookId, int collectionId)
+        public async Task AddBookToCollectionAsync(long bookId, long collectionId)
         {
             var existingBook = await _bookRepository.GetBookByIdAsync(bookId);
             var existingCollection = await _collectionRepository.GetCollectionByIdAsync(collectionId);

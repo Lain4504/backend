@@ -12,7 +12,7 @@ namespace BackEnd.Repository
             _context = context;
         }
 
-        public async Task DeleteCollectionAsync(int id)
+        public async Task DeleteCollectionAsync(long id)
         {
             var collection = await _context.Collections
                 .Include(collection => collection.Books)
@@ -36,7 +36,7 @@ namespace BackEnd.Repository
                 .ToListAsync();
         }
 
-        public async Task<Collection> GetCollectionByIdAsync(int id)
+        public async Task<Collection> GetCollectionByIdAsync(long id)
         {
             var collection = await _context.Collections
                 .Include(collection => collection.Books)

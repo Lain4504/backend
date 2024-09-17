@@ -113,8 +113,8 @@ namespace BackEnd.Controllers
         }
 
         // POST: api/book/{bookId}/collection/{collectionId}
-        [HttpPost("{bookId}/collection/{collectionId}")]
-        public async Task<IActionResult> AddBookToCollection(long bookId, int collectionId)
+        [HttpPost("add-to-collection")]
+        public async Task<IActionResult> AddBookToCollection(long bookId, long collectionId)
         {
             try
             {

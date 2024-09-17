@@ -17,3 +17,4 @@ public partial class User
 
     public string? role { get; set; }
 }
+

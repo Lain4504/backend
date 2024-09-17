@@ -12,11 +12,7 @@ namespace BackEnd.Model
 
         [ForeignKey("Book")]
         public long BookId { get; set; }
-        public virtual Book Book { get; set; }
-
-        [Required(ErrorMessage = "The link is not blank")]
         public string Link { get; set; }
-
         public string Description { get; set; }
     }
 }
