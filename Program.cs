@@ -38,8 +38,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 
 // Dependency Injection for Repositories and Services
-//builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
-//builder.Services.AddScoped<ICollectionService, CollectionService>();
+builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
+builder.Services.AddScoped<ICollectionService, CollectionService>();
 //builder.Services.AddScoped<IBookRepository, BookRepository>();
 //builder.Services.AddScoped<IBookService, BookService>();
 //builder.Services.AddScoped<IImageRepository, ImageRepository>();
