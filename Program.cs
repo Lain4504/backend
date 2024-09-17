@@ -1,8 +1,10 @@
+
 ﻿using BackEnd.Model;
 using BackEnd.Repository;
 using BackEnd.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,7 @@ builder.Services.AddCors(options =>
                     .AllowAnyMethod());
 });
 
+
 // Add Authentication and Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -33,11 +36,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true; // Tự động gia hạn cookie khi gần hết hạn
     });
 
+
 // Dependency Injection for Repositories and Services
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
 
 var app = builder.Build();
 
@@ -64,10 +69,12 @@ app.UseRouting();
 // Apply CORS policy
 app.UseCors("AllowSpecificOrigins");
 
+
 // Enable authentication middleware
 app.UseAuthentication();
 
 // Enable authorization middleware
+
 app.UseAuthorization();
 
 app.MapControllers();

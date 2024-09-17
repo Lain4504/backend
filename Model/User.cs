@@ -1,3 +1,4 @@
+
 ﻿using System;
 using System.Collections.Generic;
 using BackEnd.Model;
@@ -15,5 +16,4 @@ public partial class User
     public string? password { get; set; }
 
     public string? role { get; set; }
-
 }

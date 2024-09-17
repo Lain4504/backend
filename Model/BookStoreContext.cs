@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
 
+﻿using Microsoft.EntityFrameworkCore;
 namespace BackEnd.Model
 {
     public class BookStoreContext : DbContext
@@ -10,10 +10,6 @@ namespace BackEnd.Model
 
         public BookStoreContext(DbContextOptions<BookStoreContext> options) : base(options)
         {
-
         }
-
-
-
     }
 }
