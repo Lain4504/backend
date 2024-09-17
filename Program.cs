@@ -1,7 +1,10 @@
-using BackEnd.Model;
+
+﻿using BackEnd.Model;
 using BackEnd.Repository;
 using BackEnd.Service;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,12 +27,25 @@ builder.Services.AddCors(options =>
 });
 
 
+// Add Authentication and Cookie Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/user/login"; // Đường dẫn đến trang đăng nhập
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Thời gian hết hạn của cookie
+        options.SlidingExpiration = true; // Tự động gia hạn cookie khi gần hết hạn
+    });
+
+
 // Dependency Injection for Repositories and Services
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,6 +70,12 @@ app.UseRouting();
 
 // Apply CORS policy
 app.UseCors("AllowSpecificOrigins");
+
+
+// Enable authentication middleware
+app.UseAuthentication();
+
+// Enable authorization middleware
 
 app.UseAuthorization();
 
