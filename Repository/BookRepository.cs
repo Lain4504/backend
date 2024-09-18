@@ -16,12 +16,16 @@ namespace BackEnd.Repository
 
         public async Task<Book> GetByIdAsync(long id)
         {
-            return await _context.Books.FindAsync(id);
+            return await _context.Books
+               .Include(b => b.Images)
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
 
         public async Task<IEnumerable<Book>> GetAllAsync()
         {
-            return await _context.Books.ToListAsync();
+            return await _context.Books
+                .Include(b => b.Images)
+                .ToListAsync();
         }
 
         public async Task AddAsync(Book book)
