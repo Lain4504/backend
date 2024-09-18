@@ -1,15 +1,18 @@
-﻿//using BackEnd.Model;
+﻿using BackEnd.Models;
+using System.Linq.Expressions;
 
-//namespace BackEnd.Repository
-//{
-//    public interface IBookRepository
-//    {
-//        Task<Book> GetBookByIdAsync(long id);
-//        Task<IEnumerable<Book>> GetAllBooksAsync();
-//        Task<Book> SaveBookAsync(Book book);
-//        Task UpdateBookAsync(Book book);
-//        Task DeleteBookAsync(long id);
-//        Task<bool> BookExistsByISBNAsync(string isbn);
-//        Task<IEnumerable<Book>> GetBooksByNameAsync(string name);
-//    }
-//}
+namespace BackEnd.Repository
+{
+    public interface IBookRepository
+    {
+        Task<Book?> GetByIdAsync(long id);
+        Task<IEnumerable<Book>> GetAllAsync();
+        Task AddAsync(Book book);
+        Task UpdateAsync(Book book);
+        Task DeleteAsync(long id);
+        Task<bool> ExistsByIsbnAsync(string isbn);
+        Task<IEnumerable<Book>> FindByTitleAsync(string title);
+        Task<IEnumerable<Book>> FindByConditionAsync(Expression<Func<Book, bool>> predicate);
+        Task AddBookToCollectionAsync(long bookId, long collectionId);
+    }
+}
