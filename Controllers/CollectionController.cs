@@ -91,6 +91,16 @@ namespace BackEnd.Controllers
             await _collectionService.DeleteCollectionAsync(id);
             return NoContent();
         }
-
+        [HttpGet("sorted-and-paged")]
+        public async Task<IActionResult> GetAllBookCollections(
+       [FromQuery] string sortBy = "Id",
+       [FromQuery] int page = 0,
+       [FromQuery] int size = 5,
+       [FromQuery] string sortOrder = "asc")
+        {
+            bool isAscending = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase);
+            var bookCollections = await _collectionService.GetAllBookCollectionsAsync(page, size, sortBy, isAscending);
+            return Ok(bookCollections);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BackEnd.Models;
 using BackEnd.Repository;
+using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Service
@@ -36,5 +37,11 @@ namespace BackEnd.Service
         {
             return _repository.UpdateCollectionAsync(collection);
         }
+        public Task<PaginatedList<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
+        {
+            return _repository.GetAllBookCollectionsAsync(pageIndex, pageSize, sortBy, isAscending);    
+        }
+
     }
+
 }

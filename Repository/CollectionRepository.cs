@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackEnd.Models;
 using BackEnd.Repository;
+using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Repository
@@ -51,6 +52,23 @@ namespace BackEnd.Repository
         {
             _context.Collections.Update(collection);
             await _context.SaveChangesAsync();
+        }
+        public async Task<PaginatedList<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
+        {
+            var source = _context.Collections.AsQueryable();
+
+            // Apply sorting
+            if (isAscending)
+            {
+                source = source.OrderBy(b => EF.Property<object>(b, sortBy));
+            }
+            else
+            {
+                source = source.OrderByDescending(b => EF.Property<object>(b, sortBy));
+            }
+
+            // Get paginated results
+            return await PaginatedList<Collection>.CreateAsync(source, pageIndex, pageSize);
         }
     }
 }
