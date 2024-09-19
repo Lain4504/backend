@@ -1,7 +1,10 @@
-﻿namespace BackEnd.Service
+﻿using BackEnd.Models;
+
+namespace BackEnd.Service
 {
-    public class ISliderService
+    public interface ISliderService
     {
+        Task<IEnumerable<Slider>> GetAllSlidersAsync();
 
     }
 }

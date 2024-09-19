@@ -1,6 +1,9 @@
-﻿namespace BackEnd.Repository
+﻿using BackEnd.Models;
+
+namespace BackEnd.Repository
 {
-    public class ISliderRepository
+    public interface ISliderRepository
     {
+        Task<IEnumerable<Slider>> GetAllSlider();
     }
 }
