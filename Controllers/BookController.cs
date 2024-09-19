@@ -66,19 +66,34 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        //[HttpGet("search")]
-        //public async Task<IActionResult> SearchBooks([FromQuery] string? title, [FromQuery] string? state, [FromQuery] long? categoryId, [FromQuery] long? collectionId)
-        //{
-        //    var books = await _bookService.QueryBooksAsync(title, state, categoryId, collectionId);
-        //    return Ok(books);
-        //}
-
         [HttpPost("add-to-collection")]
         public async Task<IActionResult> AddBookToCollection(long bookId, long collectionId)
         {
             await _bookService.AddBookToCollectionAsync(bookId, collectionId);
             return NoContent();
         }
-        
+        [HttpGet("sorted-and-paged")]
+        public async Task<IActionResult> GetAllBooks(
+    [FromQuery] string sortBy = "Id",
+    [FromQuery] int page = 0,
+    [FromQuery] int size = 5,
+    [FromQuery] string sortOrder = "asc")
+        {
+            bool isAscending = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase);
+            var paginatedBooks = await _bookService.GetAllBooksAsync(page, size, sortBy, isAscending);
+
+            // Trả về dữ liệu với thuộc tính 'content'
+            var response = new
+            {
+                content = paginatedBooks, // Hoặc tùy chỉnh tùy theo cấu trúc của PaginatedList<Book>
+                totalPages = paginatedBooks.TotalPages,
+                pageIndex = page
+            };
+
+            return Ok(response);
+        }
+
+
+
     }
 }

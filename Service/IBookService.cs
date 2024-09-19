@@ -1,4 +1,5 @@
 ﻿using BackEnd.Models;
+using BackEnd.Util;
 
 namespace BackEnd.Service
 {
@@ -9,9 +10,9 @@ namespace BackEnd.Service
         Task AddBookAsync(Book book);
         Task UpdateBookAsync(Book book);
         Task DeleteBookAsync(long id);
-        Task<bool> ExistsByIsbnAsync(string isbn);
         Task<IEnumerable<Book>> FindBooksByTitleAsync(string title);
         Task AddBookToCollectionAsync(long bookId, long collectionId);
-        //Task<IEnumerable<Book>> QueryBooksAsync(string? title, string? state, long? categoryId, long? collectionId);
+        Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending);
+
     }
 }

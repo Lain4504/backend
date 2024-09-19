@@ -11,7 +11,6 @@ namespace BackEnd.Util
         {
             PageIndex = pageIndex;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-
             this.AddRange(items);
         }
 
@@ -25,5 +24,4 @@ namespace BackEnd.Util
             return new PaginatedList<T>(items, count, pageIndex, pageSize);
         }
     }
-
 }

@@ -1,6 +1,7 @@
 ﻿using Azure;
 using BackEnd.Models;
 using BackEnd.Repository;
+using BackEnd.Util;
 
 namespace BackEnd.Service
 {
@@ -38,11 +39,6 @@ namespace BackEnd.Service
             await _bookRepository.DeleteAsync(id);
         }
 
-        public async Task<bool> ExistsByIsbnAsync(string isbn)
-        {
-            return await _bookRepository.ExistsByIsbnAsync(isbn);
-        }
-
         public async Task<IEnumerable<Book>> FindBooksByTitleAsync(string title)
         {
             return await _bookRepository.FindByTitleAsync(title);
@@ -53,14 +49,11 @@ namespace BackEnd.Service
             await _bookRepository.AddBookToCollectionAsync(bookId, collectionId);
         }
 
-        //public async Task<IEnumerable<Book>> QueryBooksAsync(string? title, string? state, long? categoryId, long? collectionId)
-        //{
-        //    return await _bookRepository.FindByConditionAsync(b =>
-        //        (title == null || b.Title.Contains(title)) &&
-        //        (state == null || b.State == state) &&
-        //        (categoryId == null || b.CategoryId == categoryId) &&
-        //        (collectionId == null)
-        //    );
-        //}
+        public Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
+        {
+            return _bookRepository.GetAllBooksAsync(pageIndex, pageSize, sortBy, isAscending);       
+        }
+
+       
     }
 }
