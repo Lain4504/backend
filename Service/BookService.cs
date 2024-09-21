@@ -49,11 +49,11 @@ namespace BackEnd.Service
             await _bookRepository.AddBookToCollectionAsync(bookId, collectionId);
         }
 
-        public Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
+        public Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
-            return _bookRepository.GetAllBooksAsync(pageIndex, pageSize, sortBy, isAscending);       
+            return _bookRepository.GetAllBooksAsync(page, size, sortBy, isAscending);       
         }
-
        
+
     }
 }

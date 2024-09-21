@@ -1,7 +1,10 @@
 ﻿using BackEnd.Models;
 using BackEnd.Service;
+using BackEnd.Util;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace BackEnd.Controllers
 {
@@ -11,10 +14,12 @@ namespace BackEnd.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private readonly BookStoreContext _context;
 
-        public BookController(IBookService bookService)
+        public BookController(IBookService bookService, BookStoreContext context)
         {
             _bookService = bookService;
+            _context = context;
         }
 
         [HttpGet("{id}")]
@@ -92,7 +97,57 @@ namespace BackEnd.Controllers
 
             return Ok(response);
         }
+        [HttpGet("sorted-and-paged/by-collection")]
+        public async Task<ActionResult<PaginatedList<Book>>> GetBooksByCollectionAndPriceBetween(
+            [FromQuery] int? collection,
+            [FromQuery] int min = 0,
+            [FromQuery] int max = int.MaxValue,
+            [FromQuery] string sortBy = "Id",
+            [FromQuery] int page = 0,
+            [FromQuery] int size = 5,
+            [FromQuery] string sortOrder = "asc")
+        {
+            // Tạo truy vấn ban đầu, lọc sách theo khoảng giá
+            var query = _context.Books
+                .Join(
+                    _context.BookCollections,
+                    book => book.Id,
+                    bookCollection => bookCollection.BookId,
+                    (book, bookCollection) => new { Book = book, BookCollection = bookCollection }
+                )
+                .Where(bc => bc.Book.Price >= min && bc.Book.Price <= max);
 
+            // Nếu có collectionId, lọc sách theo bộ sưu tập
+            if (collection.HasValue)
+            {
+                query = query.Where(bc => bc.BookCollection.CollectionId == collection.Value);
+            }
+
+            // Sắp xếp theo trường dữ liệu sortBy và hướng sortOrder
+            if (sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.OrderBy(bc => EF.Property<object>(bc.Book, sortBy));
+            }
+            else
+            {
+                query = query.OrderByDescending(bc => EF.Property<object>(bc.Book, sortBy));
+            }
+
+            // Loại bỏ các bản ghi sách bị trùng lặp
+            var booksQuery = query.Select(bc => bc.Book).Distinct().Include(book => book.Images);
+
+            // Phân trang
+            var paginatedBooks =  await PaginatedList<Book>.CreateAsync(booksQuery.AsNoTracking(), page, size);
+
+            var response = new
+            {
+                content = paginatedBooks, // Hoặc tùy chỉnh tùy theo cấu trúc của PaginatedList<Book>
+                totalPages = paginatedBooks.TotalPages,
+                pageIndex = page
+            };
+
+            return Ok(response);
+        }
 
 
     }

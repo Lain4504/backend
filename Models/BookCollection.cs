@@ -5,6 +5,7 @@ namespace BackEnd.Models;
 
 public partial class BookCollection
 {
+
     public long BookId { get; set; }
 
     public long CollectionId { get; set; }

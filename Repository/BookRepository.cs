@@ -1,6 +1,7 @@
 ﻿using BackEnd.Models;
 using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
@@ -84,7 +85,7 @@ namespace BackEnd.Repository
             }
         }
 
-        public async Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
+        public async Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
             // Tải dữ liệu liên quan sử dụng Include và ThenInclude
             var source = _context.Books
@@ -102,8 +103,9 @@ namespace BackEnd.Repository
             }
 
             // Trả về danh sách phân trang
-            return await PaginatedList<Book>.CreateAsync(source, pageIndex, pageSize);
+            return await PaginatedList<Book>.CreateAsync(source, page, size);
         }
 
     }
+
 }
