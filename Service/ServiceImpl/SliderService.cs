@@ -1,7 +1,7 @@
 ﻿using BackEnd.Models;
 using BackEnd.Repository;
 
-namespace BackEnd.Service
+namespace BackEnd.Service.ServiceImpl
 {
     public class SliderService : ISliderService
     {

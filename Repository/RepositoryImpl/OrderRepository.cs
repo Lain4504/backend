@@ -1,10 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BackEnd.Models;
-using BackEnd.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd.Repository
+namespace BackEnd.Repository.RepositoryImpl
 {
     public class OrderRepository : IOrderRepository
     {

@@ -2,7 +2,7 @@ using BackEnd.Models;
 using BackEnd.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd.Service
+namespace BackEnd.Service.ServiceImpl
 {
     public class OrderService : IOrderService
     {
