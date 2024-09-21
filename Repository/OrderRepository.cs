@@ -48,9 +48,10 @@ namespace BackEnd.Repository
             throw new NotImplementedException();
         }
 
-        public async Task UpdateOrderAsync(Order Order)
+        public async Task UpdateOrderAsync(long id, string newStatus)
         {
-            _context.Orders.Update(Order);
+            var order = await _context.Orders.FindAsync(id);
+            order.State = newStatus;
             await _context.SaveChangesAsync();
         }
     }

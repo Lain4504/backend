@@ -7,7 +7,7 @@ namespace BackEnd.Repository
         Task<Order> GetOrderByIdAsync(long id);
         Task<IEnumerable<Order>> GetAllOrderAsync();
         Task SaveOrdernAsync(Order order);
-        Task UpdateOrderAsync(Order order);
+        Task UpdateOrderAsync(long id, string newStatus);
         Task DeleteOrderAsync(long id);
     }
 }
