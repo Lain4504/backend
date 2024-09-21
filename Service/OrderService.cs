@@ -32,9 +32,9 @@ namespace BackEnd.Service
             return _repository.SaveOrdernAsync(Order);
         }
 
-        public Task UpdateOrderAsync(Order Order)
+        public Task UpdateOrderAsync(long id, string newStatus)
         {
-            return _repository.UpdateOrderAsync(Order);
+            return _repository.UpdateOrderAsync(id, newStatus);
         }
     }
 }

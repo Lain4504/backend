@@ -8,7 +8,7 @@ namespace BackEnd.Service
         Task<Order> GetOrderByIdAsync(long id);
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task SaveOrderAsync(Order Order);
-        Task UpdateOrderAsync(Order Order);
+        Task UpdateOrderAsync(long id, string newStatus);
         Task DeleteOrderAsync(long id);
 
     }

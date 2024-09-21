@@ -64,19 +64,15 @@ namespace BackEnd.Controllers
             return CreatedAtAction(nameof(GetOrderById), new { id = Order.Id }, Order);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateOrder(long id, [FromBody] Order Order)
+        public async Task<ActionResult> UpdateOrder(long id, [FromBody] string newStatus)
         {
-            if (id != Order.Id)
-            {
-                return BadRequest();
-            }
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _OrderService.UpdateOrderAsync(Order);
+            await _OrderService.UpdateOrderAsync(id, newStatus);
             return NoContent();
         }
         [HttpDelete("{id}")]
