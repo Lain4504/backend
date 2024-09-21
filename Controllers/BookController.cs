@@ -49,7 +49,7 @@ namespace BackEnd.Controllers
             }
         }
 
-            [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> AddBook([FromBody] Book book)
         {
             await _bookService.AddBookAsync(book);
@@ -98,57 +98,71 @@ namespace BackEnd.Controllers
             return Ok(response);
         }
         [HttpGet("sorted-and-paged/by-collection")]
-        public async Task<ActionResult<PaginatedList<Book>>> GetBooksByCollectionAndPriceBetween(
-            [FromQuery] int? collection,
-            [FromQuery] int min = 0,
-            [FromQuery] int max = int.MaxValue,
-            [FromQuery] string sortBy = "Id",
-            [FromQuery] int page = 0,
-            [FromQuery] int size = 5,
-            [FromQuery] string sortOrder = "asc")
+        public async Task<ActionResult<object>> GetBooksByCollectionAndPriceBetween(
+         [FromQuery] int? collection,
+         [FromQuery] int min = 0,
+         [FromQuery] int max = 0,
+         [FromQuery] string sortBy = "Id",
+         [FromQuery] int page = 0,
+         [FromQuery] int size = 5,
+         [FromQuery] string sortOrder = "asc")
         {
-            // Tạo truy vấn ban đầu, lọc sách theo khoảng giá
-            var query = _context.Books
-                .Join(
-                    _context.BookCollections,
-                    book => book.Id,
-                    bookCollection => bookCollection.BookId,
-                    (book, bookCollection) => new { Book = book, BookCollection = bookCollection }
-                )
-                .Where(bc => bc.Book.Price >= min && bc.Book.Price <= max);
+            if (max == 0) max = int.MaxValue;
 
-            // Nếu có collectionId, lọc sách theo bộ sưu tập
+            var booksQuery = _context.Books.AsQueryable();
+
             if (collection.HasValue)
             {
-                query = query.Where(bc => bc.BookCollection.CollectionId == collection.Value);
+                booksQuery = from b in booksQuery
+                             join bc in _context.BookCollections on b.Id equals bc.BookId
+                             where bc.CollectionId == collection.Value
+                             select b;
             }
 
-            // Sắp xếp theo trường dữ liệu sortBy và hướng sortOrder
-            if (sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase))
-            {
-                query = query.OrderBy(bc => EF.Property<object>(bc.Book, sortBy));
-            }
-            else
-            {
-                query = query.OrderByDescending(bc => EF.Property<object>(bc.Book, sortBy));
-            }
+            // Thêm điều kiện lọc giá
+            booksQuery = booksQuery.Where(b => b.Price >= min && b.Price <= max);
 
-            // Loại bỏ các bản ghi sách bị trùng lặp
-            var booksQuery = query.Select(bc => bc.Book).Distinct().Include(book => book.Images);
+            // Thêm điều kiện sắp xếp
+            booksQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                ? booksQuery.OrderBy(b => EF.Property<object>(b, sortBy))
+                : booksQuery.OrderByDescending(b => EF.Property<object>(b, sortBy));
 
-            // Phân trang
-            var paginatedBooks =  await PaginatedList<Book>.CreateAsync(booksQuery.AsNoTracking(), page, size);
+            // Thực hiện phân trang
+            var totalCount = await booksQuery.CountAsync();
+            var items = await booksQuery.Skip(page * size).Take(size).Include(b => b.Images).ToListAsync();
+
+            var totalPages = (int)Math.Ceiling((double)totalCount / size);
 
             var response = new
             {
-                content = paginatedBooks, // Hoặc tùy chỉnh tùy theo cấu trúc của PaginatedList<Book>
-                totalPages = paginatedBooks.TotalPages,
-                pageIndex = page
+                content = items,
+                pageable = new
+                {
+                    sort = new
+                    {
+                        empty = false,
+                        sorted = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase),
+                        unsorted = !sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                    },
+                    offset = page * size,
+                    pageSize = size,
+                    pageNumber = page,
+                    paged = true,
+                    unpaged = false
+                },
+                totalElements = totalCount,
+                totalPages = totalPages,
+                last = page >= totalPages - 1,
+                size = size,
+                number = page,
+                first = page == 0,
+                numberOfElements = items.Count,
+                empty = !items.Any()
             };
 
             return Ok(response);
         }
+    }
 
 
     }
-}
