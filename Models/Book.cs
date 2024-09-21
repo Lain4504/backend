@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.Models;
 
@@ -48,4 +49,17 @@ public partial class Book
     public virtual Publisher? Publisher { get; set; }
 
     public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+
+    [NotMapped]
+    public long? SalePrice
+    {
+        get
+        {
+            if (Price.HasValue && Discount.HasValue)
+            {
+                return (long)(Price.Value - (Price.Value * Discount.Value));
+            }
+            return null;
+        }
+    }
 }

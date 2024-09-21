@@ -1,4 +1,5 @@
 ﻿using BackEnd.Models;
+using BackEnd.Util;
 using System.Linq.Expressions;
 
 namespace BackEnd.Repository
@@ -12,7 +13,8 @@ namespace BackEnd.Repository
         Task DeleteAsync(long id);
         Task<bool> ExistsByIsbnAsync(string isbn);
         Task<IEnumerable<Book>> FindByTitleAsync(string title);
-        Task<IEnumerable<Book>> FindByConditionAsync(Expression<Func<Book, bool>> predicate);
         Task AddBookToCollectionAsync(long bookId, long collectionId);
+        Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending);
+
     }
 }

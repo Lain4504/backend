@@ -1,5 +1,7 @@
 ﻿using BackEnd.Models;
+using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
@@ -82,5 +84,28 @@ namespace BackEnd.Repository
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
+        {
+            // Tải dữ liệu liên quan sử dụng Include và ThenInclude
+            var source = _context.Books
+                .Include(b => b.Images)
+                .AsQueryable();
+
+            // Sắp xếp theo thuộc tính mong muốn
+            if (isAscending)
+            {
+                source = source.OrderBy(book => EF.Property<object>(book, sortBy));
+            }
+            else
+            {
+                source = source.OrderByDescending(book => EF.Property<object>(book, sortBy));
+            }
+
+            // Trả về danh sách phân trang
+            return await PaginatedList<Book>.CreateAsync(source, page, size);
+        }
+
     }
+
 }
