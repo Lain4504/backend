@@ -3,7 +3,7 @@ using BackEnd.Repository;
 using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd.Service
+namespace BackEnd.Service.ServiceImpl
 {
     public class WishlistService : IWishlistService
     {

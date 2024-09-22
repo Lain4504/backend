@@ -3,7 +3,7 @@ using BackEnd.Models;
 using BackEnd.Repository;
 using BackEnd.Util;
 
-namespace BackEnd.Service
+namespace BackEnd.Service.ServiceImpl
 {
     public class BookService : IBookService
     {
@@ -51,9 +51,9 @@ namespace BackEnd.Service
 
         public Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
-            return _bookRepository.GetAllBooksAsync(page, size, sortBy, isAscending);       
+            return _bookRepository.GetAllBooksAsync(page, size, sortBy, isAscending);
         }
-       
+
 
     }
 }

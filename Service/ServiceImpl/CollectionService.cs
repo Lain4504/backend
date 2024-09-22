@@ -3,7 +3,7 @@ using BackEnd.Repository;
 using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd.Service
+namespace BackEnd.Service.ServiceImpl
 {
     public class CollectionService : ICollectionService
     {
@@ -39,7 +39,7 @@ namespace BackEnd.Service
         }
         public Task<PaginatedList<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
         {
-            return _repository.GetAllBookCollectionsAsync(pageIndex, pageSize, sortBy, isAscending);    
+            return _repository.GetAllBookCollectionsAsync(pageIndex, pageSize, sortBy, isAscending);
         }
 
     }

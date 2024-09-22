@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using BackEnd.Models;
 
-namespace BackEnd.Repository
+namespace BackEnd.Repository.RepositoryImpl
 {
     public class UserRepository : IUserRepository
     {
@@ -19,10 +19,10 @@ namespace BackEnd.Repository
                 .Where(u => u.Email == Email)
                 .Select(u => new
                 {
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Password = u.Password,
-                    Role = u.Role
+                    u.FullName,
+                    u.Email,
+                    u.Password,
+                    u.Role
                 })
                 .SingleOrDefaultAsync();
 

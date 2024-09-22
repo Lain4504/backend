@@ -3,7 +3,9 @@ using BackEnd.Repository;
 using BackEnd.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Newtonsoft.Json;  
+using Newtonsoft.Json;
+using BackEnd.Repository.RepositoryImpl;
+using BackEnd.Service.ServiceImpl;
 
 var builder = WebApplication.CreateBuilder(args);
 

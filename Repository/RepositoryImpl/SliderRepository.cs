@@ -1,7 +1,7 @@
 ﻿using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd.Repository
+namespace BackEnd.Repository.RepositoryImpl
 {
     public class SliderRepository : ISliderRepository
     {

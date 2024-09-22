@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
-namespace BackEnd.Repository
+namespace BackEnd.Repository.RepositoryImpl
 {
     public class BookRepository : IBookRepository
     {

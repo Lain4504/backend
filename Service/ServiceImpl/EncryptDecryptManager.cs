@@ -2,7 +2,7 @@
 using System.Text;
 using System.IO;
 
-namespace BackEnd.Service
+namespace BackEnd.Service.ServiceImpl
 {
     public class EncryptDecryptManager
     {

@@ -2,7 +2,7 @@
 using BackEnd.Models;
 using BackEnd.Repository;
 using BCrypt.Net;
-namespace BackEnd.Service
+namespace BackEnd.Service.ServiceImpl
 {
     public class UserService : IUserService
     {
