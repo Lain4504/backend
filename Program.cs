@@ -53,7 +53,9 @@ builder.Services.AddScoped<ISliderRepository, SliderRepository>();
 //order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-
+//WishList
+builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
