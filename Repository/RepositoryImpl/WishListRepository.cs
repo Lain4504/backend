@@ -1,11 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BackEnd.Models;
-using BackEnd.Repository;
 using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd.Repository
+namespace BackEnd.Repository.RepositoryImpl
 {
     public class WishlistRepository : IWishListRepository
     {
