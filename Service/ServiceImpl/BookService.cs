@@ -2,6 +2,7 @@
 using BackEnd.Models;
 using BackEnd.Repository;
 using BackEnd.Util;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Service.ServiceImpl
 {
@@ -54,6 +55,21 @@ namespace BackEnd.Service.ServiceImpl
             return _bookRepository.GetAllBooksAsync(page, size, sortBy, isAscending);
         }
 
+        public async Task<IEnumerable<Book>> GetBooksByCollectionAsync(int? collectionId, string sortBy, string sortOrder)
+        {
+            var booksQuery = _bookRepository.GetBooks();
 
+            if (collectionId.HasValue)
+            {
+                booksQuery = _bookRepository.GetBooksByCollection(collectionId.Value);
+            }
+
+            booksQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                ? booksQuery.OrderBy(b => EF.Property<object>(b, sortBy))
+                : booksQuery.OrderByDescending(b => EF.Property<object>(b, sortBy));
+
+            return await booksQuery.Include(b => b.Images).ToListAsync();
+        }
     }
 }
+

@@ -105,6 +105,17 @@ namespace BackEnd.Repository.RepositoryImpl
             // Trả về danh sách phân trang
             return await PaginatedList<Book>.CreateAsync(source, page, size);
         }
+        public IQueryable<Book> GetBooksByCollection(int collectionId)
+        {
+            return from b in _context.Books
+                   join bc in _context.BookCollections on b.Id equals bc.BookId
+                   where bc.CollectionId == collectionId
+                   select b;
+        }
+        public IQueryable<Book> GetBooks()
+        {
+            return _context.Books.AsQueryable();
+        }
 
     }
 

@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Cors;
 
 namespace BackEnd.Controllers
 {
     [Route("api/user")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigins")]
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
