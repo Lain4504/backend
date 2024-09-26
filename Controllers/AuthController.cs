@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using BackEnd.Service;
+using BackEnd.DTO.Request;
 
 namespace BackEnd.Controllers
 {
@@ -11,14 +12,16 @@ namespace BackEnd.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public AuthController(IUserService userService)
+        public AuthController(IUserService userService, IEmailService emailService)
         {
             _userService = userService;
+            _emailService = emailService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] DTO.Request.RegisterRequest registerRequest)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
         {
             // Kiểm tra xem email đã tồn tại chưa
             var existingUser = await _userService.GetUserByEmailAsync(registerRequest.email);
@@ -29,16 +32,55 @@ namespace BackEnd.Controllers
 
             // Đăng ký người dùng
             var user = await _userService.RegisterAsync(registerRequest.email, registerRequest.password);
-
             if (user == null)
             {
-                // Nếu việc đăng ký người dùng không thành công
                 return StatusCode(500, "An error occurred while registering the user.");
             }
 
-            // Trả về thông báo thành công với thông tin người dùng mới
-            return CreatedAtAction(nameof(Register), new { Id = user.Id }, new { id = user.Id, email = user.Email });
+            // Tạo JWT token kích hoạt tài khoản
+            var token = _userService.GenerateJwtToken(user.Email);
+
+            // Gửi email kích hoạt
+            await _emailService.SendActivationEmail(user.Email, token);
+
+            return Ok(new { message = "Registration successful. Please check your email to activate your account." });
         }
+        [HttpPost("activate")]
+        public async Task<IActionResult> ActivateAccount([FromBody] ActivateAccountRequest request)
+        {
+            // Kiểm tra xem token có được cung cấp không
+            if (request == null || string.IsNullOrEmpty(request.Token))
+            {
+                return BadRequest("Token is required.");
+            }
+
+            // Xác thực token
+            var claimsPrincipal = _userService.ValidateJwtToken(request.Token);
+
+            if (claimsPrincipal == null)
+            {
+                return BadRequest("Invalid token.");
+            }
+
+            // Lấy email từ claim
+            var email = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest("Invalid token.");
+            }
+
+            // Kích hoạt tài khoản người dùng
+            var user = await _userService.ActivateAccountAsync(email);
+
+            if (user == null)
+            {
+                return StatusCode(500, "An error occurred while activating the account.");
+            }
+
+            return Ok(new { message = "Account activated successfully." });
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] DTO.Request.LoginRequest loginRequest)
         {

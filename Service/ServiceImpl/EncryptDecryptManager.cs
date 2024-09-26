@@ -7,7 +7,7 @@ namespace BackEnd.Service.ServiceImpl
     public class EncryptDecryptManager
     {
         // Đặt khóa 16 byte cho AES-128
-        private static readonly byte[] key = Encoding.UTF8.GetBytes("1234567890123456");
+        private static readonly byte[] key = Encoding.UTF8.GetBytes("y8+nSs/2X#`:<&aZ");
 
 
         public static string Encrypt(string text)

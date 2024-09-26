@@ -22,7 +22,8 @@ namespace BackEnd.Repository.RepositoryImpl
                     u.FullName,
                     u.Email,
                     u.Password,
-                    u.Role
+                    u.Role,
+                    u.State
                 })
                 .SingleOrDefaultAsync();
 
@@ -37,7 +38,8 @@ namespace BackEnd.Repository.RepositoryImpl
             {
                 Email = user.Email,
                 Password = user.Password,
-                Role = user.Role
+                Role = user.Role,
+                State = user.State
             };
         }
 
@@ -48,6 +50,20 @@ namespace BackEnd.Repository.RepositoryImpl
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
+        public async Task UpdateUserAsync(User user)
+        {
+            // Kiểm tra xem người dùng có tồn tại không
+            var existingUser = await _context.Users.FindAsync(user.Email);
+            if (existingUser == null)
+            {
+                throw new Exception("User not found.");
+            }
 
+            // Cập nhật các thuộc tính cần thiết
+            existingUser.State = user.State; 
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _context.SaveChangesAsync();
+        }
     }
 }
