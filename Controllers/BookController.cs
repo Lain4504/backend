@@ -14,12 +14,10 @@ namespace BackEnd.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
-        private readonly BookStoreContext _context;
 
-        public BookController(IBookService bookService, BookStoreContext context)
+        public BookController(IBookService bookService)
         {
             _bookService = bookService;
-            _context = context;
         }
 
         [HttpGet("{id}")]
@@ -90,7 +88,7 @@ namespace BackEnd.Controllers
             // Trả về dữ liệu với thuộc tính 'content'
             var response = new
             {
-                content = paginatedBooks, // Hoặc tùy chỉnh tùy theo cấu trúc của PaginatedList<Book>
+                content = paginatedBooks, 
                 totalPages = paginatedBooks.TotalPages,
                 pageIndex = page
             };
@@ -164,31 +162,13 @@ namespace BackEnd.Controllers
         //    }
         [HttpGet("sorted-and-paged/by-collection")]
         public async Task<ActionResult<object>> GetBooksByCollection(
-    [FromQuery] int? collection,
-    [FromQuery] string sortBy = "Id",
-    [FromQuery] string sortOrder = "asc")
+        [FromQuery] int? collection,
+        [FromQuery] string sortBy = "Id",
+        [FromQuery] string sortOrder = "asc")
         {
-            var booksQuery = _context.Books.AsQueryable();
+            var items = await _bookService.GetBooksByCollectionAsync(collection, sortBy, sortOrder);
 
-            // Kiểm tra xem có tham số collection không
-            if (collection.HasValue)
-            {
-                booksQuery = from b in booksQuery
-                             join bc in _context.BookCollections on b.Id equals bc.BookId
-                             where bc.CollectionId == collection.Value
-                             select b;
-            }
-
-            // Thêm điều kiện sắp xếp
-            booksQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                ? booksQuery.OrderBy(b => EF.Property<object>(b, sortBy))
-                : booksQuery.OrderByDescending(b => EF.Property<object>(b, sortBy));
-
-            // Lấy danh sách sách
-            var items = await booksQuery.Include(b => b.Images).ToListAsync();
-
-            // Lấy tổng số phần tử
-            var totalCount = items.Count;
+            var totalCount = items.Count();
 
             var response = new
             {
@@ -199,8 +179,9 @@ namespace BackEnd.Controllers
 
             return Ok(response);
         }
-
     }
 
-
 }
+
+
+

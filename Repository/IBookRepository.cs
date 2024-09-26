@@ -15,6 +15,7 @@ namespace BackEnd.Repository
         Task<IEnumerable<Book>> FindByTitleAsync(string title);
         Task AddBookToCollectionAsync(long bookId, long collectionId);
         Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending);
-
+        IQueryable<Book> GetBooksByCollection(int collectionId);
+        IQueryable<Book> GetBooks();
     }
 }
