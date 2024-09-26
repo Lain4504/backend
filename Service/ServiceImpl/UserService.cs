@@ -32,6 +32,12 @@ namespace BackEnd.Service.ServiceImpl
                 return null; // Trả về null nếu không tìm thấy hoặc mật khẩu rỗng
             }
 
+            // Kiểm tra trạng thái người dùng
+            if (user.State != "ACTIVE") 
+            {
+                return null; // Trả về null nếu trạng thái không phải là active
+            }
+
             // Giải mã mật khẩu từ cơ sở dữ liệu
             string decryptedPassword;
             try

@@ -18,12 +18,12 @@ namespace BackEnd.Service.ServiceImpl
             var activationLink = $"http://localhost:5173/activation/{token}";
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("BookStore", "lehuynhtuong9a2@gmail.com"));
+            message.From.Add(new MailboxAddress("ForeverBookStore", "lehuynhtuong9a2@gmail.com"));
             message.To.Add(new MailboxAddress("", email));
             message.Subject = "Activate your account";
             message.Body = new TextPart("html")
             {
-                Text = $"Click the link to activate your account: <a href='{activationLink}'>Activate</a>"
+                Text = $"Click the link to activate your account: <a href='{activationLink}' style='display: inline-block; padding: 10px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: background-color 0.3s;'>Kích hoạt tài khoản / Activate Account</a>"
             };
 
             using (var client = new SmtpClient())
