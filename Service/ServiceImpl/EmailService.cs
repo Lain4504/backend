@@ -15,7 +15,7 @@ namespace BackEnd.Service.ServiceImpl
         // Hàm gửi email kích hoạt
         public async Task SendActivationEmail(string email, string token)
         {
-            var activationLink = $"http://localhost:5173/active/{token}";
+            var activationLink = $"http://localhost:5173/activation/{token}";
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("BookStore", "lehuynhtuong9a2@gmail.com"));

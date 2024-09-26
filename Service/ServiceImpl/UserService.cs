@@ -69,7 +69,7 @@ namespace BackEnd.Service.ServiceImpl
                     Email = Email,
                     Password = hashedPassword,
                     Role = "0",
-                    State ="unactive"
+                    State ="INACTIVE"
                 };
 
                 // Lưu người dùng vào cơ sở dữ liệu
@@ -163,7 +163,7 @@ namespace BackEnd.Service.ServiceImpl
             }
 
             // Cập nhật trạng thái tài khoản thành active
-            user.State = "actice";
+            user.State = "ACTIVE";
 
             // Lưu thay đổi vào cơ sở dữ liệu
             await _userRepository.UpdateUserAsync(user);

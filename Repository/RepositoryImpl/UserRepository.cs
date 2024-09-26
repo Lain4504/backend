@@ -52,18 +52,20 @@ namespace BackEnd.Repository.RepositoryImpl
         }
         public async Task UpdateUserAsync(User user)
         {
-            // Kiểm tra xem người dùng có tồn tại không
-            var existingUser = await _context.Users.FindAsync(user.Email);
+            // Kiểm tra xem người dùng có tồn tại không bằng Email
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+
             if (existingUser == null)
             {
                 throw new Exception("User not found.");
             }
 
             // Cập nhật các thuộc tính cần thiết
-            existingUser.State = user.State; 
+            existingUser.State = user.State;
 
             // Lưu thay đổi vào cơ sở dữ liệu
             await _context.SaveChangesAsync();
         }
+
     }
 }
