@@ -77,7 +77,7 @@ namespace BackEnd.Controllers
             }
 
             await _collectionService.UpdateCollectionAsync(collection);
-            return NoContent();
+            return Ok(new { message = "Update successful!" });
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCollection(long id)
