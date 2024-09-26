@@ -13,9 +13,7 @@ namespace BackEnd.Util
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
             this.AddRange(items);
         }
-
-        public bool HasPreviousPage => PageIndex > 0;
-        public bool HasNextPage => PageIndex + 1 < TotalPages;
+    
 
         public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize)
         {
