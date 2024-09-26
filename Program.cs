@@ -6,6 +6,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Newtonsoft.Json;
 using BackEnd.Repository.RepositoryImpl;
 using BackEnd.Service.ServiceImpl;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +25,26 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add Authentication using JWT Bearer
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
 // Add DbContext
 builder.Services.AddDbContext<BookStoreContext>(options =>
@@ -51,13 +77,15 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISliderService, SliderService>();
 builder.Services.AddScoped<ISliderRepository, SliderRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>(); 
 
-//order
+// Order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-//WishList
+// WishList
 builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
