@@ -171,13 +171,13 @@ namespace BackEnd.Controllers
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
         }
-        [HttpGet("get-profile/{id}")]
-        public async Task<IActionResult> GetProfile(long id)
+        [HttpGet("get-profile/{Id}")]
+        public async Task<IActionResult> GetProfile(long Id)
         {
             try
             {
                 // Gọi service để lấy thông tin người dùng theo email
-                var user = await _userService.GetUserByIDAsync(id);
+                var user = await _userService.GetUserByIDAsync(Id);
                 if (user == null)
                 {
                     return NotFound("User not found.");
