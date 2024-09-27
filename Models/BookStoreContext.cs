@@ -71,9 +71,10 @@ public partial class BookStoreContext : DbContext
 
         modelBuilder.Entity<AuthorBook>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("author_book");
+            entity.HasKey(ab => 
+            new { ab.AuthorId, ab.BookId })
+            .HasName("PK_BookCollection");
+            entity.ToTable("author_book");
 
             entity.Property(e => e.AuthorId).HasColumnName("author_id");
             entity.Property(e => e.BookId).HasColumnName("book_id");

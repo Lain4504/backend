@@ -41,16 +41,40 @@ namespace BackEnd.Repository.RepositoryImpl
             _context.Books.Update(book);
             await _context.SaveChangesAsync();
         }
-
-        public async Task DeleteAsync(long id)
+        public async Task DeleteAsync(long bookId)
         {
-            var book = await _context.Books.FindAsync(id);
+            // Find the book by ID
+            var book = await _context.Books.Include(b => b.Images)
+                                             .FirstOrDefaultAsync(b => b.Id == bookId);
             if (book != null)
             {
+                // Delete related records in author_book
+                var authorBooks = await _context.AuthorBooks
+                    .Where(ab => ab.BookId == bookId)
+                    .ToListAsync();
+                _context.AuthorBooks.RemoveRange(authorBooks);
+
+                // Delete related records in book_collection
+                var collectionsToDelete = await _context.BookCollections
+                    .Where(bc => bc.BookId == bookId)
+                    .ToListAsync();
+                _context.BookCollections.RemoveRange(collectionsToDelete);
+
+                // Delete related images
+                var imagesToDelete = await _context.Images
+                    .Where(i => i.BookId == bookId)
+                    .ToListAsync();
+                _context.Images.RemoveRange(imagesToDelete);
+
+                // Delete the book
                 _context.Books.Remove(book);
+
+                // Save changes
                 await _context.SaveChangesAsync();
             }
         }
+
+
 
         public async Task<bool> ExistsByIsbnAsync(string isbn)
         {
