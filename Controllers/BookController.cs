@@ -14,12 +14,10 @@ namespace BackEnd.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
-        private readonly BookStoreContext _context;
 
-        public BookController(IBookService bookService, BookStoreContext context)
+        public BookController(IBookService bookService)
         {
             _bookService = bookService;
-            _context = context;
         }
 
         [HttpGet("{id}")]
@@ -90,73 +88,92 @@ namespace BackEnd.Controllers
             // Trả về dữ liệu với thuộc tính 'content'
             var response = new
             {
-                content = paginatedBooks, // Hoặc tùy chỉnh tùy theo cấu trúc của PaginatedList<Book>
+                content = paginatedBooks, 
                 totalPages = paginatedBooks.TotalPages,
                 pageIndex = page
             };
 
             return Ok(response);
         }
+        //    [HttpGet("sorted-and-paged/by-collection")]
+        //    public async Task<ActionResult<object>> GetBooksByCollectionAndPriceBetween(
+        //     [FromQuery] int? collection,
+        //     [FromQuery] int? min = 0,
+        //     [FromQuery] int? max = 0,
+        //     [FromQuery] string sortBy = "Id",
+        //     [FromQuery] int page = 0,
+        //     [FromQuery] int size = 5,
+        //     [FromQuery] string sortOrder = "asc")
+        //    {
+        //        if (max == 0) max = int.MaxValue;
+
+        //        var booksQuery = _context.Books.AsQueryable();
+
+        //        if (collection.HasValue)
+        //        {
+        //            booksQuery = from b in booksQuery
+        //                         join bc in _context.BookCollections on b.Id equals bc.BookId
+        //                         where bc.CollectionId == collection.Value
+        //                         select b;
+        //        }
+
+        //        // Thêm điều kiện lọc giá
+        //        booksQuery = booksQuery.Where(b => b.Price >= min && b.Price <= max);
+
+        //        // Thêm điều kiện sắp xếp
+        //        booksQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+        //            ? booksQuery.OrderBy(b => EF.Property<object>(b, sortBy))
+        //            : booksQuery.OrderByDescending(b => EF.Property<object>(b, sortBy));
+
+        //        // Thực hiện phân trang
+        //        var totalCount = await booksQuery.CountAsync();
+        //        var items = await booksQuery.Skip(page * size).Take(size).Include(b => b.Images).ToListAsync();
+
+        //        var totalPages = (int)Math.Ceiling((double)totalCount / size);
+
+        //        var response = new
+        //        {
+        //            content = items,
+        //            pageable = new
+        //            {
+        //                sort = new
+        //                {
+        //                    empty = false,
+        //                    sorted = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase),
+        //                    unsorted = !sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+        //                },
+        //                offset = page * size,
+        //                pageSize = size,
+        //                pageNumber = page,
+        //                paged = true,
+        //                unpaged = false
+        //            },
+        //            totalElements = totalCount,
+        //            totalPages = totalPages,
+        //            last = page >= totalPages - 1,
+        //            size = size,
+        //            number = page,
+        //            first = page == 0,
+        //            numberOfElements = items.Count,
+        //            empty = !items.Any()
+        //        };
+
+        //        return Ok(response);
+        //    }
         [HttpGet("sorted-and-paged/by-collection")]
-        public async Task<ActionResult<object>> GetBooksByCollectionAndPriceBetween(
-         [FromQuery] int? collection,
-         [FromQuery] int min = 0,
-         [FromQuery] int max = 0,
-         [FromQuery] string sortBy = "Id",
-         [FromQuery] int page = 0,
-         [FromQuery] int size = 5,
-         [FromQuery] string sortOrder = "asc")
+        public async Task<ActionResult<object>> GetBooksByCollection(
+        [FromQuery] int? collection,
+        [FromQuery] string sortBy = "Id",
+        [FromQuery] string sortOrder = "asc")
         {
-            if (max == 0) max = int.MaxValue;
+            var items = await _bookService.GetBooksByCollectionAsync(collection, sortBy, sortOrder);
 
-            var booksQuery = _context.Books.AsQueryable();
-
-            if (collection.HasValue)
-            {
-                booksQuery = from b in booksQuery
-                             join bc in _context.BookCollections on b.Id equals bc.BookId
-                             where bc.CollectionId == collection.Value
-                             select b;
-            }
-
-            // Thêm điều kiện lọc giá
-            booksQuery = booksQuery.Where(b => b.Price >= min && b.Price <= max);
-
-            // Thêm điều kiện sắp xếp
-            booksQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                ? booksQuery.OrderBy(b => EF.Property<object>(b, sortBy))
-                : booksQuery.OrderByDescending(b => EF.Property<object>(b, sortBy));
-
-            // Thực hiện phân trang
-            var totalCount = await booksQuery.CountAsync();
-            var items = await booksQuery.Skip(page * size).Take(size).Include(b => b.Images).ToListAsync();
-
-            var totalPages = (int)Math.Ceiling((double)totalCount / size);
+            var totalCount = items.Count();
 
             var response = new
             {
                 content = items,
-                pageable = new
-                {
-                    sort = new
-                    {
-                        empty = false,
-                        sorted = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase),
-                        unsorted = !sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                    },
-                    offset = page * size,
-                    pageSize = size,
-                    pageNumber = page,
-                    paged = true,
-                    unpaged = false
-                },
                 totalElements = totalCount,
-                totalPages = totalPages,
-                last = page >= totalPages - 1,
-                size = size,
-                number = page,
-                first = page == 0,
-                numberOfElements = items.Count,
                 empty = !items.Any()
             };
 
@@ -164,5 +181,7 @@ namespace BackEnd.Controllers
         }
     }
 
+}
 
-    }
+
+
