@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Repository;
 using BCrypt.Net;
@@ -129,7 +130,7 @@ namespace BackEnd.Service.ServiceImpl
                 issuer: _configuration["Jwt:Issuer"], // Issuer từ appsettings
                 audience: _configuration["Jwt:Audience"], // Audience từ appsettings
                 claims: claims, // Các claim cho token
-                expires: DateTime.Now.AddDays(1), // Token hết hạn sau 1 ngày
+                expires: DateTime.Now.AddHours(1), // Token hết hạn sau 1 giờ
                 signingCredentials: creds); // Sử dụng thông tin SigningCredentials
 
             // Trả về chuỗi JWT token
@@ -214,7 +215,20 @@ namespace BackEnd.Service.ServiceImpl
             }
         }
 
+        public async Task UpdateProfile(UserUpdateRequest user, long id)
+        {
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _userRepository.UpdateUserProfile(user, id);
+        }
+        public async Task<User> GetUserByIDAsync(long id)
+        {
+            // Simulate retrieving a user from a database or external service
+            User user = await _userRepository.GetByIDAsync(id);
 
+            return user; // Return the user object
+        }
 
     }
+
+
 }

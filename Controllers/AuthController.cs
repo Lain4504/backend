@@ -6,6 +6,7 @@ using BackEnd.Service;
 using BackEnd.DTO.Request;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity.Data;
+using BackEnd.Models;
 
 namespace BackEnd.Controllers
 {
@@ -159,6 +160,39 @@ namespace BackEnd.Controllers
             }
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
+        }
+        [HttpGet("get-profile{id}")]
+        public async Task<IActionResult> GetProfile(long id)
+        {
+            try
+            {
+                // Gọi service để lấy thông tin người dùng theo email
+                var user = await _userService.GetUserByIDAsync(id);
+                if (user == null)
+                {
+                    return NotFound("User not found.");
+                }
+
+                return Ok(user); // Trả về thông tin người dùng nếu tìm thấy
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("update-profile/{Id}")]
+        public async Task<IActionResult> UpdateProfile([FromBody] DTO.Request.UserUpdateRequest userUpdate, long Id )
+        {
+            try
+            {
+                await _userService.UpdateProfile(userUpdate, Id);
+                return Ok("Profile updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

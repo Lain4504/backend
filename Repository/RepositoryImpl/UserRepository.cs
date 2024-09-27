@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BackEnd.Models;
+using BackEnd.DTO.Request;
 
 namespace BackEnd.Repository.RepositoryImpl
 {
@@ -22,8 +23,12 @@ namespace BackEnd.Repository.RepositoryImpl
                     u.FullName,
                     u.Email,
                     u.Password,
+                    u.Phone,
+                    u.Dob,
+                    u.Address,
                     u.Role,
-                    u.State
+                    u.State,
+
                 })
                 .SingleOrDefaultAsync();
 
@@ -36,13 +41,52 @@ namespace BackEnd.Repository.RepositoryImpl
             // Xử lý các trường có thể null
             return new User
             {
+                FullName = user.FullName,
                 Email = user.Email,
                 Password = user.Password,
+                Phone = user.Phone,
+                Dob = user.Dob,
+                Address = user.Address,
                 Role = user.Role,
                 State = user.State
             };
         }
 
+        public async Task<User> GetByIDAsync(long id)
+        {
+            var user = await _context.Users
+                .Where(u => u.Id == id) // Giả sử Id là khóa chính của người dùng
+                .Select(u => new
+                {
+                    u.FullName,
+                    u.Email,
+                    u.Password,
+                    u.Phone,
+                    u.Dob,
+                    u.Address,
+                    u.Role,
+                    u.State,
+                })
+                .SingleOrDefaultAsync();
+
+            if (user == null)
+            {
+               return null; // Hoặc có thể ném một ngoại lệ tùy thuộc vào yêu cầu
+            }
+
+            // Return the User object with the retrieved fields
+            return new User
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                Password = user.Password,
+                Phone = user.Phone,
+                Dob = user.Dob,
+                Address = user.Address,
+                Role = user.Role,
+                State = user.State
+            };
+        }
 
 
         public async Task AddAsync(User user)
@@ -80,6 +124,24 @@ namespace BackEnd.Repository.RepositoryImpl
             existingUser.Password = user.Password;
 
             // Lưu thay đổi vào cơ sở dữ liệu
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUserProfile(UserUpdateRequest user, long id)
+        {
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                throw new Exception("User does not exist.");
+            }
+
+            // Cập nhật thông tin người dùng
+            existingUser.FullName = user.FullName;
+            existingUser.Dob = user.Dob;
+            existingUser.Address = user.Address;
+            existingUser.Phone = user.Phone;
+
+            // Lưu thay đổi vào database thông qua repository
             await _context.SaveChangesAsync();
         }
     }
