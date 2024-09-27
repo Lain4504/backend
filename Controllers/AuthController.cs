@@ -5,6 +5,7 @@ using System.Security.Claims;
 using BackEnd.Service;
 using BackEnd.DTO.Request;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace BackEnd.Controllers
 {
@@ -23,7 +24,7 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
+        public async Task<IActionResult> Register([FromBody] DTO.Request.RegisterRequest registerRequest)
         {
             // Kiểm tra xem email đã tồn tại chưa
             var existingUser = await _userService.GetUserByEmailAsync(registerRequest.email);
@@ -126,6 +127,42 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi trong quá trình đăng nhập.");
             }
         }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPasword([FromBody] DTO.Request.ForgotPasswordRequest forgotRequest)
+        {
+            if (string.IsNullOrEmpty(forgotRequest.Email))
+            {
+                return BadRequest("Email không hợp lệ.");
+            }
+            // Gửi email với liên kết đặt lại mật khẩu chứa token
+            await _emailService.SendResetPasswordEmail(forgotRequest.Email);
+            return Ok("Vui lòng kiểm tra email của bạn để đặt lại mật khẩu.");
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] DTO.Request.ResetPasswordRequest resetRequest)
+        {
+            // Kiểm tra tính hợp lệ của token
+            var claimsPrincipal = _userService.ValidateJwtToken(resetRequest.Token);
+            if (claimsPrincipal == null)
+            {
+                return BadRequest("Token không hợp lệ hoặc đã hết hạn.");
+            }
+
+            // Lấy email từ claims (nếu bạn đã đưa email vào token)
+            var email = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
+
+            // Thực hiện việc đặt lại mật khẩu (giả định bạn có phương thức UpdatePassword)
+            var result = await _userService.UpdatePassword(email, resetRequest.NewPassword);
+            if (!result)
+            {
+                return BadRequest("Đặt lại mật khẩu không thành công.");
+            }
+
+            return Ok("Mật khẩu đã được đặt lại thành công.");
+        }
 
     }
 }
+
+
+        

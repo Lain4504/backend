@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using BackEnd.Models;
 using BackEnd.Repository;
 using BCrypt.Net;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 namespace BackEnd.Service.ServiceImpl
@@ -149,7 +151,7 @@ namespace BackEnd.Service.ServiceImpl
                     ValidIssuer = _configuration["Jwt:Issuer"],
                     ValidAudience = _configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ClockSkew = TimeSpan.Zero // Không cho phép sai lệch thời gian
+                    ClockSkew = TimeSpan.Zero 
                 }, out SecurityToken validatedToken);
 
                 return claimsPrincipal;
@@ -176,6 +178,42 @@ namespace BackEnd.Service.ServiceImpl
 
             return user; // Trả về thông tin người dùng đã được kích hoạt
         }
+        public async Task<bool> UpdatePassword(string email, string newPassword)
+        {
+            try
+            {
+                var user = await _userRepository.GetByEmailAsync(email);
+                if (user == null)
+                {
+                    return false; // Người dùng không tồn tại
+                }
+
+                // Mã hóa mật khẩu mới
+                user.Password = EncryptDecryptManager.Encrypt(newPassword);
+
+                // Cập nhật người dùng
+                await _userRepository.UpdateUserPassword(user);
+                return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                // Kiểm tra lỗi trùng lặp
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
+                {
+                    // Trả về thông báo lỗi phù hợp
+                    throw new Exception("Email is already registered."); // Hoặc xử lý theo cách của bạn
+                }
+
+                // Ném lại lỗi nếu không phải là lỗi trùng lặp
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Xử lý các lỗi khác nếu cần
+                throw new Exception("An error occurred while updating the password.", ex);
+            }
+        }
+
 
 
     }
