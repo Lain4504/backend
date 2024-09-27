@@ -85,9 +85,10 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // WishList
 builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
-
+// Publisher
+builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
+builder.Services.AddScoped<IPublisherService, PublisherService>();
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
