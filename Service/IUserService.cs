@@ -11,5 +11,6 @@ namespace BackEnd.Service
         string GenerateJwtToken(string email);
         ClaimsPrincipal ValidateJwtToken(string token);
         Task<User> ActivateAccountAsync(string email);
+        Task<bool> UpdatePassword(string email, string newPassword);
     }
 }

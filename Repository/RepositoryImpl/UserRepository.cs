@@ -66,6 +66,21 @@ namespace BackEnd.Repository.RepositoryImpl
             // Lưu thay đổi vào cơ sở dữ liệu
             await _context.SaveChangesAsync();
         }
+        public async Task UpdateUserPassword(User user)
+        {
+            // Kiểm tra xem người dùng có tồn tại không bằng Email
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
 
+            if (existingUser == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            // Cập nhật các thuộc tính cần thiết
+            existingUser.Password = user.Password;
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _context.SaveChangesAsync();
+        }
     }
 }
