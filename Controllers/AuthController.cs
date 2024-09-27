@@ -106,7 +106,7 @@ namespace BackEnd.Controllers
 
                 // Tạo các claim cho người dùng
                 var claims = new[]
-                {
+                {   new Claim(ClaimTypes.NameIdentifier, existingUser.Id.ToString()),
                     new Claim(ClaimTypes.Email, existingUser.Email),
                     new Claim(ClaimTypes.Role, existingUser.Role?.ToString())
                 };
@@ -161,7 +161,7 @@ namespace BackEnd.Controllers
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
         }
-        [HttpGet("get-profile{id}")]
+        [HttpGet("get-profile/{id}")]
         public async Task<IActionResult> GetProfile(long id)
         {
             try
@@ -194,6 +194,7 @@ namespace BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
 
     }
 }

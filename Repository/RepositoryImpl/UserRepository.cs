@@ -20,6 +20,7 @@ namespace BackEnd.Repository.RepositoryImpl
                 .Where(u => u.Email == Email)
                 .Select(u => new
                 {
+                    u.Id,
                     u.FullName,
                     u.Email,
                     u.Password,
@@ -41,6 +42,7 @@ namespace BackEnd.Repository.RepositoryImpl
             // Xử lý các trường có thể null
             return new User
             {
+                Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
                 Password = user.Password,
@@ -58,14 +60,13 @@ namespace BackEnd.Repository.RepositoryImpl
                 .Where(u => u.Id == id) // Giả sử Id là khóa chính của người dùng
                 .Select(u => new
                 {
+                    u.Id,
                     u.FullName,
                     u.Email,
                     u.Password,
                     u.Phone,
                     u.Dob,
-                    u.Address,
-                    u.Role,
-                    u.State,
+                    u.Address
                 })
                 .SingleOrDefaultAsync();
 
@@ -77,14 +78,13 @@ namespace BackEnd.Repository.RepositoryImpl
             // Return the User object with the retrieved fields
             return new User
             {
+                Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
                 Password = user.Password,
                 Phone = user.Phone,
                 Dob = user.Dob,
                 Address = user.Address,
-                Role = user.Role,
-                State = user.State
             };
         }
 
