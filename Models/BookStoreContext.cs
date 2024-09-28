@@ -456,6 +456,18 @@ public partial class BookStoreContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("state");
+            entity.Property(e => e.Phone)
+                .HasMaxLength(10) 
+                .IsUnicode(false)
+                .HasColumnName("phone");
+            entity.Property(e => e.Address)
+                .HasMaxLength(500)
+                .IsUnicode(true)
+                .HasColumnName("address");
+
+            entity.Property(e => e.Dob)
+                .HasColumnType("date") 
+                .HasColumnName("dob");
         });
 
         modelBuilder.Entity<Wishlist>(entity =>

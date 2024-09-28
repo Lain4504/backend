@@ -17,6 +17,12 @@ public partial class User
   
     public string? State {  get; set; } 
 
+    public string? Phone { get; set; }
+
+    public string? Address {  get; set; }
+
+    public DateTime? Dob { get; set; }
+
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
