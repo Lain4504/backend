@@ -6,6 +6,11 @@ using BackEnd.Service;
 using BackEnd.DTO.Request;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity.Data;
+using BackEnd.Models;
+using BackEnd.Service.ServiceImpl;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace BackEnd.Controllers
 {
@@ -83,7 +88,6 @@ namespace BackEnd.Controllers
 
             return Ok(new { message = "Account activated successfully." });
         }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] DTO.Request.LoginRequest loginRequest)
         {
@@ -106,20 +110,26 @@ namespace BackEnd.Controllers
                 // Tạo các claim cho người dùng
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.Email, existingUser.Email),
-                    new Claim(ClaimTypes.Role, existingUser.Role?.ToString())
+                new Claim(ClaimTypes.NameIdentifier, existingUser.Id.ToString()),
+                new Claim(ClaimTypes.Email, existingUser.Email),
+                new Claim(ClaimTypes.Role, existingUser.Role?.ToString())
                 };
 
+                // Tạo token
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("x&-8m(6TQd<f`v'G.KY#7:3*PgXb2se!")); // Thay YOUR_SECRET_KEY bằng khóa bí mật của bạn
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                // Tạo đối tượng ClaimsIdentity với các claim đã tạo
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
+                var token = new JwtSecurityToken(
+                    issuer: "JwtAudience", 
+                    audience: "JwtAudience",
+                    claims: claims,
+                    expires: DateTime.Now.AddMinutes(30),
+                    signingCredentials: creds);
 
-                // Thiết lập cookie phiên làm việc cho người dùng
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-                // Trả về thông báo thành công
-                return Ok(new { message = "Đăng nhập thành công.", user = existingUser });
+                // Trả về thông báo thành công cùng với token
+                return Ok(new { message = "Đăng nhập thành công.", token = tokenString, user = existingUser });
             }
             catch (Exception ex)
             {
@@ -127,6 +137,7 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi trong quá trình đăng nhập.");
             }
         }
+
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPasword([FromBody] DTO.Request.ForgotPasswordRequest forgotRequest)
         {
@@ -160,6 +171,40 @@ namespace BackEnd.Controllers
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
         }
+        [HttpGet("get-profile/{Id}")]
+        public async Task<IActionResult> GetProfile(long Id)
+        {
+            try
+            {
+                // Gọi service để lấy thông tin người dùng theo email
+                var user = await _userService.GetUserByIDAsync(Id);
+                if (user == null)
+                {
+                    return NotFound("User not found.");
+                }
+
+                return Ok(user); // Trả về thông tin người dùng nếu tìm thấy
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("update-profile/{Id}")]
+        public async Task<IActionResult> UpdateProfile([FromBody] DTO.Request.UserUpdateRequest userUpdate, long Id )
+        {
+            try
+            {
+                await _userService.UpdateProfile(userUpdate, Id);
+                return Ok("Profile updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
     }
 }
