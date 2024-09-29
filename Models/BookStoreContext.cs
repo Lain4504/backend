@@ -50,6 +50,7 @@ public partial class BookStoreContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder.UseCollation("Vietnamese_100_CI_AS_KS_WS_SC_UTF8");
 
         modelBuilder.Entity<Author>(entity =>
@@ -59,10 +60,6 @@ public partial class BookStoreContext : DbContext
             entity.ToTable("author");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Company)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("company");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsUnicode(false)
@@ -71,9 +68,10 @@ public partial class BookStoreContext : DbContext
 
         modelBuilder.Entity<AuthorBook>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("author_book");
+            entity.HasKey(ab => 
+            new { ab.AuthorId, ab.BookId })
+            .HasName("PK_BookCollection");
+            entity.ToTable("author_book");
 
             entity.Property(e => e.AuthorId).HasColumnName("author_id");
             entity.Property(e => e.BookId).HasColumnName("book_id");
@@ -455,6 +453,22 @@ public partial class BookStoreContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("state");
+            entity.Property(e => e.Phone)
+                .HasMaxLength(10) 
+                .IsUnicode(false)
+                .HasColumnName("phone");
+            entity.Property(e => e.Address)
+                .HasMaxLength(500)
+                .IsUnicode(true)
+                .HasColumnName("address");
+
+            entity.Property(e => e.Dob)
+                .HasColumnType("date") 
+                .HasColumnName("dob");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(10)  // Thêm giới hạn độ dài cho trường Gender
+                .IsUnicode(false)  // Chỉ lưu ký tự ASCII
+                .HasColumnName("gender");  // Thêm trường gender
         });
 
         modelBuilder.Entity<Wishlist>(entity =>

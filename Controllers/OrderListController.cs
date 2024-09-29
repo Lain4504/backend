@@ -15,7 +15,7 @@ namespace BackEnd.Controllers
         {
             _OrderService = OrderService;
         }
-        [HttpGet("/get-all")]
+        [HttpGet("get-all")]
         public async Task<ActionResult> GetBookOrders()
         {
             try

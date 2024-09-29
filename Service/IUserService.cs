@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 namespace BackEnd.Service
 {
@@ -12,5 +13,10 @@ namespace BackEnd.Service
         ClaimsPrincipal ValidateJwtToken(string token);
         Task<User> ActivateAccountAsync(string email);
         Task<bool> UpdatePassword(string email, string newPassword);
+        Task UpdateProfile(UserUpdateRequest user, long id);
+        Task<User> GetUserByIDAsync(long id);
+        Task<bool> ChangePassword(UserChangePassword userChange, long Id);
+        Task<IEnumerable<User>> GetAllUser();
+        Task DeleteUserById(long id);
     }
 }
