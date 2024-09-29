@@ -7,7 +7,7 @@ namespace BackEnd.Service
     {
         Task<Book?> GetBookByIdAsync(long id);
         Task<IEnumerable<Book>> GetAllBooksAsync();
-        Task AddBookAsync(Book book);
+        Task<Book> SaveBookAsync(Book book);
         Task UpdateBookAsync(Book book);
         Task DeleteBookAsync(long id);
         Task<IEnumerable<Book>> FindBooksByTitleAsync(string title);

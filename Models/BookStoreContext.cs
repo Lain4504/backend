@@ -50,6 +50,7 @@ public partial class BookStoreContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder.UseCollation("Vietnamese_100_CI_AS_KS_WS_SC_UTF8");
 
         modelBuilder.Entity<Author>(entity =>
@@ -59,10 +60,6 @@ public partial class BookStoreContext : DbContext
             entity.ToTable("author");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Company)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("company");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsUnicode(false)

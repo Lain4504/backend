@@ -30,10 +30,11 @@ namespace BackEnd.Repository.RepositoryImpl
                 .ToListAsync();
         }
 
-        public async Task AddAsync(Book book)
+        public async Task<Book> SaveAsync(Book book)
         {
-            await _context.Books.AddAsync(book);
+            _context.Books.Add(book);
             await _context.SaveChangesAsync();
+            return book;
         }
 
         public async Task UpdateAsync(Book book)
@@ -76,7 +77,7 @@ namespace BackEnd.Repository.RepositoryImpl
 
 
 
-        public async Task<bool> ExistsByIsbnAsync(string isbn)
+        public async Task<bool> ExistsByISBNAsync(string isbn)
         {
             return await _context.Books.AnyAsync(b => b.Isbn == isbn);
         }
