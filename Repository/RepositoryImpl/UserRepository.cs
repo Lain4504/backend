@@ -29,6 +29,7 @@ namespace BackEnd.Repository.RepositoryImpl
                     u.Address,
                     u.Role,
                     u.State,
+                    u.Gender
 
                 })
                 .SingleOrDefaultAsync();
@@ -50,7 +51,8 @@ namespace BackEnd.Repository.RepositoryImpl
                 Dob = user.Dob,
                 Address = user.Address,
                 Role = user.Role,
-                State = user.State
+                State = user.State,
+                Gender = user.Gender
             };
         }
 
@@ -62,11 +64,12 @@ namespace BackEnd.Repository.RepositoryImpl
                 {
                     u.Id,
                     u.FullName,
-                    u.Email,
                     u.Password,
+                    u.Email,
                     u.Phone,
                     u.Dob,
-                    u.Address
+                    u.Address,
+                    u.Gender
                 })
                 .SingleOrDefaultAsync();
 
@@ -85,6 +88,7 @@ namespace BackEnd.Repository.RepositoryImpl
                 Phone = user.Phone,
                 Dob = user.Dob,
                 Address = user.Address,
+                Gender = user.Gender
             };
         }
 
@@ -126,8 +130,22 @@ namespace BackEnd.Repository.RepositoryImpl
             // Lưu thay đổi vào cơ sở dữ liệu
             await _context.SaveChangesAsync();
         }
+        public async Task ChangePassword(User user, long id)
+        {
+            var existingUser = await _context.Users.FindAsync(id);
 
-        public async Task UpdateUserProfile(UserUpdateRequest user, long id)
+            if (existingUser == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            // Cập nhật các thuộc tính cần thiết
+            existingUser.Password = user.Password;
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _context.SaveChangesAsync();
+        }
+            public async Task UpdateUserProfile(UserUpdateRequest user, long id)
         {
             var existingUser = await _context.Users.FindAsync(id);
             if (existingUser == null)
@@ -140,8 +158,24 @@ namespace BackEnd.Repository.RepositoryImpl
             existingUser.Dob = user.Dob;
             existingUser.Address = user.Address;
             existingUser.Phone = user.Phone;
+            existingUser.Gender = user.Gender;
 
             // Lưu thay đổi vào database thông qua repository
+            await _context.SaveChangesAsync();
+        }
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
+        public async Task DeleteUserAsync(long id)
+        {
+            var user = await GetByIDAsync(id);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
     }

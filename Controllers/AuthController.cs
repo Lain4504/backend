@@ -120,7 +120,7 @@ namespace BackEnd.Controllers
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                 var token = new JwtSecurityToken(
-                    issuer: "JwtAudience", 
+                    issuer: "JwtAudience",
                     audience: "JwtAudience",
                     claims: claims,
                     expires: DateTime.Now.AddMinutes(30),
@@ -192,7 +192,7 @@ namespace BackEnd.Controllers
         }
 
         [HttpPut("update-profile/{Id}")]
-        public async Task<IActionResult> UpdateProfile([FromBody] DTO.Request.UserUpdateRequest userUpdate, long Id )
+        public async Task<IActionResult> UpdateProfile([FromBody] DTO.Request.UserUpdateRequest userUpdate, long Id)
         {
             try
             {
@@ -205,6 +205,55 @@ namespace BackEnd.Controllers
             }
         }
 
+        [HttpPut("change-password/{Id}")]
+        public async Task<IActionResult> ChangePassword([FromBody] DTO.Request.UserChangePassword userChange, long Id)
+        {
+            var result = await _userService.ChangePassword(userChange, Id);
+            if (!result)
+            {
+                return BadRequest("Đặt lại mật khẩu không thành công.");
+            }
+            return Ok("Mật khẩu đã được đặt lại thành công.");
+
+
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllUser()
+        {
+            try
+            {
+                var users = await _userService.GetAllUser();
+                if (users == null || users.Count() == 0)
+                {
+                    return NoContent();
+                }
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+
+            }
+        }
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteUserById(int id)
+        {
+            try
+            {
+                var user = await _userService.GetUserByIDAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                await _userService.DeleteUserById(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
+        }
 
     }
 }

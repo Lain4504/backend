@@ -467,6 +467,10 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Dob)
                 .HasColumnType("date") 
                 .HasColumnName("dob");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(10)  // Thêm giới hạn độ dài cho trường Gender
+                .IsUnicode(false)  // Chỉ lưu ký tự ASCII
+                .HasColumnName("gender");  // Thêm trường gender
         });
 
         modelBuilder.Entity<Wishlist>(entity =>
