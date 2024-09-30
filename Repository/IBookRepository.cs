@@ -8,10 +8,10 @@ namespace BackEnd.Repository
     {
         Task<Book?> GetByIdAsync(long id);
         Task<IEnumerable<Book>> GetAllAsync();
-        Task AddAsync(Book book);
+        Task<Book> SaveAsync(Book book);
         Task UpdateAsync(Book book);
         Task DeleteAsync(long id);
-        Task<bool> ExistsByIsbnAsync(string isbn);
+        Task<bool> ExistsByISBNAsync(string isbn);
         Task<IEnumerable<Book>> FindByTitleAsync(string title);
         Task AddBookToCollectionAsync(long bookId, long collectionId);
         Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending);

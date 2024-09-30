@@ -48,10 +48,20 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBook([FromBody] Book book)
+        public async Task<IActionResult> SaveBook([FromBody] Book book)
         {
-            await _bookService.AddBookAsync(book);
-            return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
+            if (book == null)
+            {
+                return BadRequest(new { Message = "Book data is required." }); // HTTP 400 Bad Request
+            }
+
+            var result = await _bookService.SaveBookAsync(book);
+            if (result == null)
+            {
+                return Conflict(new { Message = "Mã ISBN không thể bị trùng." }); // HTTP 409 Conflict
+            }
+
+            return CreatedAtAction(nameof(SaveBook), new { id = result.Id }, result); // HTTP 201 Created
         }
 
         [HttpPut("{id}")]

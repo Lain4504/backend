@@ -10,6 +10,7 @@ namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigins")]
     public class PublisherController : ControllerBase
     {
         private readonly IPublisherService _publisherService;

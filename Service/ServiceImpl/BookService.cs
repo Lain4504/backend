@@ -25,9 +25,15 @@ namespace BackEnd.Service.ServiceImpl
             return await _bookRepository.GetAllAsync();
         }
 
-        public async Task AddBookAsync(Book book)
+        public async Task<Book> SaveBookAsync(Book book)
         {
-            await _bookRepository.AddAsync(book);
+            if (await _bookRepository.ExistsByISBNAsync(book.Isbn))
+            {
+                return null; // ISBN exists, return null to indicate failure
+            }
+
+            book.State = "ACTIVE";
+            return await _bookRepository.SaveAsync(book);
         }
 
         public async Task UpdateBookAsync(Book book)
