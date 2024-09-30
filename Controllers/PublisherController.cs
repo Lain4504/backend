@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackEnd.Models;
 using BackEnd.Service;
+using BackEnd.Service.ServiceImpl;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackEnd.Controllers
@@ -52,21 +54,20 @@ namespace BackEnd.Controllers
 
         // PUT: api/Publisher/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePublisher(long id, [FromBody] Publisher updatedPublisher)
+        public async Task<ActionResult> UpdateCollection(long id, [FromBody] Publisher publisher)
         {
+            if (id != publisher.Id)
+            {
+                return BadRequest();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var publisher = await _publisherService.GetPublisherByIdAsync(id);
-            if (publisher == null)
-            {
-                return NotFound();
-            }
-
-            await _publisherService.UpdatePublisherAsync(id, updatedPublisher.Name);
-            return NoContent();
+            await _publisherService.UpdatePublisherAsync(publisher);
+            return Ok(new { message = "Update successful!" });
         }
 
         // DELETE: api/Publisher/{id} 

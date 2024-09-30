@@ -10,6 +10,6 @@ namespace BackEnd.Repository
     Task<IEnumerable<Publisher>> GetAllPublishersAsync();
     Task<Publisher?> GetPublisherByIdAsync(long id);
     Task SavePublisherAsync(Publisher publisher);
-    Task UpdatePublisherAsync(long id, string newName);
+    Task UpdatePublisherAsync(Publisher publisher);
 }
 }
