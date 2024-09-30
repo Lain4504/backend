@@ -20,6 +20,7 @@ public partial class User
     public string? Phone { get; set; }
 
     public string? Address {  get; set; }
+    public string? Gender { get; set; }  // Thêm thuộc tính Gender
 
     public DateTime? Dob { get; set; }
 

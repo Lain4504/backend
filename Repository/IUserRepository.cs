@@ -11,6 +11,9 @@ namespace BackEnd.Repository
         Task AddAsync(User user);
         Task UpdateUserAsync(User user);
         Task UpdateUserPassword(User user);
+        Task ChangePassword(User user, long id);
         Task UpdateUserProfile(UserUpdateRequest user, long id);
+        Task<IEnumerable<User>> GetAllUsersAsync();
+        Task DeleteUserAsync(long id);
     }
 }

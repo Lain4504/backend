@@ -6,6 +6,7 @@ using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Repository;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -177,7 +178,7 @@ namespace BackEnd.Service.ServiceImpl
             // Lưu thay đổi vào cơ sở dữ liệu
             await _userRepository.UpdateUserAsync(user);
 
-            return user; // Trả về thông tin người dùng đã được kích hoạt
+            return user; 
         }
         public async Task<bool> UpdatePassword(string email, string newPassword)
         {
@@ -223,9 +224,43 @@ namespace BackEnd.Service.ServiceImpl
         public async Task<User> GetUserByIDAsync(long id)
         {
             // Simulate retrieving a user from a database or external service
-            User user = await _userRepository.GetByIDAsync(id);
+            var user = await _userRepository.GetByIDAsync(id);
 
-            return user; // Return the user object
+            return user; 
+        }
+
+        public async Task<bool> ChangePassword(UserChangePassword userChange, long Id)
+        {
+            // Bước 1: Lấy thông tin người dùng theo Id từ cơ sở dữ liệu
+            var user = await _userRepository.GetByIDAsync(Id);
+            if (user == null)
+            {
+                throw new Exception("Không tìm thấy người dùng.");
+            }
+            // Bước 2: Kiểm tra mật khẩu hiện tại (mật khẩu cũ)
+            var isOldPasswordValid = userChange.OldPassword;
+            if (isOldPasswordValid != EncryptDecryptManager.Decrypt(user.Password))
+            {
+                throw new Exception("Mật khẩu cũ không chính xác.");
+            }
+            // Bước 3: Kiểm tra tính hợp lệ của mật khẩu mới (kiểm tra xem mật khẩu mới có khớp với xác nhận mật khẩu hay không)
+            if (!string.IsNullOrEmpty(userChange.ConfirmNewPassword) && userChange.NewPassword != userChange.ConfirmNewPassword)
+            {
+                throw new Exception("Mật khẩu mới và mật khẩu xác nhận không khớp.");
+            }
+            // Bước 4: Mã hóa mật khẩu mới và cập nhật lại mật khẩu của người dùng
+            user.Password = EncryptDecryptManager.Encrypt(userChange.NewPassword);
+            // Bước 5: Lưu các thay đổi vào cơ sở dữ liệu
+            await _userRepository.ChangePassword(user, Id);
+            return true;
+        }
+        public async Task<IEnumerable<User>> GetAllUser()
+        {
+            return await _userRepository.GetAllUsersAsync();
+        }
+        public async Task DeleteUserById(long id)
+        {
+            await _userRepository.DeleteUserAsync(id);
         }
 
     }

@@ -85,6 +85,12 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // WishList
 builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
+// PostCategory
+builder.Services.AddScoped<IPostCategoryRepository, PostCategoryRepository>();
+builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
+// Post
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
 // Publisher
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
