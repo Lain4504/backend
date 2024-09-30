@@ -47,9 +47,9 @@ namespace BackEnd.Service.ServiceImpl
             }
         }
 
-        public async Task SendResetPasswordEmail(string email)
+        public async Task SendResetPasswordEmail(string email, long id, string role)
         {
-            var token = _userservice.GenerateJwtToken(email);
+            var token = _userservice.GenerateJwtToken(email, id, role);
             var resetLink = $"http://localhost:5173/reset-password/{token}";
 
             var message = new MimeMessage();

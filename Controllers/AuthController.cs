@@ -46,12 +46,44 @@ namespace BackEnd.Controllers
             }
 
             // Tạo JWT token kích hoạt tài khoản
-            var token = _userService.GenerateJwtToken(user.Email);
+            var token = _userService.GenerateJwtToken(user.Email, user.Id, user.Role);
 
             // Gửi email kích hoạt
             await _emailService.SendActivationEmail(user.Email, token);
 
             return Ok(new { message = "Registration successful. Please check your email to activate your account." });
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] DTO.Request.LoginRequest loginRequest)
+        {
+            // Kiểm tra đầu vào rỗng
+            if (string.IsNullOrEmpty(loginRequest.email) || string.IsNullOrEmpty(loginRequest.password))
+            {
+                return BadRequest("Email và mật khẩu không được để trống.");
+            }
+
+            try
+            {
+                // Xác thực người dùng bằng email và mật khẩu gốc (không mã hóa)
+                var existingUser = await _userService.AuthenticateAsync(loginRequest.email, loginRequest.password);
+                if (existingUser == null)
+                {
+                    // Trả về lỗi nếu thông tin đăng nhập không hợp lệ
+                    return Unauthorized("Email hoặc mật khẩu không đúng.");
+                }
+
+                // Sử dụng phương thức GenerateJwtToken để tạo token dựa trên email của người dùng
+                var tokenString = _userService.GenerateJwtToken(existingUser.Email, existingUser.Id, existingUser.Role);
+
+                // Trả về thông báo thành công cùng với token và thông tin người dùng
+                return Ok(new { message = "Đăng nhập thành công.", token = tokenString, user = existingUser });
+            }
+            catch (Exception ex)
+            {
+                // Xử lý các lỗi khác
+                return StatusCode(500, "Đã xảy ra lỗi trong quá trình đăng nhập.");
+            }
         }
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAccount([FromBody] ActivateAccountRequest request)
@@ -88,67 +120,33 @@ namespace BackEnd.Controllers
 
             return Ok(new { message = "Account activated successfully." });
         }
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] DTO.Request.LoginRequest loginRequest)
-        {
-            // Kiểm tra đầu vào rỗng
-            if (string.IsNullOrEmpty(loginRequest.email) || string.IsNullOrEmpty(loginRequest.password))
-            {
-                return BadRequest("Email và mật khẩu không được để trống.");
-            }
 
-            try
-            {
-                // Xác thực người dùng bằng email và mật khẩu gốc (không mã hóa)
-                var existingUser = await _userService.AuthenticateAsync(loginRequest.email, loginRequest.password);
-                if (existingUser == null)
-                {
-                    // Trả về lỗi nếu thông tin đăng nhập không hợp lệ
-                    return Unauthorized("Email hoặc mật khẩu không đúng.");
-                }
-
-                // Tạo các claim cho người dùng
-                var claims = new[]
-                {
-                new Claim(ClaimTypes.NameIdentifier, existingUser.Id.ToString()),
-                new Claim(ClaimTypes.Email, existingUser.Email),
-                new Claim(ClaimTypes.Role, existingUser.Role?.ToString())
-                };
-
-                // Tạo token
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("x&-8m(6TQd<f`v'G.KY#7:3*PgXb2se!")); // Thay YOUR_SECRET_KEY bằng khóa bí mật của bạn
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                var token = new JwtSecurityToken(
-                    issuer: "JwtAudience",
-                    audience: "JwtAudience",
-                    claims: claims,
-                    expires: DateTime.Now.AddMinutes(30),
-                    signingCredentials: creds);
-
-                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-                // Trả về thông báo thành công cùng với token
-                return Ok(new { message = "Đăng nhập thành công.", token = tokenString, user = existingUser });
-            }
-            catch (Exception ex)
-            {
-                // Xử lý các lỗi khác
-                return StatusCode(500, "Đã xảy ra lỗi trong quá trình đăng nhập.");
-            }
-        }
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPasword([FromBody] DTO.Request.ForgotPasswordRequest forgotRequest)
+        public async Task<IActionResult> ForgotPassword([FromBody] DTO.Request.ForgotPasswordRequest forgotRequest)
         {
             if (string.IsNullOrEmpty(forgotRequest.Email))
             {
                 return BadRequest("Email không hợp lệ.");
             }
+
+            // Lấy thông tin người dùng từ cơ sở dữ liệu
+            var user = await _userService.GetUserByEmailAsync(forgotRequest.Email);
+            if (user == null)
+            {
+                return NotFound("Không tìm thấy người dùng với email đã cung cấp.");
+            }
+
+            // Tạo token JWT với id và role của người dùng
+            var token = _userService.GenerateJwtToken(user.Email, user.Id, user.Role);
+
             // Gửi email với liên kết đặt lại mật khẩu chứa token
-            await _emailService.SendResetPasswordEmail(forgotRequest.Email);
+            await _emailService.SendResetPasswordEmail(forgotRequest.Email, user.Id, user.Role);
             return Ok("Vui lòng kiểm tra email của bạn để đặt lại mật khẩu.");
         }
+
+
+
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] DTO.Request.ResetPasswordRequest resetRequest)
         {
@@ -171,6 +169,7 @@ namespace BackEnd.Controllers
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
         }
+
         [HttpGet("get-profile/{Id}")]
         public async Task<IActionResult> GetProfile(long Id)
         {
@@ -204,19 +203,46 @@ namespace BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpPut("change-password/{Id}")]
-        public async Task<IActionResult> ChangePassword([FromBody] DTO.Request.UserChangePassword userChange, long Id)
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] DTO.Request.UserChangePassword userChange)
         {
-            var result = await _userService.ChangePassword(userChange, Id);
+            // Lấy token từ userChange
+            var token = userChange.Token;
+
+            // Xác thực token
+            var claimsPrincipal = _userService.ValidateJwtToken(token);
+            if (claimsPrincipal == null)
+            {
+                return Unauthorized("Token không hợp lệ hoặc đã hết hạn.");
+            }
+
+            // Lấy email từ claim
+            var emailClaim = claimsPrincipal.FindFirst(ClaimTypes.Email);
+            if (emailClaim == null)
+            {
+                return Unauthorized("Không tìm thấy email trong token.");
+            }
+
+            // Lấy giá trị của emailClaim
+            var emailValue = emailClaim.Value;
+            if (string.IsNullOrEmpty(emailValue))
+            {
+                return BadRequest("Email không hợp lệ: Giá trị trống.");
+            }
+
+            // Gọi UserService để thay đổi mật khẩu
+            var result = await _userService.ChangePassword(userChange, emailValue);
             if (!result)
             {
                 return BadRequest("Đặt lại mật khẩu không thành công.");
             }
+
             return Ok("Mật khẩu đã được đặt lại thành công.");
-
-
         }
+
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetAllUser()
         {
@@ -235,6 +261,7 @@ namespace BackEnd.Controllers
 
             }
         }
+
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteUserById(int id)
         {
