@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BackEnd.Repository.RepositoryImpl
 {
@@ -14,43 +15,66 @@ namespace BackEnd.Repository.RepositoryImpl
             _context = context;
         }
 
-        public async Task DeleteOrderAsync(long id)
+        public async Task<List<Order>> GetOrderByUserIdAsync(long userid)
         {
-            var Order = await _context.Orders.FindAsync(id);
-            if (Order != null)
-            {
-                // Remove the Order
-                _context.Orders.Remove(Order);
-                await _context.SaveChangesAsync();
-            }
-        }
+            var qr = from o in _context.Orders
+                     where o.UserId == userid
+                     select o;
 
-        public async Task<IEnumerable<Order>> GetAllOrderAsync()
-        {
-            return await _context.Orders.ToListAsync();
+            var result = await qr.ToListAsync();
+            return result;
         }
 
 
-        public async Task<Order> GetOrderByIdAsync(long id)
+        public async Task<Order> GetOrderByOrderIdAsync(long orderId)
         {
-            return await _context.Orders.FindAsync(id);
+
+            var result = await _context.Orders.FindAsync(orderId);
+            if (result == null) throw new Exception("Not found");
+            return result;
         }
 
-        public async Task SaveOrderAsync(Order Order)
+        public async Task<List<Order>> GetAllOrderStateNotAsync(OrderState state)
         {
-            await _context.Orders.AddAsync(Order);
+            var qr = from o in _context.Orders
+                     where o.State != state.ToString()
+                     select o;
+            return await qr.ToListAsync();
+        }
+
+        // public Task UpdateOrderAsync(Order order)
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        public async Task ChangeOrderPaymentState(long id, PaymentState state)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null) return;
+            order.PaymentState = state.ToString();
+            await _context.SaveChangesAsync();
+        }
+        public async Task ChangeOrderState(long id, string state)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null) return;
+            order.State = state;
             await _context.SaveChangesAsync();
         }
 
-        public Task SaveOrdernAsync(Order order)
+        public async Task ChangeOrderShippingState(long orderId, ShippingState shippingState)
         {
-            throw new NotImplementedException();
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null) return;
+            order.ShippingState = shippingState.ToString();
+            await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateOrderAsync(long id, string newStatus)
+        public async Task Cancel(long id)
         {
             var order = await _context.Orders.FindAsync(id);
-            order.State = newStatus;
+            if (order == null) return;
+            order.State = OrderState.Canceled.ToString();
             await _context.SaveChangesAsync();
         }
     }
