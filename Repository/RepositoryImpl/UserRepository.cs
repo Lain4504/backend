@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using BackEnd.Models;
 using BackEnd.DTO.Request;
+using Microsoft.AspNetCore.Identity;
 
 namespace BackEnd.Repository.RepositoryImpl
 {
@@ -130,22 +131,7 @@ namespace BackEnd.Repository.RepositoryImpl
             // Lưu thay đổi vào cơ sở dữ liệu
             await _context.SaveChangesAsync();
         }
-        public async Task ChangePassword(User user, long id)
-        {
-            var existingUser = await _context.Users.FindAsync(id);
-
-            if (existingUser == null)
-            {
-                throw new Exception("User not found.");
-            }
-
-            // Cập nhật các thuộc tính cần thiết
-            existingUser.Password = user.Password;
-
-            // Lưu thay đổi vào cơ sở dữ liệu
-            await _context.SaveChangesAsync();
-        }
-            public async Task UpdateUserProfile(UserUpdateRequest user, long id)
+        public async Task UpdateUserProfile(UserUpdateRequest user, long id)
         {
             var existingUser = await _context.Users.FindAsync(id);
             if (existingUser == null)
@@ -163,6 +149,22 @@ namespace BackEnd.Repository.RepositoryImpl
             // Lưu thay đổi vào database thông qua repository
             await _context.SaveChangesAsync();
         }
+        public async Task ChangePassword(User user)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+
+            if (existingUser == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            // Cập nhật các thuộc tính cần thiết
+            existingUser.Password = user.Password;
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             return await _context.Users.ToListAsync();
