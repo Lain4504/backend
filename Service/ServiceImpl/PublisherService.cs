@@ -29,18 +29,26 @@ namespace BackEnd.Service.ServiceImpl
             await _publisherRepository.SavePublisherAsync(publisher);
         }
 
-        public async Task UpdatePublisherAsync(long id, string newName)
+        public async Task UpdatePublisherAsync(Publisher publisher)
         {
-            var publisher = await _publisherRepository.GetPublisherByIdAsync(id);
-            if (publisher != null)
-            {
-                publisher.Name = newName;
-                await _publisherRepository.UpdatePublisherAsync(id, newName);
-            }
+            await _publisherRepository.UpdatePublisherAsync(publisher);
         }
 
         public async Task DeletePublisherAsync(long id)
         {
+            // Step 1: Retrieve books associated with this publisher
+            var books = await _publisherRepository.GetBooksByPublisherIdAsync(id);
+            if (books != null && books.Any())
+            {
+                // Step 2: Remove publisher reference from each book
+                foreach (var book in books)
+                {
+                    book.PublisherId = null;
+                    await _publisherRepository.UpdateBookAsync(book);
+                }
+            }
+
+            // Step 3: Delete the publisher
             await _publisherRepository.DeletePublisherAsync(id);
         }
     }

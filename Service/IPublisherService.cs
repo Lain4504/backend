@@ -9,7 +9,7 @@ namespace BackEnd.Service
         Task<IEnumerable<Publisher>> GetAllPublishersAsync();
         Task<Publisher> GetPublisherByIdAsync(long id);
         Task CreatePublisherAsync(Publisher publisher);
-        Task UpdatePublisherAsync(long id, string newName);
+        Task UpdatePublisherAsync(Publisher publisher);
         Task DeletePublisherAsync(long id);
     }
 }
