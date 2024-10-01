@@ -37,7 +37,7 @@ namespace BackEnd.Service.ServiceImpl
             }
 
             // Kiểm tra trạng thái người dùng
-            if (user.State != "ACTIVE") 
+            if (user.State != "ACTIVE")
             {
                 return null; // Trả về null nếu trạng thái không phải là active
             }
@@ -78,8 +78,8 @@ namespace BackEnd.Service.ServiceImpl
                 {
                     Email = Email,
                     Password = hashedPassword,
-                    Role = "0",
-                    State ="INACTIVE"
+                    Role = "USER",
+                    State = "INACTIVE"
                 };
 
                 // Lưu người dùng vào cơ sở dữ liệu
@@ -108,7 +108,7 @@ namespace BackEnd.Service.ServiceImpl
         }
 
         // Hàm tạo JWT token
-        public string GenerateJwtToken(string email, long id , string role )
+        public string GenerateJwtToken(string email, long id, string role)
         {
             // Tạo danh sách các claim cho token
             var claims = new[]
@@ -154,7 +154,7 @@ namespace BackEnd.Service.ServiceImpl
                     ValidIssuer = _configuration["Jwt:Issuer"],
                     ValidAudience = _configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ClockSkew = TimeSpan.Zero 
+                    ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
                 return claimsPrincipal;
