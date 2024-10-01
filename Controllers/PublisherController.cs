@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackEnd.Models;
 using BackEnd.Service;
-using BackEnd.Service.ServiceImpl;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,7 +54,7 @@ namespace BackEnd.Controllers
 
         // PUT: api/Publisher/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCollection(long id, [FromBody] Publisher publisher)
+        public async Task<ActionResult> UpdatePublisher(long id, [FromBody] Publisher publisher)
         {
             if (id != publisher.Id)
             {
@@ -71,7 +70,7 @@ namespace BackEnd.Controllers
             return Ok(new { message = "Update successful!" });
         }
 
-        // DELETE: api/Publisher/{id} 
+        // DELETE: api/Publisher/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePublisher(long id)
         {

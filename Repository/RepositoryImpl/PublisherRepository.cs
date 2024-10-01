@@ -77,5 +77,15 @@ namespace BackEnd.Repository.RepositoryImpl
             _context.Publishers.Update(publisher);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<Book>> GetBooksByPublisherIdAsync(long publisherId)
+        {
+            return await _context.Books.Where(b => b.PublisherId == publisherId).ToListAsync();
+        }
+
+        public async Task UpdateBookAsync(Book book)
+        {
+            _context.Books.Update(book);
+            await _context.SaveChangesAsync();
     }
+}
 }
