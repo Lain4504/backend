@@ -15,78 +15,161 @@ namespace BackEnd.Controllers
         {
             _OrderService = OrderService;
         }
-        [HttpGet("get-all")]
-        public async Task<ActionResult> GetBookOrders()
+
+
+
+        [HttpGet("/user/{id}")]
+        public async Task<IActionResult> getOrderByUser(long id)
         {
             try
             {
-                var Orders = await _OrderService.GetAllOrdersAsync();
+                List<Order> orders = await _OrderService.GetOrderByUser(id);
+                if (orders.Count == 0)
+                {
+                    return NotFound("userId not exits, please inter correct userId");
+                }
+                return Ok(orders);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
+        }
+
+        // [HttpPost("/process")]
+        // public async Task processOrder(long id, Order order)
+        // {
+        //     await _OrderService.ChangeOrderState(order.Id, OrderState.Processing);
+        // }
+
+
+
+        //     [HttpGet("")]
+        //     public async Task<IActionResult> QueryOrder(
+        // [FromRoute] OrderState? state,
+        // [FromRoute] ShippingState? shipping,
+        // [FromRoute] PaymentState? payment,
+        // [FromRoute] DateTime? fromDate,
+        // [FromRoute] DateTime? toDate,
+        // [FromQuery(Name = "sortBy")] string sortBy = "id",
+        // [FromQuery(Name = "page")] int page = 0,
+        // [FromQuery(Name = "size")] int size = 5,
+        // [FromQuery(Name = "sortOrder")] string sortOrder = "asc")
+        //     {
+        //         try
+        //         {
+        //             // Set the sorting direction based on sortOrder
+        //             var direction = (sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase))
+        //                 ? SortDirection.Ascending
+        //                 : SortDirection.Descending;
+
+        //             // Create pageable object using skip and take (for pagination)
+        //             var pageable = new Pageable(page, size, direction, sortBy);
+
+        //             // Convert fromDate and toDate to DateTime objects
+        //             DateTime? from = null;
+        //             DateTime? to = null;
+
+        //             if (fromDate.HasValue)
+        //             {
+        //                 from = fromDate.Value.Date; // Start of the day
+        //             }
+        //             if (toDate.HasValue)
+        //             {
+        //                 to = toDate.Value.Date.AddDays(1).AddTicks(-1); // End of the day
+        //             }
+
+        //             // Query the service to get paginated orders
+        //             var orders = await _OrderService.QueryOrder(state, payment, shipping, from, to, pageable);
+
+        //             // Return OK response with orders
+        //             return Ok(orders);
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             // Handle any exceptions and return server error
+        //             return StatusCode(500, "Internal server error. Please try again later.");
+        //         }
+        //     }
+
+
+
+        [HttpGet("/get-all")]
+        public async Task<ActionResult> getAll()
+        {
+            try
+            {
+                var Orders = await _OrderService.GetAll();
                 if (Orders == null || Orders.Count() == 0)
                 {
                     return NoContent();
                 }
                 return Ok(Orders);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Internal server error. Please try again later.");
 
             }
 
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetOrderById(long id)
+
+        [HttpGet("/{id}")]
+        public Task<Order> getOrderById(long id)
+        {
+            return _OrderService.GetOrderById(id);
+        }
+
+        [HttpPut("update-shipping/{id}/{state}")]
+        public async Task<IActionResult> UpdateShipping(long id, ShippingState state)
         {
             try
             {
-                var Order = await _OrderService.GetOrderByIdAsync(id);
-                if (Order == null)
-                {
-                    return NotFound();
-                }
-                return Ok(Order);
+                await _OrderService.ChangeOrderShippingState(id, state);
+                return NoContent();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
-
-
         }
-        [HttpPost]
-        public async Task<ActionResult> SaveOrder([FromBody] Order Order)
+
+
+        [HttpPut("update-orderState/{id}/{state}")]
+        public async Task<IActionResult> UpdateOrderState([FromRoute] long id, [FromRoute] OrderState state)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                await _OrderService.ChangeOrderState(id, state);
+                return NoContent();
             }
-            await _OrderService.SaveOrderAsync(Order); ;
-            return CreatedAtAction(nameof(GetOrderById), new { id = Order.Id }, Order);
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateOrder(long id, [FromBody] string newStatus)
+
+
+        [HttpPut("cancel/{id}")]
+        public async Task<IActionResult> CancelOrder([FromRoute] long id)
         {
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var existingOrder = await _OrderService.GetOrderById(id);
+                if (existingOrder.ShippingState == null) throw new Exception("Cannot found shipping state");
 
-            await _OrderService.UpdateOrderAsync(id, newStatus);
-            return NoContent();
-        }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrder(long id)
-        {
-            var Order = await _OrderService.GetOrderByIdAsync(id);
-            if (Order == null)
+                if (existingOrder.ShippingState.Equals(ShippingState.SHIPPING))
+                {
+                    return Ok("Không thể hủy đơn hàng đang trong quá trình vận chuyển");
+                }
+
+                await _OrderService.Cancel(id);
+                return NoContent();
+            }
+            catch (Exception)
             {
-                return NotFound();
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
-
-            await _OrderService.DeleteOrderAsync(id);
-            return NoContent();
         }
-
     }
 }
