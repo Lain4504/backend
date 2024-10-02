@@ -49,7 +49,9 @@ namespace BackEnd.Controllers
             }
 
             // Tạo JWT token kích hoạt tài khoản
+
             var token = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
+
 
             // Gửi email kích hoạt
             await _emailService.SendActivationEmail(user.Email, token);
@@ -88,8 +90,6 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi trong quá trình đăng nhập.");
             }
         }
-
-
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAccount([FromBody] ActivateAccountRequest request)
         {
@@ -149,8 +149,6 @@ namespace BackEnd.Controllers
             await _emailService.SendResetPasswordEmail(forgotRequest.Email, user.Id, user.Role);
             return Ok("Vui lòng kiểm tra email của bạn để đặt lại mật khẩu.");
         }
-
-
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] DTO.Request.ResetPasswordRequest resetRequest)
@@ -244,9 +242,6 @@ namespace BackEnd.Controllers
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
         }
-
-
-
 
         [HttpGet]
         public async Task<IActionResult> GetAllUser()

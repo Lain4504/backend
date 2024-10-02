@@ -54,24 +54,23 @@ namespace BackEnd.Controllers
 
         // PUT: api/Publisher/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePublisher(long id, [FromBody] Publisher updatedPublisher)
+        public async Task<ActionResult> UpdatePublisher(long id, [FromBody] Publisher publisher)
         {
+            if (id != publisher.Id)
+            {
+                return BadRequest();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var publisher = await _publisherService.GetPublisherByIdAsync(id);
-            if (publisher == null)
-            {
-                return NotFound();
-            }
-
-            await _publisherService.UpdatePublisherAsync(id, updatedPublisher.Name);
-            return NoContent();
+            await _publisherService.UpdatePublisherAsync(publisher);
+            return Ok(new { message = "Update successful!" });
         }
 
-        // DELETE: api/Publisher/{id} 
+        // DELETE: api/Publisher/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePublisher(long id)
         {

@@ -44,9 +44,6 @@ namespace BackEnd.Repository.RepositoryImpl
                 _context.Publishers.Remove(publisher);
                 await _context.SaveChangesAsync();
             }
-
-
-
         }
 
         // Phương thức lấy tất cả các publisher
@@ -75,17 +72,20 @@ namespace BackEnd.Repository.RepositoryImpl
         }
 
         // Phương thức cập nhật tên của Publisher theo id
-        public async Task UpdatePublisherAsync(long id, string newName)
+        public async Task UpdatePublisherAsync(Publisher publisher)
         {
-            var publisher = await _context.Publishers.FindAsync(id);
-
-            if (publisher == null)
-            {
-                throw new InvalidOperationException($"Publisher with Id {id} not found.");
-            }
-
-            publisher.Name = newName;
+            _context.Publishers.Update(publisher);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<Book>> GetBooksByPublisherIdAsync(long publisherId)
+        {
+            return await _context.Books.Where(b => b.PublisherId == publisherId).ToListAsync();
+        }
+
+        public async Task UpdateBookAsync(Book book)
+        {
+            _context.Books.Update(book);
+            await _context.SaveChangesAsync();
     }
+}
 }
