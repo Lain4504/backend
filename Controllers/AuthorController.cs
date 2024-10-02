@@ -7,36 +7,43 @@ namespace BackEnd.Controllers
     [ApiController]
     [Route("api/author")]
     [EnableCors("AllowSpecificOrigins")]
-
- //Temp code for getAllAuthor
     public class AuthorController : ControllerBase
     {
-        private readonly BookStoreContext _context;
+        private readonly IAuthorService _authorService;
 
-        public AuthorController(BookStoreContext context)
+        public AuthorController(IAuthorService authorService)
         {
-            _context = context;
+            _authorService = authorService;
         }
 
         // GET: api/Author
         [HttpGet]
-        public ActionResult<IEnumerable<Author>> GetAllAuthors()
+        public async Task<IActionResult> GetAllAuthors()
         {
-            try
+            var authors = await _authorService.GetAllAuthors();
+            if (authors == null || !authors.Any())
             {
-                var authors = _context.Authors.ToList();
-
-                if (authors == null || authors.Count == 0)
-                {
-                    return NotFound("No authors found.");
-                }
-
-                return Ok(authors);
+                return NotFound("No authors found.");
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
+            return Ok(authors);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAuthorById(long id)
+        {
+            var author = await _authorService.GetAuthorById(id);
+            if (author == null)
+            {
+                return NotFound("Author not found.");
+            }
+            return Ok(author);
+        }
+
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteAuthor(long id)
+        //{
+        //    await _authorService.DeleteAuthor(id);
+        //    return NoContent();
+        //}
     }
 }

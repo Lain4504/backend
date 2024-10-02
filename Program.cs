@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
+using BackEnd.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,8 +41,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:JwtIssuer"],
+        ValidAudience = builder.Configuration["Jwt:JwtAudience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
@@ -68,6 +69,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true; // Tự động gia hạn cookie khi gần hết hạn
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("ADMIN"));
+    options.AddPolicy("RequireUserRole", policy => policy.RequireRole("USER"));
+});
+
 // Dependency Injection for Repositories and Services
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<ICollectionService, CollectionService>();
@@ -77,7 +84,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISliderService, SliderService>();
 builder.Services.AddScoped<ISliderRepository, SliderRepository>();
-builder.Services.AddScoped<IEmailService, EmailService>(); 
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -94,7 +101,13 @@ builder.Services.AddScoped<IPostService, PostService>();
 // Publisher
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
+// Author 
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IJwtService, JwtService>(); // Đăng ký JWTService
+
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -111,6 +124,9 @@ else
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+// Đăng ký Middleware kiểm tra token
+app.UseMiddleware<TokenValidationMiddleware>();
 
 // Apply CORS policy
 app.UseCors("AllowSpecificOrigins");
