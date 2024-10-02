@@ -11,6 +11,7 @@ using BackEnd.Service.ServiceImpl;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.Controllers
 {
@@ -21,11 +22,13 @@ namespace BackEnd.Controllers
     {
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
+        private readonly IJwtService _jWTService;
 
-        public AuthController(IUserService userService, IEmailService emailService)
+        public AuthController(IUserService userService, IEmailService emailService, IJwtService jWTService)
         {
             _userService = userService;
             _emailService = emailService;
+            _jWTService = jWTService;
         }
 
         [HttpPost("register")]
@@ -46,7 +49,9 @@ namespace BackEnd.Controllers
             }
 
             // Tạo JWT token kích hoạt tài khoản
-            var token = _userService.GenerateJwtToken(user.Email, user.Id, user.Role);
+
+            var token = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
+
 
             // Gửi email kích hoạt
             await _emailService.SendActivationEmail(user.Email, token);
@@ -74,7 +79,7 @@ namespace BackEnd.Controllers
                 }
 
                 // Sử dụng phương thức GenerateJwtToken để tạo token dựa trên email của người dùng
-                var tokenString = _userService.GenerateJwtToken(existingUser.Email, existingUser.Id, existingUser.Role);
+                var tokenString = _jWTService.GenerateJwtToken(existingUser.Email, existingUser.Id, existingUser.Role);
 
                 // Trả về thông báo thành công cùng với token và thông tin người dùng
                 return Ok(new { message = "Đăng nhập thành công.", token = tokenString, user = existingUser });
@@ -95,7 +100,7 @@ namespace BackEnd.Controllers
             }
 
             // Xác thực token
-            var claimsPrincipal = _userService.ValidateJwtToken(request.Token);
+            var claimsPrincipal = _jWTService.ValidateJwtToken(request.Token);
 
             if (claimsPrincipal == null)
             {
@@ -138,20 +143,18 @@ namespace BackEnd.Controllers
             }
 
             // Tạo token JWT với id và role của người dùng
-            var token = _userService.GenerateJwtToken(user.Email, user.Id, user.Role);
+            var token = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
 
             // Gửi email với liên kết đặt lại mật khẩu chứa token
             await _emailService.SendResetPasswordEmail(forgotRequest.Email, user.Id, user.Role);
             return Ok("Vui lòng kiểm tra email của bạn để đặt lại mật khẩu.");
         }
 
-
-
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] DTO.Request.ResetPasswordRequest resetRequest)
         {
             // Kiểm tra tính hợp lệ của token
-            var claimsPrincipal = _userService.ValidateJwtToken(resetRequest.Token);
+            var claimsPrincipal = _jWTService.ValidateJwtToken(resetRequest.Token);
             if (claimsPrincipal == null)
             {
                 return BadRequest("Token không hợp lệ hoặc đã hết hạn.");
@@ -210,7 +213,7 @@ namespace BackEnd.Controllers
             var token = userChange.Token;
 
             // Xác thực token
-            var claimsPrincipal = _userService.ValidateJwtToken(token);
+            var claimsPrincipal = _jWTService.ValidateJwtToken(token);
             if (claimsPrincipal == null)
             {
                 return Unauthorized("Token không hợp lệ hoặc đã hết hạn.");
@@ -239,9 +242,6 @@ namespace BackEnd.Controllers
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
         }
-
-
-
 
         [HttpGet]
         public async Task<IActionResult> GetAllUser()
