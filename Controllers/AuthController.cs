@@ -24,6 +24,7 @@ namespace BackEnd.Controllers
         private readonly IEmailService _emailService;
         private readonly IJwtService _jWTService;
 
+        public AuthController(IUserService userService, IEmailService emailService, IJwtService jWTService)
         {
             _userService = userService;
             _emailService = emailService;
@@ -48,6 +49,7 @@ namespace BackEnd.Controllers
             }
 
             // Tạo JWT token kích hoạt tài khoản
+            var token = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
 
             // Gửi email kích hoạt
             await _emailService.SendActivationEmail(user.Email, token);
