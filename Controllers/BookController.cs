@@ -1,5 +1,7 @@
-﻿using BackEnd.Models;
+﻿using BackEnd.DTO.Request;
+using BackEnd.Models;
 using BackEnd.Service;
+using BackEnd.Service.ServiceImpl;
 using BackEnd.Util;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -80,11 +82,24 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost("add-to-collection")]
-        public async Task<IActionResult> AddBookToCollection(long bookId, long collectionId)
+        public async Task<IActionResult> AddBookToCollection([FromBody] AddBookToCollectionRequest request)
         {
-            await _bookService.AddBookToCollectionAsync(bookId, collectionId);
-            return NoContent();
+            if (request == null || request.BookId <= 0 || request.CollectionId <= 0)
+            {
+                return BadRequest("Invalid request.");
+            }
+
+            // Logic to add the book to the specified collection
+            var result = await _bookService.AddBookToCollectionAsync(request.BookId, request.CollectionId);
+
+            if (result)
+            {
+                return Ok("Book successfully added to the collection.");
+            }
+
+            return BadRequest("Failed to add book to collection. Please ensure the book and collection exist.");
         }
+
         [HttpGet("sorted-and-paged")]
         public async Task<IActionResult> GetAllBooks(
     [FromQuery] string sortBy = "Id",
