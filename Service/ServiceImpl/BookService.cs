@@ -51,10 +51,12 @@ namespace BackEnd.Service.ServiceImpl
             return await _bookRepository.FindByTitleAsync(title);
         }
 
-        public async Task AddBookToCollectionAsync(long bookId, long collectionId)
+        public async Task<bool> AddBookToCollectionAsync(long bookId, long collectionId)
         {
-            await _bookRepository.AddBookToCollectionAsync(bookId, collectionId);
+            // Call the repository method to add the book to the collection
+            return await _bookRepository.AddBookToCollectionAsync(bookId, collectionId);
         }
+
 
         public Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {

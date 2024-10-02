@@ -92,23 +92,43 @@ namespace BackEnd.Repository.RepositoryImpl
             return await _context.Books.Where(predicate).ToListAsync();
         }
 
-        public async Task AddBookToCollectionAsync(long bookId, long collectionId)
+        public async Task<bool> AddBookToCollectionAsync(long bookId, long collectionId)
         {
             var book = await _context.Books.FindAsync(bookId);
             var collection = await _context.Collections.FindAsync(collectionId);
 
-            if (book != null && collection != null)
+            if (book == null)
             {
-                var bookCollection = new BookCollection
-                {
-                    BookId = bookId,
-                    CollectionId = collectionId
-                };
-
-                _context.BookCollections.Add(bookCollection);
-                await _context.SaveChangesAsync();
+                throw new ArgumentException($"Book with ID {bookId} does not exist.");
             }
+
+            if (collection == null)
+            {
+                throw new ArgumentException($"Collection with ID {collectionId} does not exist.");
+            }
+
+            // Check if the book is already in the specified collection
+            var exists = await _context.BookCollections
+                .AnyAsync(bc => bc.BookId == bookId && bc.CollectionId == collectionId);
+
+            if (exists)
+            {
+                return false; // The book is already in the collection, so do not add it
+            }
+
+            // If the book is not in the collection, add it
+            var bookCollection = new BookCollection
+            {
+                BookId = bookId,
+                CollectionId = collectionId
+            };
+
+            _context.BookCollections.Add(bookCollection);
+            await _context.SaveChangesAsync();
+            return true; // Successfully added
         }
+
+
 
         public async Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
