@@ -9,7 +9,6 @@ using BackEnd.Service.ServiceImpl;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 using BackEnd.Middlewares;
@@ -57,18 +56,21 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigins",
         builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5175")
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .WithExposedHeaders("Authorization")); // Allow credentials if needed
 });
 
-// Add Authentication and Cookie Authentication
+// Add Cookie Authentication if needed
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/user/login"; // Đường dẫn đến trang đăng nhập
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Thời gian hết hạn của cookie
-        options.SlidingExpiration = true; // Tự động gia hạn cookie khi gần hết hạn
+        options.LoginPath = "/user/login"; // Path to the login page
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(1); // Cookie expiration time
+        options.SlidingExpiration = true; // Automatically renew cookie
     });
 
+// Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("ADMIN"));
@@ -85,26 +87,19 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISliderService, SliderService>();
 builder.Services.AddScoped<ISliderRepository, SliderRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
-// Order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-// WishList
 builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
-// PostCategory
 builder.Services.AddScoped<IPostCategoryRepository, PostCategoryRepository>();
 builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
-// Post
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
-// Publisher
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
-// Author 
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
-builder.Services.AddScoped<IJwtService, JwtService>(); // Đăng ký JWTService
+builder.Services.AddScoped<IJwtService, JwtService>(); // Register JWTService
 
 var app = builder.Build();
 
@@ -125,10 +120,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-// Đăng ký Middleware kiểm tra token
-app.UseMiddleware<TokenValidationMiddleware>();
-
-// Apply CORS policy
+// Apply CORS policy first
 app.UseCors("AllowSpecificOrigins");
 
 // Enable authentication middleware
@@ -137,6 +129,12 @@ app.UseAuthentication();
 // Enable authorization middleware
 app.UseAuthorization();
 
-app.MapControllers();
+// Register token validation middleware
+app.UseMiddleware<TokenValidationMiddleware>();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();
