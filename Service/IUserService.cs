@@ -9,9 +9,6 @@ namespace BackEnd.Service
         Task<User> AuthenticateAsync(string Email, string Password);
         Task<User> RegisterAsync(string Email, string Password);
         Task<User> GetUserByEmailAsync(String Email);
-        string GenerateJwtToken(string email, long id , string role);
-        ClaimsPrincipal ValidateJwtToken(string token);
-
         Task<User> ActivateAccountAsync(string email);
         Task<bool> UpdatePassword(string email, string newPassword);
         Task<User> GetUserByIDAsync(long id);
