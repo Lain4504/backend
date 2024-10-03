@@ -5,7 +5,7 @@ namespace BackEnd.Repository
 {
     public interface IPostCategoryRepository
     {
-        Task<List<PostCategory>> GetPostCategoryByIdAsync(long id);
+        Task<PostCategory> GetPostCategoryByIdAsync(long id);
         Task<IEnumerable<PostCategory>> GetAllCategoryAsync();
         Task AddPostCategoryAsync(PostCategory Post);
         Task DeletePostCategoryAsync(long id);
