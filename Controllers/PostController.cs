@@ -38,7 +38,7 @@ namespace BackEnd.Controllers
             {
                 var posts = await _PostService.GetAllPostAsync();
                 if (posts == null)
-                    return NoContent();
+                    return NotFound();
                 return Ok(posts);
             }
             catch (Exception ex)
