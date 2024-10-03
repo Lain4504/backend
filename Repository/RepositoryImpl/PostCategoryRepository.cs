@@ -44,9 +44,13 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task DeletePostCategoryAsync(long id)
         {
-            var postCategory = await _context.PostCategories.FindAsync(id);
+            var postCategory = await _context.PostCategories.FirstOrDefaultAsync(b => b.Id == id);
             if (postCategory != null)
             {
+                var post = await _context.Posts
+                    .Where(ab => ab.CategoryId == id)
+                    .ToListAsync();
+                _context.Posts.RemoveRange(post);
                 _context.PostCategories.Remove(postCategory);
                 await _context.SaveChangesAsync();
             }
@@ -57,7 +61,6 @@ namespace BackEnd.Repository.RepositoryImpl
             _context.PostCategories.Update(postCategory);
             await _context.SaveChangesAsync();
         }
-
     }
 
 }
