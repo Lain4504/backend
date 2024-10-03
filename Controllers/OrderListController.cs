@@ -18,7 +18,7 @@ namespace BackEnd.Controllers
 
 
 
-        [HttpGet("/user/{id}")]
+        [HttpGet("user/{id}")]
         public async Task<IActionResult> getOrderByUser(long id)
         {
             try
@@ -94,7 +94,7 @@ namespace BackEnd.Controllers
 
 
 
-        [HttpGet("/get-all")]
+        [HttpGet("get-all")]
         public async Task<ActionResult> getAll()
         {
             try
@@ -114,7 +114,7 @@ namespace BackEnd.Controllers
 
         }
 
-        [HttpGet("/{id}")]
+        [HttpGet("{id}")]
         public Task<Order> getOrderById(long id)
         {
             return _OrderService.GetOrderById(id);

@@ -24,7 +24,7 @@ namespace BackEnd.Middlewares
                 "/reset-password",
                 "/change-password",
                 "/api/collection",
-               "/api/collection/{id}"
+                "/api/collection/{id}"
             };
 
             // Kiểm tra nếu đường dẫn hiện tại có trong danh sách các endpoint bảo vệ
