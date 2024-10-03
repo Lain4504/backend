@@ -15,12 +15,9 @@ namespace BackEnd.Repository.RepositoryImpl
             _context = context;
         }
 
-        public async Task<List<Post>> GetPostByIdAsync(long id)
+        public async Task<Post> GetPostByIdAsync(long id)
         {
-            var qr = from w in _context.Posts
-                     where w.Id == id
-                     select w;
-            return await qr.ToListAsync();
+           return await _context.Posts.FindAsync(id);
         }
         public async Task<IEnumerable<Post>> GetAllAsync()
         {

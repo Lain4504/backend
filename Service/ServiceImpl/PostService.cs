@@ -13,7 +13,7 @@ namespace BackEnd.Service.ServiceImpl
             _repository = repository;
         }
 
-        public Task<List<Post>> GetPostByIdAsync(long id)
+        public Task<Post> GetPostByIdAsync(long id)
         {
             return _repository.GetPostByIdAsync(id);
         }

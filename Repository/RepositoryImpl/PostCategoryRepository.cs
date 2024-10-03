@@ -16,13 +16,9 @@ namespace BackEnd.Repository.RepositoryImpl
             _context = context;
         }
 
-        public async Task<List<PostCategory>> GetPostCategoryByIdAsync(long id)
+        public async Task<PostCategory> GetPostCategoryByIdAsync(long id)
         {
-            var qr = from w in _context.PostCategories
-                     where w.Id == id
-                     select w;
-
-            return await qr.ToListAsync();
+            return await _context.PostCategories.FindAsync(id);
         }
 
         public async Task<IEnumerable<PostCategory>> GetAllCategoryAsync()

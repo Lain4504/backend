@@ -6,7 +6,7 @@ namespace BackEnd.Service
     public interface IPostCategoryService
     {
 
-        Task<List<PostCategory>> GetPostCategoryByIdAsync(long id);
+        Task<PostCategory> GetPostCategoryByIdAsync(long id);
         Task<IEnumerable<PostCategory>> GetAllPostCategoriesAsync();
         Task AddPostCategoryAsync(PostCategory post);
         Task DeletePostCategoryAsync(long id);
