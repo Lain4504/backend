@@ -46,10 +46,10 @@ namespace BackEnd.Repository.RepositoryImpl
         public async Task AddPostAsync(Post post)
         {
             var existingPost = await _context.Posts
-            .FirstOrDefaultAsync(w => w.Title == post.Title);
-
+            .FirstOrDefaultAsync(w => w.Id == post.Id);
             if (existingPost == null)
             {
+                 post.CreatedAt = DateTime.UtcNow;
                 _context.Posts.Add(post);
                 await _context.SaveChangesAsync();
             }
