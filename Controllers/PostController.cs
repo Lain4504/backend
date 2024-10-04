@@ -17,11 +17,13 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost]
-         public async Task<IActionResult> AddPost([FromBody] Post post)
+        public async Task<IActionResult> AddPost([FromBody] Post post)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _PostService.AddPostAsync(post);
-            return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
+            var result = await _PostService.AddPostAsync(post);
+            if (result)
+                return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
+            return Conflict(new { Message = "Mã Title không được trùng." });
         }
         
         [HttpGet("{id}")]
