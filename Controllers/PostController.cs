@@ -21,9 +21,9 @@ namespace BackEnd.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var result = await _PostService.AddPostAsync(post);
-            if (result == 0)
-                return Conflict(new { Message = "Mã Title bị trùng." });
-            return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
+            if (result)
+                return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
+            return Conflict(new { Message = "Mã Title không được trùng." });
         }
         
         [HttpGet("{id}")]

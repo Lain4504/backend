@@ -43,7 +43,7 @@ namespace BackEnd.Repository.RepositoryImpl
             return await PaginatedList<Post>.CreateAsync(source, page, size);
         }
 
-        public async Task<int> AddPostAsync(Post post)
+        public async Task<bool> AddPostAsync(Post post)
         {
             if (post.Title != null) 
             {
@@ -57,9 +57,10 @@ namespace BackEnd.Repository.RepositoryImpl
             {
                 post.CreatedAt = DateTime.UtcNow;
                 _context.Posts.Add(post);
-                return await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
             }
-            return 0;
+            return false;
         }
 
         public async Task DeletePostAsync(long id)
