@@ -27,7 +27,7 @@ namespace BackEnd.Service.ServiceImpl
         {
             return _repository.GetAllPostAsync(page, size, sortBy, isAscending);
         }
-        public Task AddPostAsync(Post Post)
+        public Task<bool> AddPostAsync(Post Post)
         {
             return _repository.AddPostAsync(Post);
         }
