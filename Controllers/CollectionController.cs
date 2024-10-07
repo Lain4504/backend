@@ -53,7 +53,7 @@ namespace BackEnd.Controllers
 
 
         }
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<ActionResult> SaveCollection([FromBody] Collection collection)
         {
             if (!ModelState.IsValid)
@@ -63,7 +63,7 @@ namespace BackEnd.Controllers
             await _collectionService.SaveCollectionAsync(collection); ;
             return CreatedAtAction(nameof(GetCollectionById), new { id = collection.Id }, collection);
         }
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<ActionResult> UpdateCollection(long id, [FromBody] Collection collection)
         {
             if (id != collection.Id)
@@ -79,7 +79,7 @@ namespace BackEnd.Controllers
             await _collectionService.UpdateCollectionAsync(collection);
             return Ok(new { message = "Update successful!" });
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCollection(long id)
         {
             var collection = await _collectionService.GetCollectionByIdAsync(id);
