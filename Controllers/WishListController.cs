@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackEnd.Controllers
 {
-    [Route("/api/Wishlist")]
+    [Route("/api/wishlist")]
     [ApiController]
     [EnableCors("AllowSpecificOrigins")]
     public class WishlistController : ControllerBase
@@ -26,7 +26,7 @@ namespace BackEnd.Controllers
             await _WishlistService.AddWishlistAsync(wishlist); ;
         }
 
-        [HttpGet]
+        [HttpGet("user/{userId}")]
         public async Task<ActionResult> GetBookWishlists(long userId)
         {
             try
@@ -55,7 +55,7 @@ namespace BackEnd.Controllers
         }
 
         //delete all book in wishlist
-        [HttpDelete("/all-{userId}")]    //id of user 
+        [HttpDelete("all-{userId}")]    //id of user 
         public async Task<IActionResult> DeleteAllWishlist(long userId)
         {
             await _WishlistService.DeleteAllWishlistAsync(userId);
