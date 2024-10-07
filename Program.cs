@@ -66,7 +66,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/user/login"; // Path to the login page
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(1); // Cookie expiration time
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie expiration time
         options.SlidingExpiration = true; // Automatically renew cookie
     });
 
