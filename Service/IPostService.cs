@@ -12,5 +12,6 @@ namespace BackEnd.Service
         Task<bool> AddPostAsync(Post post);
         Task DeletePostAsync(long id);
         Task UpdatePostAsync(Post post);
+        Task<IEnumerable<Post>> GetPostsByPostCategoryAsync(int? postcategoryId, string sortBy, string sortOrder);
     }
 }

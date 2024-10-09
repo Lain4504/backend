@@ -40,6 +40,21 @@ namespace BackEnd.Service.ServiceImpl
         {
             return _repository.UpdatePostAsync(post);
         }
+        public async Task<IEnumerable<Post>> GetPostsByPostCategoryAsync(int? postcategoryId, string sortBy, string sortOrder)
+        {
+            var postsQuery = _repository.GetPosts();
+
+            if (postcategoryId.HasValue)
+            {
+                postsQuery = _repository.GetPostsByPostCategory(postcategoryId.Value);
+            }
+
+            postsQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                ? postsQuery.OrderBy(p => EF.Property<object>(p, sortBy))
+                : postsQuery.OrderByDescending(p => EF.Property<object>(p, sortBy));
+
+            return await postsQuery.ToListAsync();
+        }
 
     }
 }
