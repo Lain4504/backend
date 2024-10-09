@@ -83,7 +83,25 @@ namespace BackEnd.Controllers
             await _PostService.UpdatePostAsync(post);
             return Ok(new { message = "Update successful!" });
         }
+        [HttpGet("sorted-and-paged/by-postcategory")]
+        public async Task<ActionResult<object>> GetPostsByPostCategory(
+        [FromQuery] int? postcategory,
+        [FromQuery] string sortBy = "Id",
+        [FromQuery] string sortOrder = "asc")
+        {
+            var items = await _PostService.GetPostsByPostCategoryAsync(postcategory, sortBy, sortOrder);
 
+            var totalCount = items.Count();
+
+            var response = new
+            {
+                content = items,
+                totalElements = totalCount,
+                empty = !items.Any()
+            };
+
+            return Ok(response);
+        }
        
     }
 }
