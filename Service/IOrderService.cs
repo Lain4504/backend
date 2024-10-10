@@ -13,8 +13,6 @@ public interface IOrderService
 
     Task ChangeOrderState(long orderId, OrderState orderState);
 
-    Task<List<Order>> QueryOrder(OrderState state, PaymentState paymentState, ShippingState shippingState, DateTime from, DateTime to, int pageIndex, int pageSize);
-
     Task<List<Order>> GetAll();
 
     Task ChangeOrderPaymentState(long orderId, PaymentState paymentState);
@@ -24,4 +22,5 @@ public interface IOrderService
     Task<Order> GetOrderById(long id);
 
     Task Cancel(long orderId);
+    Task ProcessOrderAsync(Order order);
 }
