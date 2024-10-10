@@ -11,5 +11,7 @@ namespace BackEnd.Repository
         Task<bool> AddPostAsync(Post Post);
         Task DeletePostAsync(long id);
         Task UpdatePostAsync(Post post);
+        IQueryable<Post> GetPostsByPostCategory(int postcategoryId);
+        IQueryable<Post> GetPosts();
     }
 }
