@@ -78,6 +78,14 @@ namespace BackEnd.Service.ServiceImpl
 
             return await booksQuery.Include(b => b.Images).ToListAsync();
         }
+        public IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId)
+        {
+            return _bookRepository.GetAllBookCollectionsByBookId(bookId);
+        }
+        public async Task<List<Book>> GetBooksByAuthorIdAsync(long authorId)
+        {
+            return await _bookRepository.GetBooksByAuthorIdAsync(authorId);
+        }
     }
 }
 

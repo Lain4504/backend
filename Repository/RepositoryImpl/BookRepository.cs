@@ -158,6 +158,21 @@ namespace BackEnd.Repository.RepositoryImpl
         {
             return _context.Books.AsQueryable();
         }
+        public IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId)
+        {
+            return _context.BookCollections
+                .Include(bc => bc.Collection) // Include the related Collection
+                .Where(bc => bc.BookId == bookId)
+                .ToList();
+        }
+        public async Task<List<Book>> GetBooksByAuthorIdAsync(long authorId)
+        {
+            return await _context.AuthorBooks
+                .Where(ab => ab.AuthorId == authorId)
+                .Select(ab => ab.Book)
+                .ToListAsync();
+        }
+
 
     }
 

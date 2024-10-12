@@ -14,5 +14,8 @@ namespace BackEnd.Service
         Task<bool> AddBookToCollectionAsync(long bookId, long collectionId);
         Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending);
         Task<IEnumerable<Book>> GetBooksByCollectionAsync(int? collectionId, string sortBy, string sortOrder);
+        IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId);
+        Task<List<Book>> GetBooksByAuthorIdAsync(long authorId);
+
     }
 }

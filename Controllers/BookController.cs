@@ -154,6 +154,26 @@ namespace BackEnd.Controllers
             }
             return Ok(new { content = books });
         }
+        [HttpGet("get-collections/{bookId}")]
+        public IActionResult GetAllBookCollectionsByBookId(long bookId)
+        {
+            var bookCollections = _bookService.GetAllBookCollectionsByBookId(bookId);
+            if(bookCollections == null || !bookCollections.Any())
+            {
+                return NotFound();
+            }
+            return Ok(bookCollections);
+        }
+        [HttpGet("author/{authorId}")]
+        public async Task<ActionResult<List<Book>>> GetBooksByAuthorId( long authorId)
+        {
+            var books = await _bookService.GetBooksByAuthorIdAsync(authorId);
+            if (books == null || books.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(books);
+        }
     }
 
 }
