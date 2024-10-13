@@ -20,7 +20,6 @@ namespace BackEnd.Repository.RepositoryImpl
             var qr = from o in _context.Orders
                      where o.UserId == userid
                      select o;
-
             var result = await qr.ToListAsync();
             return result;
         }
@@ -75,6 +74,11 @@ namespace BackEnd.Repository.RepositoryImpl
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return;
             order.State = OrderState.Canceled.ToString();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveAsync(Order order)
+        {
             await _context.SaveChangesAsync();
         }
     }

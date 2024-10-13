@@ -29,6 +29,13 @@ namespace BackEnd.Repository.RepositoryImpl
                 .Include(b => b.Images)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Book>> FindByTitleAsync(string title)
+        {
+            return await _context.Books
+                .Where(b => b.Title.Contains(title))
+                .Include(b => b.Images)
+                .ToListAsync();
+        }
 
         public async Task<Book> SaveAsync(Book book)
         {
@@ -74,17 +81,9 @@ namespace BackEnd.Repository.RepositoryImpl
                 await _context.SaveChangesAsync();
             }
         }
-
-
-
         public async Task<bool> ExistsByISBNAsync(string isbn)
         {
             return await _context.Books.AnyAsync(b => b.Isbn == isbn);
-        }
-
-        public async Task<IEnumerable<Book>> FindByTitleAsync(string title)
-        {
-            return await _context.Books.Where(b => b.Title.Contains(title)).ToListAsync();
         }
 
         public async Task<IEnumerable<Book>> FindByConditionAsync(Expression<Func<Book, bool>> predicate)
@@ -127,8 +126,6 @@ namespace BackEnd.Repository.RepositoryImpl
             await _context.SaveChangesAsync();
             return true; // Successfully added
         }
-
-
 
         public async Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
