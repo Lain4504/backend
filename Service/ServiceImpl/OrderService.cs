@@ -1,7 +1,5 @@
 using BackEnd.Models;
 using BackEnd.Repository;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Service.ServiceImpl
 {
