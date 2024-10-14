@@ -1,8 +1,5 @@
-using System.Linq;
-using System.Threading.Tasks;
 using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BackEnd.Repository.RepositoryImpl
 {
@@ -20,7 +17,6 @@ namespace BackEnd.Repository.RepositoryImpl
             var qr = from o in _context.Orders
                      where o.UserId == userid
                      select o;
-
             var result = await qr.ToListAsync();
             return result;
         }
@@ -42,10 +38,6 @@ namespace BackEnd.Repository.RepositoryImpl
             return await qr.ToListAsync();
         }
 
-        // public Task UpdateOrderAsync(Order order)
-        // {
-        //     throw new NotImplementedException();
-        // }
 
         public async Task ChangeOrderPaymentState(long id, PaymentState state)
         {
@@ -75,6 +67,39 @@ namespace BackEnd.Repository.RepositoryImpl
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return;
             order.State = OrderState.Canceled.ToString();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveAsync(Order order)
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Order>> GetAllAsync()
+        {
+            return await _context.Orders.ToListAsync();
+        }
+
+        public async Task<Order> GetByUserAndStateAsync(long userId, OrderState state)
+        {
+            var qr = from o in _context.Orders
+                     where o.State == state.ToString() && o.UserId == userId
+                     select o;
+            return await qr.FirstOrDefaultAsync();
+        }
+
+
+        public async Task<List<Order>> GetAllOrderAndState(OrderState state)
+        {
+            var qr = from o in _context.Orders
+                     where o.State.Equals(state.ToString())
+                     select o;
+            return await qr.ToListAsync();
+        }
+
+        public async Task AddNewCartAsync(Order order)
+        {
+            await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
         }
     }

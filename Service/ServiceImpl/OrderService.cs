@@ -1,7 +1,5 @@
 using BackEnd.Models;
 using BackEnd.Repository;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Service.ServiceImpl
 {
@@ -21,35 +19,6 @@ namespace BackEnd.Service.ServiceImpl
             return await _orderRepository.GetOrderByUserIdAsync(userId);
         }
 
-        // public async Task ProcessOrder(Order order)
-        // {
-        //     var existingOrder = await _orderRepository.GetOrderByOrderIdAsync(order.Id);
-
-        //     if (existingOrder == null || !existingOrder.State.Equals(OrderState.Processing))
-        //         return;
-
-        //     order.Created = existingOrder.Created;
-
-        //     var existingUser = await _userRepository.GetByIDAsync(order.UserId ?? 0); // Await the user retrieval
-        //     if (existingUser == null)
-        //     {
-        //         return;
-        //     }
-
-        //     foreach (var orderDetail in order.OrderDetails)
-        //     {
-        //         var existingBook = await _bookRepository.GetByIdAsync(orderDetail.Book.Id);
-        //         if (existingBook == null || !existingBook.State.Equals(BookState.ACTIIVE) || existingBook.Stock < orderDetail.Amount)
-        //         {
-        //             order.State = OrderState.Canceled.ToString(); // Correctly assign the state
-        //             order.ShopNote = "Đơn hàng đã bị hủy do một số sản phẩm hiện không khả dụng";
-        //             await _orderRepository.UpdateOrderAsync(order); // Save the changes to the order
-        //             return;
-        //         }
-        //     }
-        // }
-
-
         public async Task ChangeOrderState(long orderId, OrderState orderState)
         {
             var existingOrder = await _orderRepository.GetOrderByOrderIdAsync(orderId);
@@ -65,11 +34,6 @@ namespace BackEnd.Service.ServiceImpl
             await _orderRepository.ChangeOrderState(orderId, existingOrder.State);
         }
 
-
-        public Task<List<Order>> QueryOrder(OrderState state, PaymentState paymentState, ShippingState shippingState, DateTime from, DateTime to, int pageIndex, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task ChangeOrderPaymentState(long orderId, PaymentState paymentState)
         {
@@ -93,23 +57,62 @@ namespace BackEnd.Service.ServiceImpl
 
         public async Task Cancel(long orderId)
         {
-            // var existingOrder = await GetOrderById(orderId); // Await the result
-            // if (existingOrder.State != OrderState.Canceled.ToString()) // Check before changing state
-            // {
-            //     existingOrder.State = OrderState.Canceled.ToString(); // Update state
+            var existingOrder = await GetOrderById(orderId); // Await the result
+            if (existingOrder.State != OrderState.Canceled.ToString()) // Check before changing state
+            {
+                existingOrder.State = OrderState.Canceled.ToString(); // Update state
 
-            //     foreach (var orderDetail in existingOrder.OrderDetails)
-            //     {
-            //         var existingBook = orderDetail.Book;
-            //         if (existingBook == null) return;
-            //         existingBook.Stock += orderDetail.Amount; // Restore book stock
-            //     }
+                foreach (var orderDetail in existingOrder.OrderDetails)
+                {
+                    var existingBook = orderDetail.Book;
+                    if (existingBook == null) return;
+                    existingBook.Stock += orderDetail.Amount; // Restore book stock
+                }
 
-            // }
+            }
 
             await _orderRepository.Cancel(orderId);
         }
 
+        public async Task ProcessOrderAsync(Order order)
+        {
+            var existingOrder = await _orderRepository.GetOrderByOrderIdAsync(order.Id)
+                ?? throw new Exception("Order not found");
 
+            if (!existingOrder.State.Equals(OrderState.Processing))
+                return;
+
+            order.Created = existingOrder.Created;
+
+            var existingUser = await _userRepository.GetByIDAsync(order.User.Id);
+            if (existingUser == null)
+            {
+                return;
+            }
+
+            foreach (var orderDetail in order.OrderDetails)
+            {
+                var existingBook = await _bookRepository.GetByIdAsync(orderDetail.Book.Id);
+                if (existingBook == null || !existingBook.State.Equals(BookState.ACTIIVE) || existingBook.Stock < orderDetail.Amount)
+                {
+                    order.State.Equals(OrderState.Canceled);
+                    order.ShopNote = "Đơn hàng đã bị hủy do một số sản phẩm hiện không khả dụng";
+                    await _orderRepository.SaveAsync(order);
+                    return;
+                }
+            }
+
+            order.State.Equals(OrderState.Confirmed);
+            if (order.State.Equals(OrderState.Confirmed))
+            {
+                foreach (var orderDetail in order.OrderDetails)
+                {
+                    var existingBook = await _bookRepository.GetByIdAsync(orderDetail.Book.Id);
+                    existingBook.Stock -= orderDetail.Amount;
+                }
+            }
+
+            await _orderRepository.SaveAsync(order);
+        }
     }
 }
