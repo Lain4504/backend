@@ -9,4 +9,5 @@ public interface IAuthorRepository
     Task AddAuthorAsync(Author author);
     Task UpdateAuthorAsync(Author author);
     Task<bool> AddBookToAuthorAsync(long bookId, long authorId);
+    Task<bool> RemoveAuthorFromBook(long bookId, long authorId);
 }

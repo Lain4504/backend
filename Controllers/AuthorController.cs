@@ -6,12 +6,12 @@ using BackEnd.DTO.Request;
 namespace BackEnd.Controllers
 {
     [ApiController]
-    [Route("api/author")]
+    [Route("/api/author")]
     [EnableCors("AllowSpecificOrigins")]
     public class AuthorController : ControllerBase
     {
         private readonly IAuthorService _authorService;
-
+        
         public AuthorController(IAuthorService authorService)
         {
             _authorService = authorService;
@@ -80,6 +80,22 @@ namespace BackEnd.Controllers
             }
 
             return BadRequest("Failed to add book to author. Please ensure the book and author exist.");
+        }
+        [HttpDelete("{bookId}/author/{authorId}")]
+        public async Task<IActionResult> RemoveAuthorFromBook(long bookId, long authorId)
+        {
+            // Gọi hàm từ service để xóa Author khỏi Book
+            var result = await _authorService.RemoveAuthorFromBook(bookId, authorId);
+
+            // Kiểm tra kết quả và trả về phản hồi phù hợp
+            if (result)
+            {
+                return Ok(new { message = "Author removed from book successfully." });
+            }
+            else
+            {
+                return NotFound(new { message = "Author or Book not found." });
+            }
         }
     }
 }

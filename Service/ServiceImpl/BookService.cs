@@ -86,6 +86,11 @@ namespace BackEnd.Service.ServiceImpl
         {
             return await _bookRepository.GetBooksByAuthorIdAsync(authorId);
         }
+
+        IEnumerable<AuthorBook> IBookService.GetAllAuthorsByBookId(long bookId)
+        {
+            return _bookRepository.GetAllAuthorsByBookId(bookId);
+        }
     }
 }
 

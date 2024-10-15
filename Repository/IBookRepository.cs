@@ -18,6 +18,7 @@ namespace BackEnd.Repository
         IQueryable<Book> GetBooksByCollection(int collectionId);
         IQueryable<Book> GetBooks();
         IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId);
+        IEnumerable<AuthorBook> GetAllAuthorsByBookId(long bookId);
         Task<List<Book>> GetBooksByAuthorIdAsync(long authorId);
     }
 }

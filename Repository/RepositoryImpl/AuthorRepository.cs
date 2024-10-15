@@ -81,4 +81,18 @@ public class AuthorRepository : IAuthorRepository
     }
 
 
+    //delete author from updated book
+    public async Task<bool> RemoveAuthorFromBook(long bookId, long authorId)
+    {
+        var authorBook = await _context.AuthorBooks
+            .FirstOrDefaultAsync(ab => ab.BookId == bookId && ab.AuthorId == authorId);
+        if (authorBook != null)
+        {
+            _context.AuthorBooks.Remove(authorBook);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        return false;
+    }
+
 }

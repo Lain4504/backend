@@ -66,5 +66,17 @@ namespace BackEnd.Repository.RepositoryImpl
             // Get paginated results
             return await PaginatedList<Collection>.CreateAsync(source, pageIndex, pageSize);
         }
+        public async Task<bool> RemoveCollectionFromBook(long bookId, long collectionId)
+        {
+            var bookCollection = await _context.BookCollections
+                .FirstOrDefaultAsync(bc => bc.BookId == bookId && bc.CollectionId == collectionId);
+            if (bookCollection != null)
+            {
+                _context.BookCollections.Remove(bookCollection);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

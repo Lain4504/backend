@@ -41,6 +41,8 @@ namespace BackEnd.Service.ServiceImpl
         {
             return _repository.GetAllBookCollectionsAsync(pageIndex, pageSize, sortBy, isAscending);
         }
+        public async Task<bool> RemoveCollectionFromBook(long bookId, long collectionId) => await _repository.RemoveCollectionFromBook(bookId, collectionId);
+
 
     }
 

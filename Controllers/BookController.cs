@@ -71,8 +71,9 @@ namespace BackEnd.Controllers
         {
             if (id != book.Id) return BadRequest();
             await _bookService.UpdateBookAsync(book);
-            return NoContent();
+            return Ok(book);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(long id)
@@ -163,6 +164,16 @@ namespace BackEnd.Controllers
                 return NotFound();
             }
             return Ok(bookCollections);
+        }
+        [HttpGet("get-authors/{bookId}")]
+        public IActionResult GetAllAuthorsByBookId(long bookId)
+        {
+            var bookAuthors = _bookService.GetAllAuthorsByBookId(bookId);
+            if (bookAuthors == null || !bookAuthors.Any())
+            {
+                return NotFound();
+            }
+            return Ok(bookAuthors);
         }
         [HttpGet("author/{authorId}")]
         public async Task<ActionResult<List<Book>>> GetBooksByAuthorId( long authorId)
