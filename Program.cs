@@ -102,6 +102,7 @@ builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IJwtService, JwtService>(); // Register JWTService
 builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
 builder.Services.AddScoped<IFeedBackService,FeedBackService>();
+builder.Services.AddSignalR();
 
 
 var app = builder.Build();
@@ -138,6 +139,6 @@ app.UseMiddleware<TokenValidationMiddleware>();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
+    endpoints.MapHub<CommentHub>("/commentHub");
 });
-
 app.Run();
