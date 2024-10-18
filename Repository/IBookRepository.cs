@@ -17,5 +17,8 @@ namespace BackEnd.Repository
         Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending);
         IQueryable<Book> GetBooksByCollection(int collectionId);
         IQueryable<Book> GetBooks();
+        IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId);
+        IEnumerable<AuthorBook> GetAllAuthorsByBookId(long bookId);
+        Task<List<Book>> GetBooksByAuthorIdAsync(long authorId);
     }
 }

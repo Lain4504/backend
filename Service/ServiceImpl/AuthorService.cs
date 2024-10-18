@@ -17,5 +17,7 @@ public class AuthorService : IAuthorService
     public Task UpdateAuthor(Author author) => _authorRepository.UpdateAuthorAsync(author);
     public async Task<bool> AddBookToAuthor(long bookId, long authorId) => await _authorRepository.AddBookToAuthorAsync(bookId, authorId);
 
+    public async Task<bool> RemoveAuthorFromBook(long bookId, long authorId) => await _authorRepository.RemoveAuthorFromBook(bookId, authorId);
+
         
 }

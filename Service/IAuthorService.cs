@@ -9,4 +9,5 @@ public interface IAuthorService
     Task AddAuthor(Author author);
     Task UpdateAuthor(Author author);
     Task<bool> AddBookToAuthor(long bookId, long authorId);
+    Task<bool> RemoveAuthorFromBook(long bookId, long authorId);
 }

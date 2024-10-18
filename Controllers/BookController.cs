@@ -71,8 +71,9 @@ namespace BackEnd.Controllers
         {
             if (id != book.Id) return BadRequest();
             await _bookService.UpdateBookAsync(book);
-            return NoContent();
+            return Ok(book);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(long id)
@@ -153,6 +154,36 @@ namespace BackEnd.Controllers
                 return NotFound("No books found with the given title");
             }
             return Ok(new { content = books });
+        }
+        [HttpGet("get-collections/{bookId}")]
+        public IActionResult GetAllBookCollectionsByBookId(long bookId)
+        {
+            var bookCollections = _bookService.GetAllBookCollectionsByBookId(bookId);
+            if(bookCollections == null || !bookCollections.Any())
+            {
+                return NotFound();
+            }
+            return Ok(bookCollections);
+        }
+        [HttpGet("get-authors/{bookId}")]
+        public IActionResult GetAllAuthorsByBookId(long bookId)
+        {
+            var bookAuthors = _bookService.GetAllAuthorsByBookId(bookId);
+            if (bookAuthors == null || !bookAuthors.Any())
+            {
+                return NotFound();
+            }
+            return Ok(bookAuthors);
+        }
+        [HttpGet("author/{authorId}")]
+        public async Task<ActionResult<List<Book>>> GetBooksByAuthorId( long authorId)
+        {
+            var books = await _bookService.GetBooksByAuthorIdAsync(authorId);
+            if (books == null || books.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(books);
         }
     }
 
