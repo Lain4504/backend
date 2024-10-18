@@ -102,5 +102,13 @@ namespace BackEnd.Repository.RepositoryImpl
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<OrderDetail> GetOrderDetail(long orderId)
+        {
+            var qr = from d in _context.OrderDetails
+                     where d.OrderId == orderId
+                     select d;
+            return await qr.FirstAsync();
+        }
     }
 }
