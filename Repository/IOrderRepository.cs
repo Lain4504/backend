@@ -16,5 +16,7 @@ namespace BackEnd.Repository
         Task<Order> GetByUserAndStateAsync(long userId, OrderState state);
         Task<List<Order>> GetAllOrderAndState(OrderState state);
         Task AddNewCartAsync (Order order);
+
+        Task<OrderDetail> GetOrderDetail(long orderId);
     }
 }

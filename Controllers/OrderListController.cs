@@ -37,12 +37,25 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
+        [HttpGet("orderdetail/{orderId}")]
+        public async Task<IActionResult> getOrderDetails(long orderId)
+        {
+            try
+            {
+                OrderDetail detail = await _OrderService.GetOrderDetail(orderId);
+                return Ok(detail);
+            }
+            catch (Exception)
+            {
 
+                return StatusCode(500, "Internal server error, Please try again");
+            }
+        }
         [HttpPost("process")]
         public async Task processOrder(Order order)
         {
             await _OrderService.ChangeOrderState(order.Id, OrderState.Processing);
-            lock(_lock)
+            lock (_lock)
             {
                 _OrderService.ProcessOrderAsync(order);
             }
