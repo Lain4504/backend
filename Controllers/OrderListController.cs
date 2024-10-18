@@ -42,7 +42,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                OrderDetail detail = await _OrderService.GetOrderDetail(orderId);
+                List<OrderDetail> detail = await _OrderService.GetOrderDetail(orderId);
                 return Ok(detail);
             }
             catch (Exception)

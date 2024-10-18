@@ -103,12 +103,12 @@ namespace BackEnd.Repository.RepositoryImpl
             await _context.SaveChangesAsync();
         }
 
-        public async Task<OrderDetail> GetOrderDetail(long orderId)
+        public async Task<List<OrderDetail>> GetOrderDetail(long orderId)
         {
             var qr = from d in _context.OrderDetails
                      where d.OrderId == orderId
                      select d;
-            return await qr.FirstAsync();
+            return await qr.ToListAsync();
         }
     }
 }

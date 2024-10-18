@@ -115,7 +115,7 @@ namespace BackEnd.Service.ServiceImpl
             await _orderRepository.SaveAsync(order);
         }
 
-        public async Task<OrderDetail> GetOrderDetail(long orderId)
+        public async Task<List<OrderDetail>> GetOrderDetail(long orderId)
         {
             return await _orderRepository.GetOrderDetail(orderId);
         }
