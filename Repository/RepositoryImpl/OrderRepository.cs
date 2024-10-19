@@ -1,4 +1,4 @@
-using BackEnd.Models;
+﻿using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Repository.RepositoryImpl
@@ -20,8 +20,6 @@ namespace BackEnd.Repository.RepositoryImpl
             var result = await qr.ToListAsync();
             return result;
         }
-
-
         public async Task<Order> GetOrderByOrderIdAsync(long orderId)
         {
 
@@ -82,10 +80,13 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task<Order> GetByUserAndStateAsync(long userId, OrderState state)
         {
-            var qr = from o in _context.Orders
-                     where o.State == state.ToString() && o.UserId == userId
-                     select o;
-            return await qr.FirstOrDefaultAsync();
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails) // Include OrderDetails
+                    .ThenInclude(od => od.Book) // Include Book related to OrderDetail
+                        .ThenInclude(b => b.Images) // Include Images related to Book
+                .FirstOrDefaultAsync(o => o.State == state.ToString() && o.UserId == userId);
+
+            return order;
         }
 
 
