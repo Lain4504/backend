@@ -39,16 +39,41 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task<Book> SaveAsync(Book book)
         {
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
-            return book;
+            if (!string.IsNullOrEmpty(book.Title))
+            {
+                book.Title = book.Title.Trim();
+                while (book.Title.Contains("  "))
+                    book.Title = book.Title.Replace("  ", " ");
+            }
+
+            // Check for existing book by title
+            var existingBook = await _context.Books
+                .FirstOrDefaultAsync(b => b.Title == book.Title);
+
+            if (existingBook == null)
+            {
+                book.PublicationDate = DateOnly.FromDateTime(DateTime.UtcNow); // Set PublicationDate to today
+                _context.Books.Add(book);
+                await _context.SaveChangesAsync();
+                return book;
+            }
+
+            return null; // Return null if book already exists
         }
 
         public async Task UpdateAsync(Book book)
         {
-            _context.Books.Update(book);
-            await _context.SaveChangesAsync();
+             if (!string.IsNullOrEmpty(book.Title))
+                 {
+                      book.Title = book.Title.Trim();
+
+                         while (book.Title.Contains("  "))
+                          book.Title = book.Title.Replace("  ", " ");
+                 }
+              _context.Books.Update(book);
+           await _context.SaveChangesAsync();
         }
+
         public async Task DeleteAsync(long bookId)
         {
             // Find the book by ID
@@ -129,12 +154,10 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
-            // Tải dữ liệu liên quan sử dụng Include và ThenInclude
             var source = _context.Books
                 .Include(b => b.Images)
                 .AsQueryable();
 
-            // Sắp xếp theo thuộc tính mong muốn
             if (isAscending)
             {
                 source = source.OrderBy(book => EF.Property<object>(book, sortBy));
@@ -144,7 +167,6 @@ namespace BackEnd.Repository.RepositoryImpl
                 source = source.OrderByDescending(book => EF.Property<object>(book, sortBy));
             }
 
-            // Trả về danh sách phân trang
             return await PaginatedList<Book>.CreateAsync(source, page, size);
         }
         public IQueryable<Book> GetBooksByCollection(int collectionId)
@@ -158,7 +180,28 @@ namespace BackEnd.Repository.RepositoryImpl
         {
             return _context.Books.AsQueryable();
         }
-
+        public IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId)
+        {
+            return _context.BookCollections
+                .Include(bc => bc.Collection) // Include the related Collection
+                .Where(bc => bc.BookId == bookId)
+                .ToList();
+        }
+        public IEnumerable<AuthorBook> GetAllAuthorsByBookId(long bookId)
+        {
+            return _context.AuthorBooks
+                .Include(bc => bc.Author) 
+                .Where(bc => bc.BookId == bookId)
+                .ToList();
+        }
+        public async Task<List<Book>> GetBooksByAuthorIdAsync(long authorId)
+        {
+            return await _context.AuthorBooks
+                .Where(ab => ab.AuthorId == authorId)
+                .Include(ab => ab.Book.Images) 
+                .Select(ab => ab.Book) 
+                .ToListAsync();
+        }
     }
 
 }

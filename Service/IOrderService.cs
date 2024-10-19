@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackEnd.Models;
-using Microsoft.EntityFrameworkCore;
 
 public interface IOrderService
 {
     Task<List<Order>> GetOrderByUser(long userId);
-
-    // Task ProcessOrder(Order order);
-
+    Task<OrderDetail> GetOrderDetail(long orderId);
     Task ChangeOrderState(long orderId, OrderState orderState);
 
     Task<List<Order>> GetAll();

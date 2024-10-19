@@ -11,7 +11,13 @@ public class AuthorService : IAuthorService
     }
 
     public Task<IEnumerable<Author>> GetAllAuthors() => _authorRepository.GetAllAuthorsAsync();
-
     public Task<Author> GetAuthorById(long id) => _authorRepository.GetAuthorByIdAsync(id);
-    //public Task DeleteAuthor(long id) => _authorRepository.DeleteAuthorAsync(id);
+    public Task DeleteAuthor(long id) => _authorRepository.DeleteAuthorAsync(id);
+    public Task AddAuthor(Author author) => _authorRepository.AddAuthorAsync(author);
+    public Task UpdateAuthor(Author author) => _authorRepository.UpdateAuthorAsync(author);
+    public async Task<bool> AddBookToAuthor(long bookId, long authorId) => await _authorRepository.AddBookToAuthorAsync(bookId, authorId);
+
+    public async Task<bool> RemoveAuthorFromBook(long bookId, long authorId) => await _authorRepository.RemoveAuthorFromBook(bookId, authorId);
+
+        
 }
