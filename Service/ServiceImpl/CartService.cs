@@ -45,17 +45,23 @@ namespace BackEnd.Service.ServiceImpl
             return book;
         }
 
-        public async Task AddToCart(OrderDetail orderDetail)
+        public async Task AddToCart(int bookId, decimal price, int quantity, int userId)
         {
-            var existingCart = await GetCartByUser(orderDetail.Order.UserId ?? 0);
-            var existingBook = await GetExistingBookAsync(orderDetail.Book.Id);
+            // Lấy giỏ hàng hiện tại của người dùng
+            var existingCart = await GetCartByUser(userId);
+
+            // Lấy thông tin sách dựa trên bookId
+            var existingBook = await GetExistingBookAsync(bookId);
+
+            // Tìm kiếm sách trong giỏ hàng
             var bookInCart = await _orderDetailRepository.FindByOrderAndBookAsync(existingCart, existingBook);
 
+            // Nếu sách chưa có trong giỏ hàng
             if (bookInCart == null)
             {
                 bookInCart = new OrderDetail
                 {
-                    Amount = orderDetail.Amount,
+                    Amount = quantity,
                     Book = existingBook,
                     Order = existingCart,
                     OriginalPrice = existingBook.Price,
@@ -66,15 +72,18 @@ namespace BackEnd.Service.ServiceImpl
             }
             else
             {
-                bookInCart.Amount += orderDetail.Amount;
+                // Cập nhật số lượng sách trong giỏ hàng
+                bookInCart.Amount += quantity;
             }
 
+            // Kiểm tra số lượng sách trong giỏ hàng không vượt quá số lượng tồn kho
             if (bookInCart.Amount > existingBook.Stock)
             {
                 bookInCart.Amount = existingBook.Stock;
                 throw new Exception("Số lượng của sản phẩm trong giỏ hàng vượt quá mức cho phép");
             }
 
+            // Lưu thay đổi vào cơ sở dữ liệu
             await _orderDetailRepository.SaveChangesAsync();
         }
 
