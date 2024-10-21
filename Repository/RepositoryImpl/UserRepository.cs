@@ -70,7 +70,8 @@ namespace BackEnd.Repository.RepositoryImpl
                     u.Phone,
                     u.Dob,
                     u.Address,
-                    u.Gender
+                    u.Gender,
+                    u.Role
                 })
                 .SingleOrDefaultAsync();
 
@@ -89,7 +90,8 @@ namespace BackEnd.Repository.RepositoryImpl
                 Phone = user.Phone,
                 Dob = user.Dob,
                 Address = user.Address,
-                Gender = user.Gender
+                Gender = user.Gender,
+                Role = user.Role
             };
         }
 

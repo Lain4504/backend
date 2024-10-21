@@ -6,5 +6,6 @@ namespace BackEnd.Service
     {
         string GenerateJwtToken(string email, long id, string role);
         ClaimsPrincipal ValidateJwtToken(string token);
+        string GenerateRefreshToken();
     }
 }

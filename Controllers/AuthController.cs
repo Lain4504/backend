@@ -23,12 +23,13 @@ namespace BackEnd.Controllers
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly IJwtService _jWTService;
-
-        public AuthController(IUserService userService, IEmailService emailService, IJwtService jWTService)
+        private readonly IRefreshTokenService _refreshTokenService;
+        public AuthController(IUserService userService, IEmailService emailService, IJwtService jWTService, IRefreshTokenService refreshTokenService)
         {
             _userService = userService;
             _emailService = emailService;
             _jWTService = jWTService;
+            _refreshTokenService = refreshTokenService;
         }
 
         [HttpPost("register")]
@@ -62,7 +63,6 @@ namespace BackEnd.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] DTO.Request.LoginRequest loginRequest)
         {
-            // Kiểm tra đầu vào rỗng
             if (string.IsNullOrEmpty(loginRequest.email) || string.IsNullOrEmpty(loginRequest.password))
             {
                 return BadRequest("Email và mật khẩu không được để trống.");
@@ -70,26 +70,37 @@ namespace BackEnd.Controllers
 
             try
             {
-                // Xác thực người dùng bằng email và mật khẩu gốc (không mã hóa)
                 var existingUser = await _userService.AuthenticateAsync(loginRequest.email, loginRequest.password);
                 if (existingUser == null)
                 {
-                    // Trả về lỗi nếu thông tin đăng nhập không hợp lệ
                     return Unauthorized("Email hoặc mật khẩu không đúng.");
                 }
 
-                // Sử dụng phương thức GenerateJwtToken để tạo token dựa trên email của người dùng
-                var tokenString = _jWTService.GenerateJwtToken(existingUser.Email, existingUser.Id, existingUser.Role);
+                // Tạo Access Token
+                var accessToken = _jWTService.GenerateJwtToken(existingUser.Email, existingUser.Id, existingUser.Role);
 
-                // Trả về thông báo thành công cùng với token và thông tin người dùng
-                return Ok(new { message = "Đăng nhập thành công.", token = tokenString, user = existingUser });
+                // Tạo Refresh Token
+                var refreshToken = _jWTService.GenerateRefreshToken();
+
+                // Lưu refresh token vào cơ sở dữ liệu
+                await _refreshTokenService.SaveRefreshTokenAsync(existingUser.Id, refreshToken);
+
+                // Trả về cả access token, refresh token và thời gian hết hạn
+                return Ok(new
+                {
+                    message = "Đăng nhập thành công.",
+                    token = accessToken,
+                    refreshToken = refreshToken,
+                });
             }
             catch (Exception ex)
             {
-                // Xử lý các lỗi khác
                 return StatusCode(500, "Đã xảy ra lỗi trong quá trình đăng nhập.");
             }
         }
+
+
+
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAccount([FromBody] ActivateAccountRequest request)
         {
@@ -281,6 +292,54 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            // Kiểm tra tính hợp lệ của refresh token
+            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            {
+                return BadRequest("Refresh token không được để trống.");
+            }
+
+            var token = await _refreshTokenService.GetRefreshToken(request.RefreshToken);
+            if (token == null || token.ExpirationDate < DateTime.UtcNow)
+            {
+                return Unauthorized(new { Error = "Refresh token không hợp lệ hoặc đã hết hạn." });
+            }
+
+            var user = await _userService.GetUserByIDAsync(token.UserId);
+            if (user == null)
+            {
+                return Unauthorized(new { Error = "Không tìm thấy người dùng." });
+            }
+
+            // Tạo mới JWT token và refresh token
+            var newJwtToken = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
+            
+
+            return Ok(new { Token = newJwtToken});
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            {
+                return BadRequest("Refresh token không được để trống.");
+            }
+
+            var token = await _refreshTokenService.GetRefreshToken(request.RefreshToken);
+            if (token == null)
+            {
+                return Unauthorized(new { Error = "Refresh token không hợp lệ." });
+            }
+
+            await _refreshTokenService.RemoveRefreshToken(request.RefreshToken);
+
+
+            return Ok(new { Message = "Đăng xuất thành công." });
+        }
+
 
     }
 }
