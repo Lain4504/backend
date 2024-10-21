@@ -82,6 +82,7 @@ namespace BackEnd.Repository.RepositoryImpl
                 while (post.Title.Contains("  "))  
                     post.Title = post.Title.Replace("  ", " ");
             }
+            post.CreatedAt = DateTime.UtcNow;
             _context.Posts.Update(post);
             await _context.SaveChangesAsync();
         }
