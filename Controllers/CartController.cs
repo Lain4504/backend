@@ -16,7 +16,7 @@ namespace BackEnd.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public async Task<IActionResult> GetAllCart()
         {
             try
