@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BackEnd.Service.ServiceImpl
@@ -38,7 +39,7 @@ namespace BackEnd.Service.ServiceImpl
                 issuer: "JwtIssuer", // Issuer từ appsettings
                 audience: "JwtAudience", // Audience từ appsettings
                 claims: claims, // Các claim cho token
-                expires: DateTime.Now.AddMinutes(30), // Token hết hạn sau 30 phút
+                expires: DateTime.Now.AddMinutes(1), // Token hết hạn sau 30 phút
                 signingCredentials: creds); // Sử dụng thông tin SigningCredentials
 
             // Trả về chuỗi JWT token
@@ -69,6 +70,20 @@ namespace BackEnd.Service.ServiceImpl
             catch
             {
                 return null;
+            }
+        }
+
+        // Hàm tạo Refresh Token và mã hóa nó
+        public string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+
+            // Sử dụng RandomNumberGenerator thay thế cho RNGCryptoServiceProvider
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+                var refreshToken = Convert.ToBase64String(randomBytes);
+                return EncryptDecryptManager.Encrypt(refreshToken); 
             }
         }
     }

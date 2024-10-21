@@ -47,7 +47,7 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Wishlist> Wishlists { get; set; }
 
-
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
@@ -70,7 +70,7 @@ public partial class BookStoreContext : DbContext
         {
             entity.HasKey(ab => 
             new { ab.AuthorId, ab.BookId })
-            .HasName("PK_BookCollection");
+            .HasName("PK_AuthorBook");
             entity.ToTable("author_book");
 
             entity.Property(e => e.AuthorId).HasColumnName("author_id");
@@ -490,6 +490,34 @@ public partial class BookStoreContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Wishlists)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK6e4b6ubvjarad3f5g8wqhec");
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshToken");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Token)
+                  .IsRequired()
+                  .HasMaxLength(255);
+
+            entity.Property(e => e.CreatedDate)
+                  .IsRequired();
+
+            entity.Property(e => e.ExpirationDate)
+                  .IsRequired();
+
+            entity.Property(e => e.Revoked)
+                  .HasDefaultValue(false);
+
+            entity.Property(e => e.Used)
+                  .HasDefaultValue(false);
+
+            entity.HasOne(d => d.User)
+                  .WithMany(p => p.RefreshTokens)
+                  .HasForeignKey(d => d.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         OnModelCreatingPartial(modelBuilder);
