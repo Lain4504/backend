@@ -1,3 +1,4 @@
+﻿using BackEnd.DTO.Request;
 using BackEnd.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,10 +47,26 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddCart([FromBody] OrderDetail orderDetail)
+        public async Task<IActionResult> AddCart([FromBody] AddToCartRequest request)
         {
-            _cartService.AddToCart(orderDetail);
-            return NoContent();
+            // Kiểm tra xem request có hợp lệ không
+            if (request == null || request.BookId <= 0 || request.Quantity <= 0 || request.UserId <= 0)
+            {
+                return BadRequest("Thông tin sản phẩm không hợp lệ.");
+            }
+
+            try
+            {
+                // Gọi phương thức AddToCart từ service
+                await _cartService.AddToCart(request.BookId, request.Price, request.Quantity, request.UserId);
+                return NoContent(); // Trả về 204 No Content nếu thêm giỏ hàng thành công
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ và trả về mã lỗi phù hợp
+                return BadRequest(ex.Message);
+            }
         }
+
     }
 }
