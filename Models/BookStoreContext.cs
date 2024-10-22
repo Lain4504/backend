@@ -70,7 +70,7 @@ public partial class BookStoreContext : DbContext
         {
             entity.HasKey(ab => 
             new { ab.AuthorId, ab.BookId })
-            .HasName("PK_BookCollection");
+            .HasName("PK_AuthorBook");
             entity.ToTable("author_book");
 
             entity.Property(e => e.AuthorId).HasColumnName("author_id");
@@ -257,10 +257,6 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.CustomerNote)
                 .IsUnicode(false)
                 .HasColumnName("customer_note");
-            entity.Property(e => e.District)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("district");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
                 .IsUnicode(false)
@@ -277,10 +273,6 @@ public partial class BookStoreContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("phone");
-            entity.Property(e => e.Province)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("province");
             entity.Property(e => e.ShippingPrice).HasColumnName("shipping_price");
             entity.Property(e => e.ShippingState)
                 .HasMaxLength(255)
@@ -295,11 +287,6 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("state");
             entity.Property(e => e.TotalPrice).HasColumnName("total_price");
             entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.Ward)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("ward");
-
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FKrcaf946w0bh6qj0ljiw3pwpnu");
