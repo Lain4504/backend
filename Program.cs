@@ -101,6 +101,9 @@ builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IJwtService, JwtService>(); // Register JWTService
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
 
 builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 

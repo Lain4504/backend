@@ -47,7 +47,7 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Wishlist> Wishlists { get; set; }
 
-
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
@@ -70,7 +70,7 @@ public partial class BookStoreContext : DbContext
         {
             entity.HasKey(ab => 
             new { ab.AuthorId, ab.BookId })
-            .HasName("PK_BookCollection");
+            .HasName("PK_AuthorBook");
             entity.ToTable("author_book");
 
             entity.Property(e => e.AuthorId).HasColumnName("author_id");
@@ -257,10 +257,6 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.CustomerNote)
                 .IsUnicode(false)
                 .HasColumnName("customer_note");
-            entity.Property(e => e.District)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("district");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
                 .IsUnicode(false)
@@ -277,10 +273,6 @@ public partial class BookStoreContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("phone");
-            entity.Property(e => e.Province)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("province");
             entity.Property(e => e.ShippingPrice).HasColumnName("shipping_price");
             entity.Property(e => e.ShippingState)
                 .HasMaxLength(255)
@@ -295,11 +287,6 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("state");
             entity.Property(e => e.TotalPrice).HasColumnName("total_price");
             entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.Ward)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("ward");
-
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FKrcaf946w0bh6qj0ljiw3pwpnu");
@@ -490,6 +477,34 @@ public partial class BookStoreContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Wishlists)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK6e4b6ubvjarad3f5g8wqhec");
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshToken");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Token)
+                  .IsRequired()
+                  .HasMaxLength(255);
+
+            entity.Property(e => e.CreatedDate)
+                  .IsRequired();
+
+            entity.Property(e => e.ExpirationDate)
+                  .IsRequired();
+
+            entity.Property(e => e.Revoked)
+                  .HasDefaultValue(false);
+
+            entity.Property(e => e.Used)
+                  .HasDefaultValue(false);
+
+            entity.HasOne(d => d.User)
+                  .WithMany(p => p.RefreshTokens)
+                  .HasForeignKey(d => d.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         OnModelCreatingPartial(modelBuilder);
