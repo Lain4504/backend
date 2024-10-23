@@ -82,9 +82,23 @@ namespace BackEnd.Repository.RepositoryImpl
                 while (post.Title.Contains("  "))  
                     post.Title = post.Title.Replace("  ", " ");
             }
+            post.CreatedAt = DateTime.UtcNow;
             _context.Posts.Update(post);
             await _context.SaveChangesAsync();
         }
+
+        public IQueryable<Post> GetPostsByPostCategory(int postcategoryId)
+        {
+            return from p in _context.Posts
+                   join pc in _context.PostCategories on p.CategoryId equals pc.Id
+                   where pc.Id == postcategoryId
+                   select p;
+        }
+        public IQueryable<Post> GetPosts()
+        {
+            return _context.Posts.AsQueryable();
+        }
+
 
     }
 

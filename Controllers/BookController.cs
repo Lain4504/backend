@@ -71,8 +71,9 @@ namespace BackEnd.Controllers
         {
             if (id != book.Id) return BadRequest();
             await _bookService.UpdateBookAsync(book);
-            return NoContent();
+            return Ok(book);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(long id)
@@ -120,71 +121,7 @@ namespace BackEnd.Controllers
 
             return Ok(response);
         }
-        //    [HttpGet("sorted-and-paged/by-collection")]
-        //    public async Task<ActionResult<object>> GetBooksByCollectionAndPriceBetween(
-        //     [FromQuery] int? collection,
-        //     [FromQuery] int? min = 0,
-        //     [FromQuery] int? max = 0,
-        //     [FromQuery] string sortBy = "Id",
-        //     [FromQuery] int page = 0,
-        //     [FromQuery] int size = 5,
-        //     [FromQuery] string sortOrder = "asc")
-        //    {
-        //        if (max == 0) max = int.MaxValue;
-
-        //        var booksQuery = _context.Books.AsQueryable();
-
-        //        if (collection.HasValue)
-        //        {
-        //            booksQuery = from b in booksQuery
-        //                         join bc in _context.BookCollections on b.Id equals bc.BookId
-        //                         where bc.CollectionId == collection.Value
-        //                         select b;
-        //        }
-
-        //        // Thêm điều kiện lọc giá
-        //        booksQuery = booksQuery.Where(b => b.Price >= min && b.Price <= max);
-
-        //        // Thêm điều kiện sắp xếp
-        //        booksQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
-        //            ? booksQuery.OrderBy(b => EF.Property<object>(b, sortBy))
-        //            : booksQuery.OrderByDescending(b => EF.Property<object>(b, sortBy));
-
-        //        // Thực hiện phân trang
-        //        var totalCount = await booksQuery.CountAsync();
-        //        var items = await booksQuery.Skip(page * size).Take(size).Include(b => b.Images).ToListAsync();
-
-        //        var totalPages = (int)Math.Ceiling((double)totalCount / size);
-
-        //        var response = new
-        //        {
-        //            content = items,
-        //            pageable = new
-        //            {
-        //                sort = new
-        //                {
-        //                    empty = false,
-        //                    sorted = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase),
-        //                    unsorted = !sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
-        //                },
-        //                offset = page * size,
-        //                pageSize = size,
-        //                pageNumber = page,
-        //                paged = true,
-        //                unpaged = false
-        //            },
-        //            totalElements = totalCount,
-        //            totalPages = totalPages,
-        //            last = page >= totalPages - 1,
-        //            size = size,
-        //            number = page,
-        //            first = page == 0,
-        //            numberOfElements = items.Count,
-        //            empty = !items.Any()
-        //        };
-
-        //        return Ok(response);
-        //    }
+        
         [HttpGet("sorted-and-paged/by-collection")]
         public async Task<ActionResult<object>> GetBooksByCollection(
         [FromQuery] int? collection,
@@ -203,6 +140,50 @@ namespace BackEnd.Controllers
             };
 
             return Ok(response);
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> GetBooksByTitle([FromQuery] string title)
+        {
+            if (string.IsNullOrEmpty(title))
+            {
+                return BadRequest("Title cannot be emtry");
+            }
+            var books = await _bookService.FindBooksByTitleAsync(title);
+            if (!books.Any())
+            {
+                return NotFound("No books found with the given title");
+            }
+            return Ok(new { content = books });
+        }
+        [HttpGet("get-collections/{bookId}")]
+        public IActionResult GetAllBookCollectionsByBookId(long bookId)
+        {
+            var bookCollections = _bookService.GetAllBookCollectionsByBookId(bookId);
+            if(bookCollections == null || !bookCollections.Any())
+            {
+                return NotFound();
+            }
+            return Ok(bookCollections);
+        }
+        [HttpGet("get-authors/{bookId}")]
+        public IActionResult GetAllAuthorsByBookId(long bookId)
+        {
+            var bookAuthors = _bookService.GetAllAuthorsByBookId(bookId);
+            if (bookAuthors == null || !bookAuthors.Any())
+            {
+                return NotFound();
+            }
+            return Ok(bookAuthors);
+        }
+        [HttpGet("author/{authorId}")]
+        public async Task<ActionResult<List<Book>>> GetBooksByAuthorId( long authorId)
+        {
+            var books = await _bookService.GetBooksByAuthorIdAsync(authorId);
+            if (books == null || books.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(books);
         }
     }
 

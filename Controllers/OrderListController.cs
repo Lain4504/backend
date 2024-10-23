@@ -1,7 +1,9 @@
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Service;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Controllers
 {
@@ -13,9 +15,12 @@ namespace BackEnd.Controllers
     {
         private static readonly object _lock = new object();
         private readonly IOrderService _OrderService;
-        public OrderController(IOrderService OrderService)
+        private readonly BookStoreContext _context;
+
+        public OrderController(IOrderService OrderService, BookStoreContext content)
         {
             _OrderService = OrderService;
+            _context = content;
         }
 
 
@@ -37,12 +42,25 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
+        [HttpGet("orderdetail/{orderId}")]
+        public async Task<IActionResult> getOrderDetails(long orderId)
+        {
+            try
+            {
+                List<OrderDetail> detail = await _OrderService.GetOrderDetail(orderId);
+                return Ok(detail);
+            }
+            catch (Exception)
+            {
 
+                return StatusCode(500, "Internal server error, Please try again");
+            }
+        }
         [HttpPost("process")]
         public async Task processOrder(Order order)
         {
             await _OrderService.ChangeOrderState(order.Id, OrderState.Processing);
-            lock(_lock)
+            lock (_lock)
             {
                 _OrderService.ProcessOrderAsync(order);
             }
@@ -125,5 +143,42 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
+        [HttpPut("update-info/{id}")]
+        public async Task<IActionResult> UpdateInfoOrder(long id, [FromBody] UpdateOrderRequest updatedOrder)
+        {
+            if (id != updatedOrder.Id)
+            {
+                return BadRequest("ID không khớp với Order");
+            }
+
+            try
+            {
+                // Tìm đơn hàng dựa trên ID
+                var order = await _context.Orders.FindAsync(id);
+
+                if (order == null)
+                {
+                    return NotFound("Đơn hàng không tồn tại.");
+                }
+
+                // Cập nhật thông tin đơn hàng
+                order.FullName = updatedOrder.Name;
+                order.Phone = updatedOrder.Phone;
+                order.Address = updatedOrder.Address;
+
+                // Lưu thay đổi vào cơ sở dữ liệu
+                await _context.SaveChangesAsync();
+
+                // Trả về true nếu cập nhật thành công
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                // Trả về mã trạng thái 500 kèm thông điệp lỗi
+                return StatusCode(500, $"Lỗi cập nhật đơn hàng: {ex.Message}");
+            }
+        }
+
+
     }
 }

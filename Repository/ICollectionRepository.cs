@@ -11,6 +11,7 @@ namespace BackEnd.Repository
         Task UpdateCollectionAsync(Collection collection);
         Task DeleteCollectionAsync(long id);
         Task<PaginatedList<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending);
+        Task<bool> RemoveCollectionFromBook(long bookId, long collectionId);
 
     }
 }

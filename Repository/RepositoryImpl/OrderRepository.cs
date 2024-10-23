@@ -1,8 +1,5 @@
-using System.Linq;
-using System.Threading.Tasks;
-using BackEnd.Models;
+﻿using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BackEnd.Repository.RepositoryImpl
 {
@@ -23,8 +20,6 @@ namespace BackEnd.Repository.RepositoryImpl
             var result = await qr.ToListAsync();
             return result;
         }
-
-
         public async Task<Order> GetOrderByOrderIdAsync(long orderId)
         {
 
@@ -41,10 +36,6 @@ namespace BackEnd.Repository.RepositoryImpl
             return await qr.ToListAsync();
         }
 
-        // public Task UpdateOrderAsync(Order order)
-        // {
-        //     throw new NotImplementedException();
-        // }
 
         public async Task ChangeOrderPaymentState(long id, PaymentState state)
         {
@@ -80,6 +71,45 @@ namespace BackEnd.Repository.RepositoryImpl
         public async Task SaveAsync(Order order)
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Order>> GetAllAsync()
+        {
+            return await _context.Orders.ToListAsync();
+        }
+
+        public async Task<Order> GetByUserAndStateAsync(long userId, OrderState state)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails) // Include OrderDetails
+                    .ThenInclude(od => od.Book) // Include Book related to OrderDetail
+                        .ThenInclude(b => b.Images) // Include Images related to Book
+                .FirstOrDefaultAsync(o => o.State == state.ToString() && o.UserId == userId);
+
+            return order;
+        }
+
+
+        public async Task<List<Order>> GetAllOrderAndState(OrderState state)
+        {
+            var qr = from o in _context.Orders
+                     where o.State.Equals(state.ToString())
+                     select o;
+            return await qr.ToListAsync();
+        }
+
+        public async Task AddNewCartAsync(Order order)
+        {
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<OrderDetail>> GetOrderDetail(long orderId)
+        {
+            var qr = from d in _context.OrderDetails
+                     where d.OrderId == orderId
+                     select d;
+            return await qr.ToListAsync();
         }
     }
 }

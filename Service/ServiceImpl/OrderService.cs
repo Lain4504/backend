@@ -1,7 +1,5 @@
 using BackEnd.Models;
 using BackEnd.Repository;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Service.ServiceImpl
 {
@@ -115,6 +113,11 @@ namespace BackEnd.Service.ServiceImpl
             }
 
             await _orderRepository.SaveAsync(order);
+        }
+
+        public async Task<List<OrderDetail>> GetOrderDetail(long orderId)
+        {
+            return await _orderRepository.GetOrderDetail(orderId);
         }
     }
 }

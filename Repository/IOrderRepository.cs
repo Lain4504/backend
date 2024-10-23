@@ -12,5 +12,11 @@ namespace BackEnd.Repository
         Task ChangeOrderShippingState(long orderId,ShippingState shippingState);
         Task Cancel(long id);
         Task SaveAsync(Order order);
+        Task<List<Order>> GetAllAsync();
+        Task<Order> GetByUserAndStateAsync(long userId, OrderState state);
+        Task<List<Order>> GetAllOrderAndState(OrderState state);
+        Task AddNewCartAsync (Order order);
+
+        Task<List<OrderDetail>> GetOrderDetail(long orderId);
     }
 }
