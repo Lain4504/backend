@@ -45,7 +45,8 @@ namespace BackEnd.Service.ServiceImpl
             {
                 UserId = userId,
                 Token = refreshToken,
-                ExpirationDate = DateTime.UtcNow.AddDays(7) // Thiết lập thời hạn sử dụng của refresh token
+                ExpirationDate = DateTime.UtcNow.AddDays(7), // Thiết lập thời hạn sử dụng của refresh token
+                CreatedDate = DateTime.UtcNow,
             };
 
             // Lưu vào cơ sở dữ liệu
