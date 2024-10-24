@@ -54,7 +54,7 @@ builder.Services.AddDbContext<BookStoreContext>(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins",
-        builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5175")
+        builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
@@ -100,6 +100,11 @@ builder.Services.AddScoped<IPublisherService, PublisherService>();
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IJwtService, JwtService>(); // Register JWTService
+builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
+builder.Services.AddScoped<IFeedBackService,FeedBackService>();
+builder.Services.AddSignalR();
+
+
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -141,6 +146,6 @@ app.UseMiddleware<TokenValidationMiddleware>();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
+    endpoints.MapHub<CommentHub>("/commentHub");
 });
-
 app.Run();
