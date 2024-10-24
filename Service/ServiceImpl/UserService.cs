@@ -7,10 +7,10 @@ using BackEnd.Models;
 using BackEnd.Repository;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MySqlConnector;
 namespace BackEnd.Service.ServiceImpl
 {
     public class UserService : IUserService
@@ -144,7 +144,7 @@ namespace BackEnd.Service.ServiceImpl
             catch (DbUpdateException ex)
             {
                 // Kiểm tra lỗi trùng lặp
-                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
+                if (ex.InnerException is MySqlException mySqlEx && mySqlEx.Number == 1062) // 1062 là mã lỗi cho trùng lặp khóa chính
                 {
                     // Trả về thông báo lỗi phù hợp
                     throw new Exception("Email is already registered."); // Hoặc xử lý theo cách của bạn

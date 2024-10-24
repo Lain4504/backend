@@ -48,7 +48,8 @@ builder.Services.AddAuthentication(options =>
 
 // Add DbContext
 builder.Services.AddDbContext<BookStoreContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BookStoreContext")));
+    options.UseMySql(builder.Configuration.GetConnectionString("BookStoreContext"),
+                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookStoreContext"))));
 
 // CORS
 builder.Services.AddCors(options =>

@@ -25,7 +25,7 @@ namespace BackEnd.Controllers
             try
             {
                 var sliders = await _sliderService.GetAllSlidersAsync();
-                if (sliders == null || !sliders.Any())
+                if (sliders == null)
                 {
                     return NotFound();
                 }

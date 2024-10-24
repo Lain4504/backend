@@ -39,7 +39,7 @@ namespace BackEnd.Service.ServiceImpl
                 issuer: "JwtIssuer", // Issuer từ appsettings
                 audience: "JwtAudience", // Audience từ appsettings
                 claims: claims, // Các claim cho token
-                expires: DateTime.Now.AddMinutes(1), // Token hết hạn sau 30 phút
+                expires: DateTime.Now.AddMinutes(3), // Token hết hạn sau 30 phút
                 signingCredentials: creds); // Sử dụng thông tin SigningCredentials
 
             // Trả về chuỗi JWT token

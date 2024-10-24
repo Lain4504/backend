@@ -46,7 +46,7 @@ namespace BackEnd.Controllers
             try
             {
                 var postCategories = await _PostCategoryService.GetAllPostCategoriesAsync();
-                if (postCategories == null || !postCategories.Any())
+                if (postCategories == null)
                     return NotFound();
                 return Ok(postCategories);
             }
