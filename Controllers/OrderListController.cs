@@ -2,6 +2,7 @@ using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Service;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -150,27 +151,10 @@ namespace BackEnd.Controllers
             {
                 return BadRequest("ID không khớp với Order");
             }
-
             try
             {
-                // Tìm đơn hàng dựa trên ID
-                var order = await _context.Orders.FindAsync(id);
-
-                if (order == null)
-                {
-                    return NotFound("Đơn hàng không tồn tại.");
-                }
-
-                // Cập nhật thông tin đơn hàng
-                order.FullName = updatedOrder.Name;
-                order.Phone = updatedOrder.Phone;
-                order.Address = updatedOrder.Address;
-
-                // Lưu thay đổi vào cơ sở dữ liệu
-                await _context.SaveChangesAsync();
-
-                // Trả về true nếu cập nhật thành công
-                return Ok(true);
+                await _OrderService.UpdateOrderInfo(id, updatedOrder);
+                return Ok();
             }
             catch (Exception ex)
             {

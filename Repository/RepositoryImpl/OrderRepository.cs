@@ -1,4 +1,6 @@
-﻿using BackEnd.Models;
+﻿using BackEnd.DTO.Request;
+using BackEnd.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Repository.RepositoryImpl
@@ -15,7 +17,7 @@ namespace BackEnd.Repository.RepositoryImpl
         public async Task<List<Order>> GetOrderByUserIdAsync(long userid)
         {
             var qr = from o in _context.Orders
-                     where o.UserId == userid
+                     where o.UserId == userid && o.State != OrderState.Cart.ToString()
                      select o;
             var result = await qr.ToListAsync();
             return result;
@@ -110,6 +112,21 @@ namespace BackEnd.Repository.RepositoryImpl
                      where d.OrderId == orderId
                      select d;
             return await qr.ToListAsync();
+        }
+
+        public async Task UpdateInfoOrder(long orderId, UpdateOrderRequest updateOrder)
+        {
+            //find order by Id
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null)
+            {
+                return;
+            }
+            //update order
+            order.FullName = updateOrder.Name;
+            order.Phone = updateOrder.Phone;
+            order.Address = updateOrder.Address;
+            await _context.SaveChangesAsync();
         }
     }
 }
