@@ -1,3 +1,4 @@
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Repository;
 
@@ -118,6 +119,11 @@ namespace BackEnd.Service.ServiceImpl
         public async Task<List<OrderDetail>> GetOrderDetail(long orderId)
         {
             return await _orderRepository.GetOrderDetail(orderId);
+        }
+
+        public async Task UpdateOrderInfo(long orderId, UpdateOrderRequest updateOrder)
+        {
+            await _orderRepository.UpdateInfoOrder(orderId, updateOrder);
         }
     }
 }
