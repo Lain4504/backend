@@ -92,8 +92,8 @@ builder.Services.AddScoped<IJwtService, JwtService>(); // Register JWTService
 builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
 builder.Services.AddScoped<IFeedBackService,FeedBackService>();
 builder.Services.AddSignalR();
-
-
+builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

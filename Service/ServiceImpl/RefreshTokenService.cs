@@ -18,29 +18,35 @@ namespace BackEnd.Service.ServiceImpl
             return await _refreshTokenRepository.GetByToken(token);
         }
 
-        public async Task GenerateRefreshToken(User user, string refreshToken)
+        public async Task<DateTime> GenerateRefreshToken(User user, string refreshToken)
         {
             var existingToken = await _refreshTokenRepository.GetByToken(refreshToken);
+            DateTime expirationDate;
 
             if (existingToken != null)
             {
-                existingToken.Token = refreshToken; 
-                existingToken.ExpirationDate = DateTime.UtcNow.AddDays(30); 
+                existingToken.Token = refreshToken;
+                expirationDate = DateTime.UtcNow.AddMinutes(3);
+                existingToken.ExpirationDate = expirationDate;
             }
             else
             {
+                expirationDate = DateTime.UtcNow.AddMinutes(3);
                 var newToken = new RefreshToken
                 {
                     UserId = user.Id,
                     Token = refreshToken,
-                    ExpirationDate = DateTime.UtcNow.AddDays(30),
-                    CreatedDate =DateTime.Now// Thời gian hết hạn cho refresh token
+                    ExpirationDate = expirationDate,
+                    CreatedDate = DateTime.Now // Thời gian tạo mới
                 };
                 await _refreshTokenRepository.Add(newToken);
             }
 
             await _refreshTokenRepository.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
+
+            return expirationDate; // Trả về ExpirationDate
         }
+
 
 
         public async Task RemoveRefreshToken(string token)
