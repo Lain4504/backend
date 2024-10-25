@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -78,13 +79,14 @@ namespace BackEnd.Service.ServiceImpl
         {
             var randomBytes = new byte[64];
 
-            // Sử dụng RandomNumberGenerator thay thế cho RNGCryptoServiceProvider
+            // Sử dụng RandomNumberGenerator để tạo byte ngẫu nhiên
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(randomBytes);
-                var refreshToken = Convert.ToBase64String(randomBytes);
-                return EncryptDecryptManager.Encrypt(refreshToken); 
             }
+
+            // Trả về chuỗi mã hóa Base64
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

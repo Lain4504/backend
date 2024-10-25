@@ -8,6 +8,7 @@ namespace BackEnd.Service
     {
         Task<User> AuthenticateAsync(string Email, string Password);
         Task<User> RegisterAsync(string Email, string Password);
+        Task<User> RegisterAsync(string Email);
         Task<User> GetUserByEmailAsync(String Email);
         Task<User> ActivateAccountAsync(string email);
         Task<bool> UpdatePassword(string email, string newPassword);
