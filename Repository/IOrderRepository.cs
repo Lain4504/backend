@@ -1,3 +1,4 @@
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 
 namespace BackEnd.Repository
@@ -18,5 +19,6 @@ namespace BackEnd.Repository
         Task AddNewCartAsync (Order order);
 
         Task<List<OrderDetail>> GetOrderDetail(long orderId);
+        Task UpdateInfoOrder(long orderId, UpdateOrderRequest updateOrder);
     }
 }

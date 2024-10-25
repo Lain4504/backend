@@ -1,3 +1,4 @@
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 
 public interface IOrderService
@@ -16,4 +17,5 @@ public interface IOrderService
 
     Task Cancel(long orderId);
     Task ProcessOrderAsync(Order order);
+    Task UpdateOrderInfo(long orderId, UpdateOrderRequest updateOrder);
 }
