@@ -2,7 +2,7 @@
 {
     public class RefreshTokenRequest
     {
-        public string? RefreshToken { get; set; } // The refresh token
+        public string? refreshToken { get; set; } // The refresh token
     }
 }
 

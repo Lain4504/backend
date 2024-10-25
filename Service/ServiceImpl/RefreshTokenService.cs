@@ -1,5 +1,6 @@
 ﻿using BackEnd.Models;
 using BackEnd.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Service.ServiceImpl
 {
@@ -17,18 +18,30 @@ namespace BackEnd.Service.ServiceImpl
             return await _refreshTokenRepository.GetByToken(token);
         }
 
-        public async Task GenerateRefreshToken(User user, string token)
+        public async Task GenerateRefreshToken(User user, string refreshToken)
         {
-            var refreshToken = new RefreshToken
-            {
-                UserId = user.Id,
-                Token = token,
-                ExpirationDate = DateTime.UtcNow.AddDays(7) // Thời hạn tùy chỉnh
-            };
+            var existingToken = await _refreshTokenRepository.GetByToken(refreshToken);
 
-            await _refreshTokenRepository.Add(refreshToken);
-            await _refreshTokenRepository.SaveChangesAsync();
+            if (existingToken != null)
+            {
+                existingToken.Token = refreshToken; 
+                existingToken.ExpirationDate = DateTime.UtcNow.AddDays(30); 
+            }
+            else
+            {
+                var newToken = new RefreshToken
+                {
+                    UserId = user.Id,
+                    Token = refreshToken,
+                    ExpirationDate = DateTime.UtcNow.AddDays(30),
+                    CreatedDate =DateTime.Now// Thời gian hết hạn cho refresh token
+                };
+                await _refreshTokenRepository.Add(newToken);
+            }
+
+            await _refreshTokenRepository.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
         }
+
 
         public async Task RemoveRefreshToken(string token)
         {
@@ -39,20 +52,6 @@ namespace BackEnd.Service.ServiceImpl
                 await _refreshTokenRepository.SaveChangesAsync();
             }
         }
-        public async Task SaveRefreshTokenAsync(long userId, string refreshToken)
-        {
-            var newRefreshToken = new RefreshToken
-            {
-                UserId = userId,
-                Token = refreshToken,
-                ExpirationDate = DateTime.UtcNow.AddDays(7) // Thiết lập thời hạn sử dụng của refresh token
-            };
-
-            // Lưu vào cơ sở dữ liệu
-            await _refreshTokenRepository.Add(newRefreshToken);
-            await _refreshTokenRepository.SaveChangesAsync();
-        }
-
     }
 
 }

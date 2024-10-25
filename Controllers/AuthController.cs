@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Google.Apis.Auth;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace BackEnd.Controllers
 {
@@ -83,7 +85,7 @@ namespace BackEnd.Controllers
                 var refreshToken = _jWTService.GenerateRefreshToken();
 
                 // Lưu refresh token vào cơ sở dữ liệu
-                await _refreshTokenService.SaveRefreshTokenAsync(existingUser.Id, refreshToken);
+                await _refreshTokenService.GenerateRefreshToken(existingUser, refreshToken);
 
                 // Trả về cả access token, refresh token và thời gian hết hạn
                 return Ok(new
@@ -296,12 +298,12 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             // Kiểm tra tính hợp lệ của refresh token
-            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            if (string.IsNullOrWhiteSpace(request.refreshToken))
             {
                 return BadRequest("Refresh token không được để trống.");
             }
 
-            var token = await _refreshTokenService.GetRefreshToken(request.RefreshToken);
+            var token = await _refreshTokenService.GetRefreshToken(request.refreshToken);
             if (token == null || token.ExpirationDate < DateTime.UtcNow)
             {
                 return Unauthorized(new { Error = "Refresh token không hợp lệ hoặc đã hết hạn." });
@@ -313,11 +315,25 @@ namespace BackEnd.Controllers
                 return Unauthorized(new { Error = "Không tìm thấy người dùng." });
             }
 
-            // Tạo mới JWT token và refresh token
-            var newJwtToken = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
-            
+            try
+            {
+                // Tạo mới JWT token và refresh token
+                var newJwtToken = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
 
-            return Ok(new { Token = newJwtToken});
+                // Kiểm tra nếu việc tạo JWT token thất bại
+                if (newJwtToken == null)
+                {
+                    return StatusCode(500, "Có lỗi xảy ra khi tạo JWT token mới.");
+                }
+
+                // Trả về JWT và refresh token (nếu cần tạo refresh token mới)
+                return Ok(new { token = newJwtToken, refreshToken = request.refreshToken});
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi tại đây nếu cần
+                return StatusCode(500, "Có lỗi xảy ra khi tạo JWT token");
+            }
         }
 
         [HttpPost("logout")]
@@ -339,6 +355,54 @@ namespace BackEnd.Controllers
 
             return Ok(new { Message = "Đăng xuất thành công." });
         }
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+        {
+            try
+            {
+                // Xác thực token Google
+                var payload = await GoogleJsonWebSignature.ValidateAsync(request.token);
+
+                if (payload == null)
+                    return Unauthorized(new { Error = "Invalid Google token" });
+
+                // Lấy thông tin người dùng từ Google
+                var userId = payload.Subject; // Google user ID
+                var email = payload.Email;
+
+                // Kiểm tra người dùng trong cơ sở dữ liệu
+                var user = await _userService.GetUserByEmailAsync(email);
+
+                // Nếu người dùng không tồn tại, tạo mới
+                if (user == null)
+                {
+                    user = new User
+                    {
+                        Email = email,
+                    };
+
+                    // Lưu người dùng mới vào cơ sở dữ liệu
+                    await _userService.RegisterAsync(user.Email);
+                }
+                var existUser = await _userService.GetUserByEmailAsync(user.Email);
+
+                // Tạo JWT token cho người dùng
+                var token = _jWTService.GenerateJwtToken(existUser.Email , existUser.Id , existUser.Role);
+                var refreshToken = _jWTService.GenerateRefreshToken();
+                await _refreshTokenService.GenerateRefreshToken(existUser, refreshToken);
+                return Ok(new
+                {
+                    token = token,
+                    refreshToken = refreshToken,
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = "An error occurred: " + ex.Message });
+            }
+        }
+
+
 
 
     }
