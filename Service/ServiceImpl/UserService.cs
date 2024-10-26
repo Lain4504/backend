@@ -94,7 +94,27 @@ namespace BackEnd.Service.ServiceImpl
                 throw;
             }
         }
-
+        public async Task<User> RegisterAsync(string Email)
+        {
+            try
+            { 
+                var user = new User
+                {
+                    Email = Email,
+                    Role = "USER",
+                    State = "ACTIVE"
+                };
+                // Lưu người dùng vào cơ sở dữ liệu
+                await _userRepository.AddAsync(user);
+                // Trả về người dùng đã được lưu
+                return user;
+            }
+            catch
+            {
+                // Ném lỗi để xử lý ở nơi gọi phương thức này
+                throw;
+            }
+        }
         public async Task<User> GetUserByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email);
