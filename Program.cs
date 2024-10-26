@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 using BackEnd.Middlewares;
+using VNPAY_CS_ASPX;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,6 +113,8 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 
+builder.Services.AddScoped<Payment, Payment>();
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
