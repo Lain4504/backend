@@ -481,7 +481,7 @@ public partial class BookStoreContext : DbContext
 
         modelBuilder.Entity<RefreshToken>(entity =>
         {
-            entity.ToTable("RefreshToken");
+            entity.ToTable("refreshtoken");
 
             entity.HasKey(e => e.Id);
 

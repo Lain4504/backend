@@ -26,12 +26,12 @@ namespace BackEnd.Service.ServiceImpl
             if (existingToken != null)
             {
                 existingToken.Token = refreshToken;
-                expirationDate = DateTime.UtcNow.AddMinutes(3);
+                expirationDate = DateTime.UtcNow.AddDays(3);
                 existingToken.ExpirationDate = expirationDate;
             }
             else
             {
-                expirationDate = DateTime.UtcNow.AddMinutes(3);
+                expirationDate = DateTime.UtcNow.AddDays(3);
                 var newToken = new RefreshToken
                 {
                     UserId = user.Id,
