@@ -84,15 +84,16 @@ namespace BackEnd.Controllers
                 // Tạo Refresh Token
                 var refreshToken = _jWTService.GenerateRefreshToken();
 
-                // Lưu refresh token vào cơ sở dữ liệu
-                await _refreshTokenService.GenerateRefreshToken(existingUser, refreshToken);
+                // Lưu refresh token vào cơ sở dữ liệu và lấy ExpirationDate
+                var expirationDate = await _refreshTokenService.GenerateRefreshToken(existingUser, refreshToken);
 
-                // Trả về cả access token, refresh token và thời gian hết hạn
+                // Trả về cả access token, refresh token, thời gian hết hạn
                 return Ok(new
                 {
                     message = "Đăng nhập thành công.",
                     token = accessToken,
                     refreshToken = refreshToken,
+                    expirationDate = expirationDate // Trả về ExpirationDate
                 });
             }
             catch (Exception ex)
@@ -100,6 +101,7 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi trong quá trình đăng nhập.");
             }
         }
+
 
 
 
@@ -384,16 +386,22 @@ namespace BackEnd.Controllers
                     // Lưu người dùng mới vào cơ sở dữ liệu
                     await _userService.RegisterAsync(user.Email);
                 }
+
                 var existUser = await _userService.GetUserByEmailAsync(user.Email);
 
                 // Tạo JWT token cho người dùng
-                var token = _jWTService.GenerateJwtToken(existUser.Email , existUser.Id , existUser.Role);
+                var token = _jWTService.GenerateJwtToken(existUser.Email, existUser.Id, existUser.Role);
                 var refreshToken = _jWTService.GenerateRefreshToken();
-                await _refreshTokenService.GenerateRefreshToken(existUser, refreshToken);
+
+                // Lưu refresh token vào cơ sở dữ liệu và lấy ExpirationDate
+                var expirationDate = await _refreshTokenService.GenerateRefreshToken(existUser, refreshToken);
+
+                // Trả về cả access token, refresh token, thời gian hết hạn
                 return Ok(new
                 {
                     token = token,
                     refreshToken = refreshToken,
+                    expirationDate = expirationDate // Trả về ExpirationDate
                 });
             }
             catch (Exception ex)
@@ -401,6 +409,7 @@ namespace BackEnd.Controllers
                 return BadRequest(new { Error = "An error occurred: " + ex.Message });
             }
         }
+
 
 
 

@@ -19,6 +19,7 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task Add(RefreshToken refreshToken)
         {
+            refreshToken.CreatedDate = DateTime.UtcNow;
             await _context.RefreshTokens.AddAsync(refreshToken);
         }
 

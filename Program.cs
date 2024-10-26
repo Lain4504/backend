@@ -58,13 +58,14 @@ builder.Services.AddAuthentication(options =>
 
 // Thêm DbContext
 builder.Services.AddDbContext<BookStoreContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BookStoreContext")));
+    options.UseMySql(builder.Configuration.GetConnectionString("BookStoreContext"),
+                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookStoreContext"))));
 
 // CORS: cho phép các nguồn cụ thể
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins",
-        builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5000")
+        builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5001", "http://localhost:5000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
@@ -91,8 +92,8 @@ builder.Services.AddScoped<IJwtService, JwtService>(); // Register JWTService
 builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
 builder.Services.AddScoped<IFeedBackService,FeedBackService>();
 builder.Services.AddSignalR();
-
-
+builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

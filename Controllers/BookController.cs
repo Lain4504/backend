@@ -159,7 +159,7 @@ namespace BackEnd.Controllers
         public IActionResult GetAllBookCollectionsByBookId(long bookId)
         {
             var bookCollections = _bookService.GetAllBookCollectionsByBookId(bookId);
-            if(bookCollections == null || !bookCollections.Any())
+            if(bookCollections == null)
             {
                 return NotFound();
             }
