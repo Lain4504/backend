@@ -46,6 +46,7 @@ public partial class BookStoreContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Wishlist> Wishlists { get; set; }
+    public virtual DbSet<Ads> Ads { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,7 +69,7 @@ public partial class BookStoreContext : DbContext
 
         modelBuilder.Entity<AuthorBook>(entity =>
         {
-            entity.HasKey(ab => 
+            entity.HasKey(ab =>
             new { ab.AuthorId, ab.BookId })
             .HasName("PK_BookCollection");
             entity.ToTable("author_book");
@@ -153,7 +154,7 @@ public partial class BookStoreContext : DbContext
 
         modelBuilder.Entity<BookCollection>(entity =>
         {
-            entity.HasKey(e => new { e.CollectionId , e.BookId})
+            entity.HasKey(e => new { e.CollectionId, e.BookId })
           .HasName("PK_BookCollection");
             entity.ToTable("book_collection");
 
@@ -454,7 +455,7 @@ public partial class BookStoreContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("state");
             entity.Property(e => e.Phone)
-                .HasMaxLength(10) 
+                .HasMaxLength(10)
                 .IsUnicode(false)
                 .HasColumnName("phone");
             entity.Property(e => e.Address)
@@ -463,7 +464,7 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("address");
 
             entity.Property(e => e.Dob)
-                .HasColumnType("date") 
+                .HasColumnType("date")
                 .HasColumnName("dob");
             entity.Property(e => e.Gender)
                 .HasMaxLength(10)  // Thêm giới hạn độ dài cho trường Gender

@@ -77,7 +77,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISliderService, SliderService>();
 builder.Services.AddScoped<ISliderRepository, SliderRepository>();
-builder.Services.AddScoped<IEmailService, EmailService>(); 
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -94,7 +94,11 @@ builder.Services.AddScoped<IPostService, PostService>();
 // Publisher
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
+// Ads
+builder.Services.AddScoped<IAdsRepository, AdsRepository>();
+builder.Services.AddScoped<IAdsService, AdsService>();
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
