@@ -1,21 +1,26 @@
-using BackEnd.Models;
+﻿using BackEnd.Models;
 using BackEnd.Repository;
 using BackEnd.Service;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Newtonsoft.Json;
-using BackEnd.Repository.RepositoryImpl;
-using BackEnd.Service.ServiceImpl;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.Text;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Net;
+using BackEnd.Middlewares;
+using BackEnd.Repository.RepositoryImpl;
+using BackEnd.Service.ServiceImpl;
 
+// Khởi tạo ứng dụng
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Thêm dịch vụ vào container
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
@@ -26,7 +31,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add Authentication using JWT Bearer
+// Cấu hình xác thực JWT Bearer
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -40,66 +45,68 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:JwtIssuer"],
+        ValidAudience = builder.Configuration["Jwt:JwtAudience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Google:ClientSecret"];
 });
 
-// Add DbContext
+// Thêm DbContext
 builder.Services.AddDbContext<BookStoreContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BookStoreContext")));
+    options.UseMySql(builder.Configuration.GetConnectionString("BookStoreContext"),
+                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookStoreContext"))));
 
-// CORS
+// CORS: cho phép các nguồn cụ thể
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins",
-        builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5175")
+        builder => builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5001", "http://localhost:5000")
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .WithExposedHeaders("Authorization")); // Cho phép expose Authorization header nếu cần
 });
 
-// Add Authentication and Cookie Authentication
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/user/login"; // Đường dẫn đến trang đăng nhập
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Thời gian hết hạn của cookie
-        options.SlidingExpiration = true; // Tự động gia hạn cookie khi gần hết hạn
-    });
-
-// Dependency Injection for Repositories and Services
+// Thêm các dịch vụ và repository
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ISliderService, SliderService>();
-builder.Services.AddScoped<ISliderRepository, SliderRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
-// Order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-// WishList
-builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
-builder.Services.AddScoped<IWishlistService, WishlistService>();
-// PostCategory
 builder.Services.AddScoped<IPostCategoryRepository, PostCategoryRepository>();
 builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
-// Post
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
-// Publisher
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
-// Ads
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<ISliderRepository, SliderRepository>();
+builder.Services.AddScoped<ISliderService, SliderService>();
+builder.Services.AddScoped<IJwtService, JwtService>(); // Register JWTService
+builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
+builder.Services.AddScoped<IFeedBackService,FeedBackService>();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IWishListRepository, WishlistRepository>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 builder.Services.AddScoped<IAdsRepository, AdsRepository>();
 builder.Services.AddScoped<IAdsService, AdsService>();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Cấu hình pipeline HTTP request
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -108,23 +115,42 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.ContentType = "application/json";
+
+            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+            var errorResponse = new
+            {
+                message = "Đã xảy ra lỗi!",
+                detail = exceptionHandlerPathFeature?.Error.Message
+            };
+
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
+        });
+    });
 }
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
 
-// Apply CORS policy
+// Áp dụng CORS
 app.UseCors("AllowSpecificOrigins");
 
-// Enable authentication middleware
+// Kích hoạt middleware xác thực
 app.UseAuthentication();
-
-// Enable authorization middleware
 app.UseAuthorization();
 
-app.MapControllers();
+// Đăng ký middleware xác thực token (nếu có)
+app.UseMiddleware<TokenValidationMiddleware>();
 
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<CommentHub>("/commentHub");
+});
 app.Run();

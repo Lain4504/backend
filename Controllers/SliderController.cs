@@ -25,7 +25,7 @@ namespace BackEnd.Controllers
             try
             {
                 var sliders = await _sliderService.GetAllSlidersAsync();
-                if (sliders == null || !sliders.Any())
+                if (sliders == null)
                 {
                     return NotFound();
                 }
@@ -33,7 +33,7 @@ namespace BackEnd.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal server error. Please try again later");
             }
         }
 

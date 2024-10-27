@@ -1,15 +1,21 @@
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 
-namespace BackEnd.Service
+public interface IOrderService
 {
-    public interface IOrderService
-    {
+    Task<List<Order>> GetOrderByUser(long userId);
+    Task<List<OrderDetail>> GetOrderDetail(long orderId);
+    Task ChangeOrderState(long orderId, OrderState orderState);
 
-        Task<Order> GetOrderByIdAsync(long id);
-        Task<IEnumerable<Order>> GetAllOrdersAsync();
-        Task SaveOrderAsync(Order Order);
-        Task UpdateOrderAsync(long id, string newStatus);
-        Task DeleteOrderAsync(long id);
+    Task<List<Order>> GetAll();
 
-    }
+    Task ChangeOrderPaymentState(long orderId, PaymentState paymentState);
+
+    Task ChangeOrderShippingState(long orderId, ShippingState shippingState);
+
+    Task<Order> GetOrderById(long id);
+
+    Task Cancel(long orderId);
+    Task ProcessOrderAsync(Order order);
+    Task UpdateOrderInfo(long orderId, UpdateOrderRequest updateOrder);
 }

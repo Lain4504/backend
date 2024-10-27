@@ -20,4 +20,13 @@ public partial class OrderDetail
     public virtual Book? Book { get; set; }
 
     public virtual Order? Order { get; set; }
+
+
+    public OrderDetailState GetOrderDetailState()
+    {
+        if(Amount> Book.Stock)
+        {
+            return OrderDetailState.NOT_AVAILABLE;
+        } else return OrderDetailState.AVAILABLE;
+    }
 }

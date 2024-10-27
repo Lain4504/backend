@@ -8,14 +8,14 @@ namespace BackEnd.Service
     {
         Task<User> AuthenticateAsync(string Email, string Password);
         Task<User> RegisterAsync(string Email, string Password);
+        Task<User> RegisterAsync(string Email);
         Task<User> GetUserByEmailAsync(String Email);
-        string GenerateJwtToken(string email);
-        ClaimsPrincipal ValidateJwtToken(string token);
         Task<User> ActivateAccountAsync(string email);
         Task<bool> UpdatePassword(string email, string newPassword);
-        Task UpdateProfile(UserUpdateRequest user, long id);
         Task<User> GetUserByIDAsync(long id);
-        Task<bool> ChangePassword(UserChangePassword userChange, long Id);
+        Task UpdateProfile(UserUpdateRequest user, long id);
+
+        Task<bool> ChangePassword(UserChangePassword userChange, string email);
         Task<IEnumerable<User>> GetAllUser();
         Task DeleteUserById(long id);
     }

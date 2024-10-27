@@ -1,40 +1,129 @@
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Service.ServiceImpl
 {
     public class OrderService : IOrderService
     {
-        private readonly IOrderRepository _repository;
-        public OrderService(IOrderRepository repository)
+        private readonly IOrderRepository _orderRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IBookRepository _bookRepository;
+        public OrderService(IOrderRepository orderRepository, IUserRepository userRepository, IBookRepository bookRepository)
         {
-            _repository = repository;
+            _orderRepository = orderRepository;
+            _userRepository = userRepository;
+            _bookRepository = bookRepository;
+        }
+        public async Task<List<Order>> GetOrderByUser(long userId)
+        {
+            return await _orderRepository.GetOrderByUserIdAsync(userId);
         }
 
-        public Task DeleteOrderAsync(long id)
+        public async Task ChangeOrderState(long orderId, OrderState orderState)
         {
-            return _repository.DeleteOrderAsync(id);
+            var existingOrder = await _orderRepository.GetOrderByOrderIdAsync(orderId);
+            if (existingOrder.State == null) { return; }
+            if (!existingOrder.State.Equals(orderState))
+            {
+                if (orderState == OrderState.Processing)
+                    existingOrder.Created = DateTime.Now;
+
+                existingOrder.State = orderState.ToString();
+            }
+
+            await _orderRepository.ChangeOrderState(orderId, existingOrder.State);
         }
 
-        public Task<IEnumerable<Order>> GetAllOrdersAsync()
+
+        public async Task ChangeOrderPaymentState(long orderId, PaymentState paymentState)
         {
-            return _repository.GetAllOrderAsync();
+            await _orderRepository.ChangeOrderPaymentState(orderId, paymentState);
         }
 
-        public Task<Order> GetOrderByIdAsync(long id)
+        public async Task ChangeOrderShippingState(long orderId, ShippingState shippingState)
         {
-            return _repository.GetOrderByIdAsync(id);
+            await _orderRepository.ChangeOrderShippingState(orderId, shippingState);
         }
 
-        public Task SaveOrderAsync(Order Order)
+        public Task<List<Order>> GetAll()
         {
-            return _repository.SaveOrdernAsync(Order);
+            return _orderRepository.GetAllOrderStateNotAsync(OrderState.Cart);
         }
 
-        public Task UpdateOrderAsync(long id, string newStatus)
+        public async Task<Order> GetOrderById(long id)
         {
-            return _repository.UpdateOrderAsync(id, newStatus);
+            return await _orderRepository.GetOrderByOrderIdAsync(id);
+        }
+
+        public async Task Cancel(long orderId)
+        {
+            var existingOrder = await GetOrderById(orderId); // Await the result
+            if (existingOrder.State != OrderState.Canceled.ToString()) // Check before changing state
+            {
+                existingOrder.State = OrderState.Canceled.ToString(); // Update state
+
+                foreach (var orderDetail in existingOrder.OrderDetails)
+                {
+                    var existingBook = orderDetail.Book;
+                    if (existingBook == null) return;
+                    existingBook.Stock += orderDetail.Amount; // Restore book stock
+                }
+
+            }
+
+            await _orderRepository.Cancel(orderId);
+        }
+
+        public async Task ProcessOrderAsync(Order order)
+        {
+            var existingOrder = await _orderRepository.GetOrderByOrderIdAsync(order.Id)
+                ?? throw new Exception("Order not found");
+
+            if (!existingOrder.State.Equals(OrderState.Processing))
+                return;
+
+            order.Created = existingOrder.Created;
+
+            var existingUser = await _userRepository.GetByIDAsync(order.User.Id);
+            if (existingUser == null)
+            {
+                return;
+            }
+
+            foreach (var orderDetail in order.OrderDetails)
+            {
+                var existingBook = await _bookRepository.GetByIdAsync(orderDetail.Book.Id);
+                if (existingBook == null || !existingBook.State.Equals(BookState.ACTIIVE) || existingBook.Stock < orderDetail.Amount)
+                {
+                    order.State.Equals(OrderState.Canceled);
+                    order.ShopNote = "Đơn hàng đã bị hủy do một số sản phẩm hiện không khả dụng";
+                    await _orderRepository.SaveAsync(order);
+                    return;
+                }
+            }
+
+            order.State.Equals(OrderState.Confirmed);
+            if (order.State.Equals(OrderState.Confirmed))
+            {
+                foreach (var orderDetail in order.OrderDetails)
+                {
+                    var existingBook = await _bookRepository.GetByIdAsync(orderDetail.Book.Id);
+                    existingBook.Stock -= orderDetail.Amount;
+                }
+            }
+
+            await _orderRepository.SaveAsync(order);
+        }
+
+        public async Task<List<OrderDetail>> GetOrderDetail(long orderId)
+        {
+            return await _orderRepository.GetOrderDetail(orderId);
+        }
+
+        public async Task UpdateOrderInfo(long orderId, UpdateOrderRequest updateOrder)
+        {
+            await _orderRepository.UpdateInfoOrder(orderId, updateOrder);
         }
     }
 }

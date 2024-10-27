@@ -16,13 +16,9 @@ namespace BackEnd.Repository.RepositoryImpl
             _context = context;
         }
 
-        public async Task<List<PostCategory>> GetPostCategoryByIdAsync(long id)
+        public async Task<PostCategory> GetPostCategoryByIdAsync(long id)
         {
-            var qr = from w in _context.PostCategories
-                     where w.Id == id
-                     select w;
-
-            return await qr.ToListAsync();
+            return await _context.PostCategories.FindAsync(id);
         }
 
         public async Task<IEnumerable<PostCategory>> GetAllCategoryAsync()
@@ -44,9 +40,13 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task DeletePostCategoryAsync(long id)
         {
-            var postCategory = await _context.PostCategories.FindAsync(id);
+            var postCategory = await _context.PostCategories.FirstOrDefaultAsync(b => b.Id == id);
             if (postCategory != null)
             {
+                var post = await _context.Posts
+                    .Where(ab => ab.CategoryId == id)
+                    .ToListAsync();
+                _context.Posts.RemoveRange(post);
                 _context.PostCategories.Remove(postCategory);
                 await _context.SaveChangesAsync();
             }
@@ -57,7 +57,6 @@ namespace BackEnd.Repository.RepositoryImpl
             _context.PostCategories.Update(postCategory);
             await _context.SaveChangesAsync();
         }
-
     }
 
 }

@@ -39,15 +39,15 @@ namespace BackEnd.Controllers
 
             }
         }
-
+        
         [HttpGet]
          public async Task<IActionResult> GetAllPostCategories()
         {
             try
             {
                 var postCategories = await _PostCategoryService.GetAllPostCategoriesAsync();
-                if (postCategories == null || !postCategories.Any())
-                    return NoContent();
+                if (postCategories == null)
+                    return NotFound();
                 return Ok(postCategories);
             }
             catch (Exception ex)
@@ -75,8 +75,5 @@ namespace BackEnd.Controllers
             await _PostCategoryService.UpdatePostCategoryAsync(postCategory);
             return Ok(new { message = "Update successful!" });
         }
-
-
-
     }
 }

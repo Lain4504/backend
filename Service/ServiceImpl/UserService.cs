@@ -7,10 +7,10 @@ using BackEnd.Models;
 using BackEnd.Repository;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MySqlConnector;
 namespace BackEnd.Service.ServiceImpl
 {
     public class UserService : IUserService
@@ -37,7 +37,7 @@ namespace BackEnd.Service.ServiceImpl
             }
 
             // Kiểm tra trạng thái người dùng
-            if (user.State != "ACTIVE") 
+            if (user.State != "ACTIVE")
             {
                 return null; // Trả về null nếu trạng thái không phải là active
             }
@@ -78,8 +78,8 @@ namespace BackEnd.Service.ServiceImpl
                 {
                     Email = Email,
                     Password = hashedPassword,
-                    Role = "0",
-                    State ="INACTIVE"
+                    Role = "USER",
+                    State = "INACTIVE"
                 };
 
                 // Lưu người dùng vào cơ sở dữ liệu
@@ -94,7 +94,27 @@ namespace BackEnd.Service.ServiceImpl
                 throw;
             }
         }
-
+        public async Task<User> RegisterAsync(string Email)
+        {
+            try
+            { 
+                var user = new User
+                {
+                    Email = Email,
+                    Role = "USER",
+                    State = "ACTIVE"
+                };
+                // Lưu người dùng vào cơ sở dữ liệu
+                await _userRepository.AddAsync(user);
+                // Trả về người dùng đã được lưu
+                return user;
+            }
+            catch
+            {
+                // Ném lỗi để xử lý ở nơi gọi phương thức này
+                throw;
+            }
+        }
         public async Task<User> GetUserByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email);
@@ -107,62 +127,6 @@ namespace BackEnd.Service.ServiceImpl
             return user;
         }
 
-
-
-        // Hàm tạo JWT token
-        public string GenerateJwtToken(string email)
-        {
-            // Tạo danh sách các claim cho token
-            var claims = new[]
-            {
-            new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
-            new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // ID duy nhất cho token
-        };
-
-            // Lấy khóa bí mật từ cấu hình
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-            // Tạo đối tượng SigningCredentials với thuật toán HmacSha256
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            // Tạo JWT token
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"], // Issuer từ appsettings
-                audience: _configuration["Jwt:Audience"], // Audience từ appsettings
-                claims: claims, // Các claim cho token
-                expires: DateTime.Now.AddMinutes(30), // Token hết hạn sau 1 giờ
-                signingCredentials: creds); // Sử dụng thông tin SigningCredentials
-
-            // Trả về chuỗi JWT token
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-        public ClaimsPrincipal ValidateJwtToken(string token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
-
-            try
-            {
-                var claimsPrincipal = tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = _configuration["Jwt:Issuer"],
-                    ValidAudience = _configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ClockSkew = TimeSpan.Zero 
-                }, out SecurityToken validatedToken);
-
-                return claimsPrincipal;
-            }
-            catch
-            {
-                return null;
-            }
-        }
         public async Task<User> ActivateAccountAsync(string email)
         {
             // Tìm kiếm người dùng theo email
@@ -178,7 +142,7 @@ namespace BackEnd.Service.ServiceImpl
             // Lưu thay đổi vào cơ sở dữ liệu
             await _userRepository.UpdateUserAsync(user);
 
-            return user; 
+            return user;
         }
         public async Task<bool> UpdatePassword(string email, string newPassword)
         {
@@ -200,7 +164,7 @@ namespace BackEnd.Service.ServiceImpl
             catch (DbUpdateException ex)
             {
                 // Kiểm tra lỗi trùng lặp
-                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
+                if (ex.InnerException is MySqlException mySqlEx && mySqlEx.Number == 1062) // 1062 là mã lỗi cho trùng lặp khóa chính
                 {
                     // Trả về thông báo lỗi phù hợp
                     throw new Exception("Email is already registered."); // Hoặc xử lý theo cách của bạn
@@ -215,24 +179,25 @@ namespace BackEnd.Service.ServiceImpl
                 throw new Exception("An error occurred while updating the password.", ex);
             }
         }
+        public async Task<User> GetUserByIDAsync(long id)
+        {
+            // Simulate retrieving a user from a database or external service
+            var user = await _userRepository.GetByIDAsync(id);
+
+            return user;
+        }
 
         public async Task UpdateProfile(UserUpdateRequest user, long id)
         {
             // Lưu thay đổi vào cơ sở dữ liệu
             await _userRepository.UpdateUserProfile(user, id);
         }
-        public async Task<User> GetUserByIDAsync(long id)
-        {
-            // Simulate retrieving a user from a database or external service
-            var user = await _userRepository.GetByIDAsync(id);
 
-            return user; 
-        }
 
-        public async Task<bool> ChangePassword(UserChangePassword userChange, long Id)
+        public async Task<bool> ChangePassword(UserChangePassword userChange, string email)
         {
             // Bước 1: Lấy thông tin người dùng theo Id từ cơ sở dữ liệu
-            var user = await _userRepository.GetByIDAsync(Id);
+            var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
             {
                 throw new Exception("Không tìm thấy người dùng.");
@@ -243,17 +208,12 @@ namespace BackEnd.Service.ServiceImpl
             {
                 throw new Exception("Mật khẩu cũ không chính xác.");
             }
-            // Bước 3: Kiểm tra tính hợp lệ của mật khẩu mới (kiểm tra xem mật khẩu mới có khớp với xác nhận mật khẩu hay không)
-            if (!string.IsNullOrEmpty(userChange.ConfirmNewPassword) && userChange.NewPassword != userChange.ConfirmNewPassword)
-            {
-                throw new Exception("Mật khẩu mới và mật khẩu xác nhận không khớp.");
-            }
-            // Bước 4: Mã hóa mật khẩu mới và cập nhật lại mật khẩu của người dùng
             user.Password = EncryptDecryptManager.Encrypt(userChange.NewPassword);
-            // Bước 5: Lưu các thay đổi vào cơ sở dữ liệu
-            await _userRepository.ChangePassword(user, Id);
+            await _userRepository.ChangePassword(user);
             return true;
         }
+
+
         public async Task<IEnumerable<User>> GetAllUser()
         {
             return await _userRepository.GetAllUsersAsync();

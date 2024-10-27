@@ -1,92 +1,168 @@
+using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Service;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Controllers
 {
+
     [Route("/api/order")]
     [ApiController]
     [EnableCors("AllowSpecificOrigins")]
     public class OrderController : ControllerBase
     {
+        private static readonly object _lock = new object();
         private readonly IOrderService _OrderService;
-        public OrderController(IOrderService OrderService)
+        private readonly BookStoreContext _context;
+
+        public OrderController(IOrderService OrderService, BookStoreContext content)
         {
             _OrderService = OrderService;
+            _context = content;
         }
-        [HttpGet("get-all")]
-        public async Task<ActionResult> GetBookOrders()
+
+
+
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> getOrderByUser(long id)
         {
             try
             {
-                var Orders = await _OrderService.GetAllOrdersAsync();
+                List<Order> orders = await _OrderService.GetOrderByUser(id);
+                if (orders.Count == 0)
+                {
+                    return NotFound("userId not exits, please inter correct userId");
+                }
+                return Ok(orders);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
+        }
+        [HttpGet("orderdetail/{orderId}")]
+        public async Task<IActionResult> getOrderDetails(long orderId)
+        {
+            try
+            {
+                List<OrderDetail> detail = await _OrderService.GetOrderDetail(orderId);
+                return Ok(detail);
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(500, "Internal server error, Please try again");
+            }
+        }
+        [HttpPost("process")]
+        public async Task processOrder(Order order)
+        {
+            await _OrderService.ChangeOrderState(order.Id, OrderState.Processing);
+            lock (_lock)
+            {
+                _OrderService.ProcessOrderAsync(order);
+            }
+        }
+
+        [HttpGet("get-all")]
+        public async Task<ActionResult> getAll()
+        {
+            try
+            {
+                var Orders = await _OrderService.GetAll();
                 if (Orders == null || Orders.Count() == 0)
                 {
                     return NoContent();
                 }
                 return Ok(Orders);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Internal server error. Please try again later.");
 
             }
 
         }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetOrderById(long id)
+        public Task<Order> getOrderById(long id)
+        {
+            return _OrderService.GetOrderById(id);
+        }
+
+        [HttpPut("update-shipping/{id}/{state}")]
+        public async Task<IActionResult> UpdateShipping(long id, ShippingState state)
         {
             try
             {
-                var Order = await _OrderService.GetOrderByIdAsync(id);
-                if (Order == null)
-                {
-                    return NotFound();
-                }
-                return Ok(Order);
+                await _OrderService.ChangeOrderShippingState(id, state);
+                return NoContent();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
-
-
         }
-        [HttpPost]
-        public async Task<ActionResult> SaveOrder([FromBody] Order Order)
+
+
+        [HttpPut("update-orderState/{id}/{state}")]
+        public async Task<IActionResult> UpdateOrderState([FromRoute] long id, [FromRoute] OrderState state)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                await _OrderService.ChangeOrderState(id, state);
+                return NoContent();
             }
-            await _OrderService.SaveOrderAsync(Order); ;
-            return CreatedAtAction(nameof(GetOrderById), new { id = Order.Id }, Order);
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateOrder(long id, [FromBody] string newStatus)
+
+
+        [HttpPut("cancel/{id}")]
+        public async Task<IActionResult> CancelOrder([FromRoute] long id)
         {
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var existingOrder = await _OrderService.GetOrderById(id);
+                if (existingOrder.ShippingState == null) throw new Exception("Cannot found shipping state");
 
-            await _OrderService.UpdateOrderAsync(id, newStatus);
-            return NoContent();
+                if (existingOrder.ShippingState.Equals(ShippingState.SHIPPING))
+                {
+                    return Ok("Không thể hủy đơn hàng đang trong quá trình vận chuyển");
+                }
+
+                await _OrderService.Cancel(id);
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrder(long id)
+        [HttpPut("update-info/{id}")]
+        public async Task<IActionResult> UpdateInfoOrder(long id, [FromBody] UpdateOrderRequest updatedOrder)
         {
-            var Order = await _OrderService.GetOrderByIdAsync(id);
-            if (Order == null)
+            if (id != updatedOrder.Id)
             {
-                return NotFound();
+                return BadRequest("ID không khớp với Order");
             }
-
-            await _OrderService.DeleteOrderAsync(id);
-            return NoContent();
+            try
+            {
+                await _OrderService.UpdateOrderInfo(id, updatedOrder);
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                // Trả về mã trạng thái 500 kèm thông điệp lỗi
+                return StatusCode(500, $"Lỗi cập nhật đơn hàng: {ex.Message}");
+            }
         }
+
 
     }
 }

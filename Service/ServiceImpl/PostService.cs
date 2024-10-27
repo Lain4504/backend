@@ -13,7 +13,7 @@ namespace BackEnd.Service.ServiceImpl
             _repository = repository;
         }
 
-        public Task<List<Post>> GetPostByIdAsync(long id)
+        public Task<Post> GetPostByIdAsync(long id)
         {
             return _repository.GetPostByIdAsync(id);
         }
@@ -27,7 +27,7 @@ namespace BackEnd.Service.ServiceImpl
         {
             return _repository.GetAllPostAsync(page, size, sortBy, isAscending);
         }
-        public Task AddPostAsync(Post Post)
+        public Task<bool> AddPostAsync(Post Post)
         {
             return _repository.AddPostAsync(Post);
         }
@@ -39,6 +39,21 @@ namespace BackEnd.Service.ServiceImpl
          public Task UpdatePostAsync(Post post)
         {
             return _repository.UpdatePostAsync(post);
+        }
+        public async Task<IEnumerable<Post>> GetPostsByPostCategoryAsync(int? postcategoryId, string sortBy, string sortOrder)
+        {
+            var postsQuery = _repository.GetPosts();
+
+            if (postcategoryId.HasValue)
+            {
+                postsQuery = _repository.GetPostsByPostCategory(postcategoryId.Value);
+            }
+
+            postsQuery = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                ? postsQuery.OrderBy(p => EF.Property<object>(p, sortBy))
+                : postsQuery.OrderByDescending(p => EF.Property<object>(p, sortBy));
+
+            return await postsQuery.ToListAsync();
         }
 
     }

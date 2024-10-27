@@ -7,10 +7,12 @@ namespace BackEnd.Service.ServiceImpl
     {
         private readonly IConfiguration _configuration;
         private readonly IUserService _userservice;
-        public EmailService(IConfiguration configuration, IUserService userService)
+        private readonly IJwtService _jWTService;
+        public EmailService(IConfiguration configuration, IUserService userService, IJwtService jWTService)
         {
             _configuration = configuration;
             _userservice = userService;
+            _jWTService = jWTService;
         }
 
         // Hàm gửi email kích hoạt
@@ -47,9 +49,9 @@ namespace BackEnd.Service.ServiceImpl
             }
         }
 
-        public async Task SendResetPasswordEmail(string email)
+        public async Task SendResetPasswordEmail(string email, long id, string role)
         {
-            var token = _userservice.GenerateJwtToken(email);
+            var token = _jWTService.GenerateJwtToken(email, id, role);
             var resetLink = $"http://localhost:5173/reset-password/{token}";
 
             var message = new MimeMessage();

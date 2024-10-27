@@ -13,8 +13,6 @@ public partial class Order
 
     public string? CustomerNote { get; set; }
 
-    public string? District { get; set; }
-
     public string? Email { get; set; }
 
     public string? FullName { get; set; }
@@ -22,8 +20,6 @@ public partial class Order
     public string? PaymentState { get; set; }
 
     public string? Phone { get; set; }
-
-    public string? Province { get; set; }
 
     public long? ShippingPrice { get; set; }
 
@@ -34,8 +30,6 @@ public partial class Order
     public string? State { get; set; }
 
     public long? TotalPrice { get; set; }
-
-    public string? Ward { get; set; }
 
     public long? UserId { get; set; }
 

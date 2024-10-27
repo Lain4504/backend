@@ -15,12 +15,9 @@ namespace BackEnd.Repository.RepositoryImpl
             _context = context;
         }
 
-        public async Task<List<Post>> GetPostByIdAsync(long id)
+        public async Task<Post> GetPostByIdAsync(long id)
         {
-            var qr = from w in _context.Posts
-                     where w.Id == id
-                     select w;
-            return await qr.ToListAsync();
+           return await _context.Posts.FindAsync(id);
         }
         public async Task<IEnumerable<Post>> GetAllAsync()
         {
@@ -46,16 +43,24 @@ namespace BackEnd.Repository.RepositoryImpl
             return await PaginatedList<Post>.CreateAsync(source, page, size);
         }
 
-        public async Task AddPostAsync(Post post)
+        public async Task<bool> AddPostAsync(Post post)
         {
+            if (post.Title != null) 
+            {
+                post.Title = post.Title.Trim();
+                while (post.Title.Contains("  "))  
+                    post.Title = post.Title.Replace("  ", " ");
+            }
             var existingPost = await _context.Posts
             .FirstOrDefaultAsync(w => w.Title == post.Title);
-
             if (existingPost == null)
             {
+                post.CreatedAt = DateTime.UtcNow;
                 _context.Posts.Add(post);
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
             }
+            return false;
         }
 
         public async Task DeletePostAsync(long id)
@@ -71,9 +76,29 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task UpdatePostAsync(Post post)
         {
+            if (post.Title != null) 
+            {
+                post.Title = post.Title.Trim();
+                while (post.Title.Contains("  "))  
+                    post.Title = post.Title.Replace("  ", " ");
+            }
+            post.CreatedAt = DateTime.UtcNow;
             _context.Posts.Update(post);
             await _context.SaveChangesAsync();
         }
+
+        public IQueryable<Post> GetPostsByPostCategory(int postcategoryId)
+        {
+            return from p in _context.Posts
+                   join pc in _context.PostCategories on p.CategoryId equals pc.Id
+                   where pc.Id == postcategoryId
+                   select p;
+        }
+        public IQueryable<Post> GetPosts()
+        {
+            return _context.Posts.AsQueryable();
+        }
+
 
     }
 

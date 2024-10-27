@@ -17,11 +17,13 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost]
-         public async Task<IActionResult> AddPost([FromBody] Post post)
+        public async Task<IActionResult> AddPost([FromBody] Post post)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _PostService.AddPostAsync(post);
-            return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
+            var result = await _PostService.AddPostAsync(post);
+            if (result)
+                return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
+            return Conflict(new { Message = "Mã Title không được trùng." });
         }
         
         [HttpGet("{id}")]
@@ -38,7 +40,7 @@ namespace BackEnd.Controllers
             {
                 var posts = await _PostService.GetAllPostAsync();
                 if (posts == null)
-                    return NoContent();
+                    return NotFound();
                 return Ok(posts);
             }
             catch (Exception ex)
@@ -81,7 +83,25 @@ namespace BackEnd.Controllers
             await _PostService.UpdatePostAsync(post);
             return Ok(new { message = "Update successful!" });
         }
+        [HttpGet("sorted-and-paged/by-postcategory")]
+        public async Task<ActionResult<object>> GetPostsByPostCategory(
+        [FromQuery] int? postcategory,
+        [FromQuery] string sortBy = "Id",
+        [FromQuery] string sortOrder = "asc")
+        {
+            var items = await _PostService.GetPostsByPostCategoryAsync(postcategory, sortBy, sortOrder);
 
+            var totalCount = items.Count();
+
+            var response = new
+            {
+                content = items,
+                totalElements = totalCount,
+                empty = !items.Any()
+            };
+
+            return Ok(response);
+        }
        
     }
 }

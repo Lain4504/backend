@@ -1,5 +1,4 @@
-﻿using Azure;
-using BackEnd.Models;
+﻿using BackEnd.Models;
 using BackEnd.Repository;
 using BackEnd.Util;
 using Microsoft.EntityFrameworkCore;
@@ -51,10 +50,12 @@ namespace BackEnd.Service.ServiceImpl
             return await _bookRepository.FindByTitleAsync(title);
         }
 
-        public async Task AddBookToCollectionAsync(long bookId, long collectionId)
+        public async Task<bool> AddBookToCollectionAsync(long bookId, long collectionId)
         {
-            await _bookRepository.AddBookToCollectionAsync(bookId, collectionId);
+            // Call the repository method to add the book to the collection
+            return await _bookRepository.AddBookToCollectionAsync(bookId, collectionId);
         }
+
 
         public Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
@@ -75,6 +76,19 @@ namespace BackEnd.Service.ServiceImpl
                 : booksQuery.OrderByDescending(b => EF.Property<object>(b, sortBy));
 
             return await booksQuery.Include(b => b.Images).ToListAsync();
+        }
+        public IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId)
+        {
+            return _bookRepository.GetAllBookCollectionsByBookId(bookId);
+        }
+        public async Task<List<Book>> GetBooksByAuthorIdAsync(long authorId)
+        {
+            return await _bookRepository.GetBooksByAuthorIdAsync(authorId);
+        }
+
+        IEnumerable<AuthorBook> IBookService.GetAllAuthorsByBookId(long bookId)
+        {
+            return _bookRepository.GetAllAuthorsByBookId(bookId);
         }
     }
 }
