@@ -14,11 +14,14 @@ namespace BackEnd.Repository.RepositoryImpl
             _context = context;
         }
 
-        public async Task<List<Order>> GetOrderByUserIdAsync(long userid)
+        public async Task<List<Order>> GetOrderByUserIdAsync(long userId)
         {
+            // Use Include to load related OrderDetails
             var qr = from o in _context.Orders
-                     where o.UserId == userid && o.State != OrderState.Cart.ToString()
+                     .Include(o => o.OrderDetails) // Include OrderDetails in the query
+                     where o.UserId == userId && o.State != OrderState.Cart.ToString()
                      select o;
+
             var result = await qr.ToListAsync();
             return result;
         }
@@ -126,6 +129,7 @@ namespace BackEnd.Repository.RepositoryImpl
             order.FullName = updateOrder.Name;
             order.Phone = updateOrder.Phone;
             order.Address = updateOrder.Address;
+            order.TotalPrice = updateOrder.TotalPrice;
             await _context.SaveChangesAsync();
         }
     }
