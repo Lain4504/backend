@@ -154,7 +154,7 @@ namespace BackEnd.Controllers
             try
             {
                 await _OrderService.UpdateOrderInfo(id, updatedOrder);
-                return Ok();
+                return Ok(true);
             }
             catch (Exception ex)
             {

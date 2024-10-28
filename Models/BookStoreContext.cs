@@ -46,12 +46,13 @@ public partial class BookStoreContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Wishlist> Wishlists { get; set; }
+    public virtual DbSet<Ads> Ads { get; set; }
 
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
-        modelBuilder.UseCollation("Vietnamese_100_CI_AS_KS_WS_SC_UTF8");
+        modelBuilder.UseCollation("utf8mb4_vietnamese_ci");
 
         modelBuilder.Entity<Author>(entity =>
         {
@@ -62,13 +63,13 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("name");
         });
 
         modelBuilder.Entity<AuthorBook>(entity =>
         {
-            entity.HasKey(ab => 
+            entity.HasKey(ab =>
             new { ab.AuthorId, ab.BookId })
             .HasName("PK_AuthorBook");
             entity.ToTable("author_book");
@@ -99,10 +100,10 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Cover)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("cover");
             entity.Property(e => e.Description)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("description");
             entity.Property(e => e.Discount).HasColumnName("discount");
             entity.Property(e => e.Isbn)
@@ -115,7 +116,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.PublisherId).HasColumnName("publisher_id");
             entity.Property(e => e.Size)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("size");
             entity.Property(e => e.Sold).HasColumnName("sold");
             entity.Property(e => e.State)
@@ -125,7 +126,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Stock).HasColumnName("stock");
             entity.Property(e => e.Title)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("title");
             entity.Property(e => e.Weight).HasColumnName("weight");
 
@@ -147,13 +148,13 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("name");
         });
 
         modelBuilder.Entity<BookCollection>(entity =>
         {
-            entity.HasKey(e => new { e.CollectionId , e.BookId})
+            entity.HasKey(e => new { e.CollectionId, e.BookId })
           .HasName("PK_BookCollection");
             entity.ToTable("book_collection");
 
@@ -181,11 +182,11 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.IsDisplay).HasColumnName("is_display");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("name");
             entity.Property(e => e.Type)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("type");
         });
 
@@ -198,7 +199,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BookId).HasColumnName("book_id");
             entity.Property(e => e.Comment)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("comment");
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(6)
@@ -228,7 +229,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.BookId).HasColumnName("book_id");
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("description");
             entity.Property(e => e.Link)
                 .HasMaxLength(255)
@@ -249,13 +250,13 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Address)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("address");
             entity.Property(e => e.Created)
                 .HasPrecision(6)
                 .HasColumnName("created");
             entity.Property(e => e.CustomerNote)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("customer_note");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
@@ -263,7 +264,7 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("email");
             entity.Property(e => e.FullName)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("full_name");
             entity.Property(e => e.PaymentState)
                 .HasMaxLength(255)
@@ -279,7 +280,7 @@ public partial class BookStoreContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("shipping_state");
             entity.Property(e => e.ShopNote)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("shop_note");
             entity.Property(e => e.State)
                 .HasMaxLength(255)
@@ -325,11 +326,11 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Brief)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("brief");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Content)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("content");
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(6)
@@ -344,7 +345,7 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("thumbnail");
             entity.Property(e => e.Title)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("title");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -366,7 +367,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("name");
         });
 
@@ -379,7 +380,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("name");
             entity.Property(e => e.Website)
                 .HasMaxLength(255)
@@ -399,7 +400,7 @@ public partial class BookStoreContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("back_link");
             entity.Property(e => e.Description)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("description");
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(255)
@@ -407,7 +408,7 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("image_url");
             entity.Property(e => e.Title)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("title");
         });
 
@@ -426,7 +427,7 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("email");
             entity.Property(e => e.FullName)
                 .HasMaxLength(255)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("full_name");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
@@ -441,20 +442,21 @@ public partial class BookStoreContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("state");
             entity.Property(e => e.Phone)
-                .HasMaxLength(10) 
+                .HasMaxLength(10)
                 .IsUnicode(false)
                 .HasColumnName("phone");
             entity.Property(e => e.Address)
                 .HasMaxLength(500)
                 .IsUnicode(true)
                 .HasColumnName("address");
-
             entity.Property(e => e.Dob)
-                .HasColumnType("date") 
+                .HasColumnType("date")
                 .HasColumnName("dob");
+            entity.Property(e => e.Created)
+                 .IsRequired();
             entity.Property(e => e.Gender)
                 .HasMaxLength(10)  // Thêm giới hạn độ dài cho trường Gender
-                .IsUnicode(false)  // Chỉ lưu ký tự ASCII
+                .IsUnicode(true)  // Chỉ lưu ký tự ASCII
                 .HasColumnName("gender");  // Thêm trường gender
         });
 
@@ -481,7 +483,7 @@ public partial class BookStoreContext : DbContext
 
         modelBuilder.Entity<RefreshToken>(entity =>
         {
-            entity.ToTable("RefreshToken");
+            entity.ToTable("refreshtoken");
 
             entity.HasKey(e => e.Id);
 
@@ -506,6 +508,27 @@ public partial class BookStoreContext : DbContext
                   .HasForeignKey(d => d.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
+        modelBuilder.Entity<Ads>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ads__3213E83F2377359E");
+
+            entity.ToTable("ads");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Title)
+                .HasMaxLength(255)
+                .IsUnicode(true)
+                .HasColumnName("title");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)  // Giả sử bạn muốn giới hạn chiều dài mô tả
+                .IsUnicode(true)
+                .HasColumnName("description");
+            entity.Property(e => e.Image)
+                .HasMaxLength(255) // Giả sử đây là đường dẫn hình ảnh
+                .IsUnicode(true)
+                .HasColumnName("image");
+        });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

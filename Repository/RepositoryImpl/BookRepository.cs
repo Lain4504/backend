@@ -92,13 +92,14 @@ namespace BackEnd.Repository.RepositoryImpl
                     .Where(bc => bc.BookId == bookId)
                     .ToListAsync();
                 _context.BookCollections.RemoveRange(collectionsToDelete);
-
                 // Delete related images
                 var imagesToDelete = await _context.Images
                     .Where(i => i.BookId == bookId)
                     .ToListAsync();
                 _context.Images.RemoveRange(imagesToDelete);
-
+                var commentToDelete = await _context.Feedbacks
+                    .Where(c => c.BookId == bookId)
+                    .ToListAsync();
                 // Delete the book
                 _context.Books.Remove(book);
 
