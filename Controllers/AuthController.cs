@@ -14,6 +14,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace BackEnd.Controllers
 {
@@ -220,6 +222,22 @@ namespace BackEnd.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPut("update-user/{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateRoleAndStateRequest userUpdate)
+        {
+            var user = await _userService.GetUserByIDAsync(id);
+            if (user == null) return NotFound();
+            if (userUpdate.Role == "ADMIN" && userUpdate.State == "INACTIVE")
+            {
+                return BadRequest("Admin cannot deactivate their own account.");
+            }
+            user.Role = userUpdate.Role;  // Cần có thuộc tính Role trong UpdateUserRequest
+            user.State = userUpdate.State; // Cần có thuộc tính State trong UpdateUserRequest
+
+            await _userService.UpdateUserRoleAndState(user, id);
+
+            return NoContent();
         }
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] DTO.Request.UserChangePassword userChange)
