@@ -14,6 +14,7 @@ namespace BackEnd.Service
         Task<bool> UpdatePassword(string email, string newPassword);
         Task<User> GetUserByIDAsync(long id);
         Task UpdateProfile(UserUpdateRequest user, long id);
+        Task UpdateUserRoleAndState(User user, long id);
 
         Task<bool> ChangePassword(UserChangePassword userChange, string email);
         Task<IEnumerable<User>> GetAllUser();
