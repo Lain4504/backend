@@ -192,8 +192,11 @@ namespace BackEnd.Service.ServiceImpl
             // Lưu thay đổi vào cơ sở dữ liệu
             await _userRepository.UpdateUserProfile(user, id);
         }
-
-
+        public async Task UpdateUserRoleAndState(User user, long id)
+        {
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _userRepository.UpdateUserRoleAndState(user, id);
+        }
         public async Task<bool> ChangePassword(UserChangePassword userChange, string email)
         {
             // Bước 1: Lấy thông tin người dùng theo Id từ cơ sở dữ liệu

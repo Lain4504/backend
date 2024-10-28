@@ -18,7 +18,7 @@ namespace BackEnd.Service.ServiceImpl
         // Hàm gửi email kích hoạt
         public async Task SendActivationEmail(string email, string token)
         {
-            var activationLink = $"http://localhost:5173/activation/{token}";
+            var activationLink = $"http://localhost:5001/activation/{token}";
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("ForeverBookStore", "lehuynhtuong9a2@gmail.com"));
@@ -52,7 +52,7 @@ namespace BackEnd.Service.ServiceImpl
         public async Task SendResetPasswordEmail(string email, long id, string role)
         {
             var token = _jWTService.GenerateJwtToken(email, id, role);
-            var resetLink = $"http://localhost:5173/reset-password/{token}";
+            var resetLink = $"http://localhost:5001/reset-password/{token}";
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("ForeverBookStore", "lehuynhtuong9a2@gmail.com"));

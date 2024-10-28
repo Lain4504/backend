@@ -147,7 +147,20 @@ namespace BackEnd.Repository.RepositoryImpl
             existingUser.Address = user.Address;
             existingUser.Phone = user.Phone;
             existingUser.Gender = user.Gender;
+            // Lưu thay đổi vào database thông qua repository
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateUserRoleAndState(User user, long id)
+        {
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                throw new Exception("User does not exist.");
+            }
 
+            // Cập nhật thông tin người dùng
+            existingUser.State = user.State;
+            existingUser.Role = user.Role;
             // Lưu thay đổi vào database thông qua repository
             await _context.SaveChangesAsync();
         }
