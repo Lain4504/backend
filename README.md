@@ -1,105 +1,76 @@
-**Forever BookStore Website**
+# 📚 Forever BookStore Admin Panel
 
-This is a part of a full-stack book-selling website (backend), a project for SWP391 subject of FPT University students.
+This repository is part of a full-stack book-selling website, backend of this website. It is a project for the SWP391 subject by FPT University students.
 
-**Team member:**
+## 👥 Team Members
+- **Leader:** Huỳnh Ngọc Tiên
+- **Frontend:**
+  - Huỳnh Ngọc Tiên
+- **Backend:**
+  - Huỳnh Ngọc Tiên
+  - Lê Huỳnh Tường
+  - Lê Thanh Phương
+  - Lê Ngọc Hiếu
+  - Nguyễn Lê Hữu Huy
 
-Team size: 5.
+## 🔗 Repository Links
+- **Backend:** [backend](https://github.com/Lain4504/backend.git)
+- **Frontend:**
+  - [Website](https://github.com/Lain4504/website.git)
+  - [Admin Panel](https://github.com/Lain4504/adminpanel.git)
 
-Leader: Huỳnh Ngọc Tiên.
+## ✨ Key Features
+- **Book Catalog:** Browse through a variety of books with detailed information.
+- **Search & Filter:** Search books by title, author, or category.
+- **User Authentication:** Register, log in, and manage user accounts.
+- **Shopping Cart:** Add books to the cart and proceed to checkout.
+- **Order Management:** View and manage orders.
+- **Admin Panel:** Manage books, users, and orders (Admin-only access).
+- **Responsive Design:** Optimized for desktop, tablet, and mobile devices.
 
-Frontend: 
+## 🛠️ Tech Stack
+- **Backend:** ASP.NET Core 8, Entity Framework Core, MySQL
+- **Frontend:** React (Vite), Tailwind CSS, Ant Design
+- **Database:** MySQL
+- **API Communication:** RESTful APIs, Axios
+- **Version Control:** Git
 
-- Huỳnh Ngọc Tiên.
+## 🚀 Installation and Setup
 
-Backend:
+### IDE
+- Visual Studio 2022 (for Backend)
+- Visual Studio Code (for Website and Admin Panel)
 
-- Huỳnh Ngọc Tiên.
-- Lê Huỳnh Tưởng.
-- Lê Thanh Phương
-- Lê Ngọc Hiếu.
-- Nguyễn Lê Hữu Huy.
-
-**Link:**
-
-    Backend: https://github.com/Lain4504/backend.git
-
-    Frontend:
-
-        + Website: https://github.com/Lain4504/website.git
-
-        + Admin Panel: https://github.com/Lain4504/adminpanel.git
-
-The backend is built with ASP.NET Core using Entity Framework following the MVC pattern and utilizes SQL Server for data management.
-
-The frontend is developed with React (Vite), featuring a responsive and modern UI designed using Tailwind CSS and Ant Design.
-
-**Key Features:**
-
-- Book Catalog: Browse through a variety of books with detailed information.
-
-- Search & Filter: Search books by title, author, or category.
-
-- User Authentication: Register, log in, and manage user accounts.
-
-- Shopping Cart: Add books to the cart and proceed to checkout.
-
-- Order Management: View and manage orders.
-
-- Admin Panel: Manage books, users, and orders (Admin-only access).
-
-- Responsive Design: Optimized for desktop, tablet, and mobile devices.
-
-**Tech Stack:**
-
-- Backend: ASP.NET Core 8, Entity Framework Core, SQL Server
-
-- Frontend: React (Vite), Tailwind CSS, Ant Design
-
-- Database: SQL Server
-
-- API Communication: RESTful APIs, Axios
-
-- Version Control: Git
-
-**Installation and Setup:**
-
-**IDE:**
-
-- Visual Studio 2022 (for Backend repository)
-
-- Visual Studio Code (for Website + Admin Panel repositories)
-
-**Prerequisites:**
-
-- Make sure you have the following installed on your machine:
-
-- .NET SDK (version 7.0 or later) – Download .NET SDK
-
-- Node.js (version 18.x or later) – Download Node.js
-
-- SQL Server (or any SQL-compatible database)
-
+### Prerequisites
+- .NET SDK (version 8.0 or later) – [Download .NET SDK](https://dotnet.microsoft.com/download)
+- Node.js (version 18.x or later) – [Download Node.js](https://nodejs.org/)
+- MySQL (or any SQL-compatible database)
 - Vite (for React development)
 
-**Backend Setup (ASP.NET Core):**
+### Backend Setup (ASP.NET Core)
+1. Clone the repository using `git clone` to your local device.
+2. Open the project in Visual Studio 2022.
+3. Restore the dependencies by running `dotnet restore`.
+4. Update the database connection string in `appsettings.json`.
+5. Run the application using `dotnet run`.
 
-- Clone the repository using git clone to your local device.
+### Frontend Setup (React + Vite)
+1. Clone the repository using `git clone`.
+2. Open the project in Visual Studio Code.
+3. Install the dependencies by running `npm install` in the terminal.
+4. Start the development server by running `npm run dev`.
+5. Access the application via the URL provided in the terminal.
 
-- Open the project in Visual Studio 2022 and run.
+### Database Setup
+1. Install MySQL and create a database.
+2. Update the connection strings in the backend's `appsettings.json` file.
+3. Run the migrations to set up the database schema by using `dotnet ef database update`.
 
-**Frontend Setup (React + Vite):**
-
-- Clone the repository using git clone.
-
-- Open the project in Visual Studio Code and, in the terminal, run: npm install.
-
-- This should download all the necessary libraries for the project. If you encounter any errors, check the package.json file and the console for any libraries you need to install.
-
-- Then, run npm run dev.
+### Running Tests
+- Backend tests can be run using `dotnet test`.
+- Frontend tests can be run using `npm run test`.
 
 Now you can enjoy the project.
 
-**License:**
-
+## 📄 License
 This project is licensed under the MIT License – see the LICENSE file for details.
