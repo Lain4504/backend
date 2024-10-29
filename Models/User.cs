@@ -21,7 +21,7 @@ public partial class User
 
     public string? Address {  get; set; }
     public string? Gender { get; set; }  // Thêm thuộc tính Gender
-
+    public DateTime Created { get; set; }
     public DateTime? Dob { get; set; }
 
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();

@@ -224,6 +224,7 @@ namespace BackEnd.Controllers
             }
         }
         [Authorize(Policy = "AdminRole")]
+
         [HttpPut("update-user/{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateRoleAndStateRequest userUpdate)
         {
@@ -428,10 +429,6 @@ namespace BackEnd.Controllers
                 return BadRequest(new { Error = "An error occurred: " + ex.Message });
             }
         }
-
-
-
-
 
     }
 }
