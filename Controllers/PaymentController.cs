@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace YourNamespace.Controllers // Replace with your actual namespace
+namespace BackEnd.Controllers // Replace with your actual namespace
 {
-    [Route("api/[controller]")]
+    [Route("api/vnpay")]
     [ApiController]
     public class PaymentController : ControllerBase
     {
