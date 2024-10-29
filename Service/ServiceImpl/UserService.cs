@@ -79,7 +79,8 @@ namespace BackEnd.Service.ServiceImpl
                     Email = Email,
                     Password = hashedPassword,
                     Role = "USER",
-                    State = "INACTIVE"
+                    State = "INACTIVE",
+                    Created = DateTime.Now
                 };
 
                 // Lưu người dùng vào cơ sở dữ liệu
@@ -97,12 +98,13 @@ namespace BackEnd.Service.ServiceImpl
         public async Task<User> RegisterAsync(string Email)
         {
             try
-            { 
+            {
                 var user = new User
                 {
                     Email = Email,
                     Role = "USER",
-                    State = "ACTIVE"
+                    State = "ACTIVE",
+                    Created = DateTime.Now
                 };
                 // Lưu người dùng vào cơ sở dữ liệu
                 await _userRepository.AddAsync(user);

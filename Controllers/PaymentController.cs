@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -5,6 +6,7 @@ namespace BackEnd.Controllers // Replace with your actual namespace
 {
     [Route("api/vnpay")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigins")]
     public class PaymentController : ControllerBase
     {
         private readonly Payment _paymentService; // Instance of your Payment service
