@@ -223,6 +223,8 @@ namespace BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Policy = "AdminRole")]
+
         [HttpPut("update-user/{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateRoleAndStateRequest userUpdate)
         {
@@ -275,7 +277,7 @@ namespace BackEnd.Controllers
 
             return Ok("Mật khẩu đã được đặt lại thành công.");
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpGet]
         public async Task<IActionResult> GetAllUser()
         {
@@ -405,14 +407,14 @@ namespace BackEnd.Controllers
                     await _userService.RegisterAsync(user.Email);
                 }
 
-                var existUser = await _userService.GetUserByEmailAsync(user.Email);
+                //var existUser = await _userService.GetUserByEmailAsync(user.Email);
 
                 // Tạo JWT token cho người dùng
-                var token = _jWTService.GenerateJwtToken(existUser.Email, existUser.Id, existUser.Role);
+                var token = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
                 var refreshToken = _jWTService.GenerateRefreshToken();
 
                 // Lưu refresh token vào cơ sở dữ liệu và lấy ExpirationDate
-                var expirationDate = await _refreshTokenService.GenerateRefreshToken(existUser, refreshToken);
+                var expirationDate = await _refreshTokenService.GenerateRefreshToken(user, refreshToken);
 
                 // Trả về cả access token, refresh token, thời gian hết hạn
                 return Ok(new
@@ -427,10 +429,6 @@ namespace BackEnd.Controllers
                 return BadRequest(new { Error = "An error occurred: " + ex.Message });
             }
         }
-
-
-
-
 
     }
 }

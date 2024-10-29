@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -22,7 +21,6 @@ namespace BackEnd.Service.ServiceImpl
             // Tạo danh sách các claim cho token
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, "JwtSubject"),
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // ID duy nhất cho token
                 new Claim(ClaimTypes.NameIdentifier, id.ToString()), // ID người dùng
