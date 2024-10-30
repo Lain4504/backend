@@ -46,8 +46,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:JwtIssuer"],
-        ValidAudience = builder.Configuration["Jwt:JwtAudience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 })
@@ -57,6 +57,11 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration["Google:ClientSecret"];
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminRole", policy => policy.RequireRole("ADMIN"));
+    options.AddPolicy("UserRole", policy => policy.RequireRole("USER"));
+});
 // Thêm DbContext
 builder.Services.AddDbContext<BookStoreContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("BookStoreContext"),

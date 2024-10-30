@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.DTO.Request;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.Controllers
 {
@@ -18,6 +19,7 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/Author
+        [Authorize(Policy = "AdminRole")]
         [HttpGet]
         public async Task<IActionResult> GetAllAuthors()
         {
@@ -39,14 +41,14 @@ namespace BackEnd.Controllers
             }
             return Ok(author);
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuthor(long id)
         {
            await _authorService.DeleteAuthor(id);
            return NoContent();
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateAuthor(long id, [FromBody] Author author)
         {
@@ -55,7 +57,7 @@ namespace BackEnd.Controllers
             await _authorService.UpdateAuthor(author);
             return Ok(new { message = "Update successful!" });
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpPost]
         public async Task<IActionResult> AddAuthor([FromBody] Author author)
         {
