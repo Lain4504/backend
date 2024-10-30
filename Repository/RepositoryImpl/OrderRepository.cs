@@ -132,5 +132,45 @@ namespace BackEnd.Repository.RepositoryImpl
             order.TotalPrice = updateOrder.TotalPrice;
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateQuantityOrder(List<UpdateQuantityOrder> updateOrders)
+        {
+            // Ensure the updateOrders list is not empty
+            if (updateOrders == null || updateOrders.Count == 0)
+                return;
+
+            // Find the order
+            var order = await _context.Orders.FindAsync(updateOrders[0].orderId);
+            if (order == null)
+                throw new Exception("Order not found");
+
+            // Initialize total price
+            long? totalPrice = 0;
+
+            // Process each update order
+            foreach (var updateOrder in updateOrders)
+            {
+                var orderDetail = await _context.OrderDetails
+                    .Where(od => od.OrderId == updateOrder.orderId) // Assuming ProductId is part of UpdateQuantityOrder
+                    .FirstOrDefaultAsync();
+
+                if (orderDetail != null)
+                {
+                    // Update the amount
+                    orderDetail.Amount = updateOrder.quantity;
+
+                    // Recalculate total price based on the item's price
+                    totalPrice += orderDetail.SalePrice * updateOrder.quantity; // Assuming OrderDetail has a Price property
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            // Update the order's total price
+            order.TotalPrice = totalPrice;
+
+            // Save all changes at once
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
