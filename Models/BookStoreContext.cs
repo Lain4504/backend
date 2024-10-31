@@ -449,10 +449,11 @@ public partial class BookStoreContext : DbContext
                 .HasMaxLength(500)
                 .IsUnicode(true)
                 .HasColumnName("address");
-
             entity.Property(e => e.Dob)
                 .HasColumnType("date")
                 .HasColumnName("dob");
+            entity.Property(e => e.Created)
+                 .IsRequired();
             entity.Property(e => e.Gender)
                 .HasMaxLength(10)  // Thêm giới hạn độ dài cho trường Gender
                 .IsUnicode(true)  // Chỉ lưu ký tự ASCII
@@ -507,6 +508,27 @@ public partial class BookStoreContext : DbContext
                   .HasForeignKey(d => d.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
+        modelBuilder.Entity<Ads>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ads__3213E83F2377359E");
+
+            entity.ToTable("ads");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Title)
+                .HasMaxLength(255)
+                .IsUnicode(true)
+                .HasColumnName("title");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)  // Giả sử bạn muốn giới hạn chiều dài mô tả
+                .IsUnicode(true)
+                .HasColumnName("description");
+            entity.Property(e => e.Image)
+                .HasMaxLength(255) // Giả sử đây là đường dẫn hình ảnh
+                .IsUnicode(true)
+                .HasColumnName("image");
+        });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 using BackEnd.Middlewares;
+using VNPAY_CS_ASPX;
 using BackEnd.Repository.RepositoryImpl;
 using BackEnd.Service.ServiceImpl;
 
@@ -107,8 +108,12 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+builder.Services.AddScoped<Payment, Payment>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAdsRepository, AdsRepository>();
 builder.Services.AddScoped<IAdsService, AdsService>();
+builder.Services.AddScoped<IChartRepository, ChartRepository>();
+builder.Services.AddScoped<IChartService, ChartService>();
 var app = builder.Build();
 
 // Cấu hình pipeline HTTP request
