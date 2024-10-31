@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace BackEnd.Controllers
         {
             _publisherService = publisherService;
         }
+        [Authorize(Policy = "AdminRole")]
 
         // GET: api/Publisher
         [HttpGet]
@@ -38,6 +40,7 @@ namespace BackEnd.Controllers
             }
             return Ok(publisher);
         }
+        [Authorize(Policy = "AdminRole")]
 
         // POST: api/Publisher
         [HttpPost]
@@ -51,6 +54,7 @@ namespace BackEnd.Controllers
             await _publisherService.CreatePublisherAsync(publisher);
             return CreatedAtAction(nameof(GetPublisherById), new { id = publisher.Id }, publisher);
         }
+        [Authorize(Policy = "AdminRole")]
 
         // PUT: api/Publisher/{id}
         [HttpPut("{id}")]
@@ -69,6 +73,7 @@ namespace BackEnd.Controllers
             await _publisherService.UpdatePublisherAsync(publisher);
             return Ok(new { message = "Update successful!" });
         }
+        [Authorize(Policy = "AdminRole")]
 
         // DELETE: api/Publisher/{id}
         [HttpDelete("{id}")]

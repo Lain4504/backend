@@ -1,5 +1,6 @@
 using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,7 @@ namespace BackEnd.Controllers
         {
             _PostService = PostService;
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpPost]
         public async Task<IActionResult> AddPost([FromBody] Post post)
@@ -67,6 +69,7 @@ namespace BackEnd.Controllers
 
             return Ok(response);
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpDelete("{id}")]    
         public async Task<IActionResult> DeletePost(long id)
@@ -74,7 +77,8 @@ namespace BackEnd.Controllers
             await _PostService.DeletePostAsync(id);
             return NoContent();
         }
-      
+        [Authorize(Policy = "AdminRole")]
+
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePost(long id, [FromBody] Post post)
         {
