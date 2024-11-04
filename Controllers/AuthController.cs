@@ -104,9 +104,6 @@ namespace BackEnd.Controllers
             }
         }
 
-
-
-
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAccount([FromBody] ActivateAccountRequest request)
         {

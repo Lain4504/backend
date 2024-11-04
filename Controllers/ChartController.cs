@@ -64,6 +64,7 @@ namespace BackEnd.Controllers
                 var result = await _chartService.GetBestSellingProductsLast7DaysAsync(page, pageSize);
                 return Ok(result);
             }
+
         }
     }
 }

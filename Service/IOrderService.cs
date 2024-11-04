@@ -18,4 +18,5 @@ public interface IOrderService
     Task Cancel(long orderId);
     Task ProcessOrderAsync(Order order);
     Task UpdateOrderInfo(long orderId, UpdateOrderRequest updateOrder);
+    Task UpdateQuantityorder( List<UpdateQuantityOrder> updateOrder);
 }

@@ -16,7 +16,7 @@ namespace BackEnd.Service.ServiceImpl
         }
 
         // Hàm tạo JWT token
-        public string GenerateJwtToken(string email, long id, string role)
+        public string GenerateJwtToken(string email, long id, string role)//nhưng nếu vậy thì tài khoản đã tạo trước đó sao lại đăng nhập được
         {
             // Tạo danh sách các claim cho token
             var claims = new[]

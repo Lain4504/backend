@@ -36,7 +36,6 @@ public class Payment
         vnpay.AddRequestData("vnp_Command", "pay");
         vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
         vnpay.AddRequestData("vnp_Amount", price.ToString());
-        vnpay.AddRequestData("vnp_BankCode", "VNPAYQR");
         vnpay.AddRequestData("vnp_CreateDate", order.Created.Value.ToString("yyyyMMddHHmmss"));
         vnpay.AddRequestData("vnp_CurrCode", "VND");
 

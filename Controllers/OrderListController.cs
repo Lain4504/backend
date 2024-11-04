@@ -1,6 +1,7 @@
 using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +67,7 @@ namespace BackEnd.Controllers
                 _OrderService.ProcessOrderAsync(order);
             }
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpGet("get-all")]
         public async Task<ActionResult> getAll()
         {
@@ -163,6 +164,24 @@ namespace BackEnd.Controllers
             }
         }
 
+        [HttpPut("update-quantity")]
+        public async Task<IActionResult> UpdateQuantityOrder([FromBody] List<UpdateQuantityOrder> updatedOrder)
+        {
+            // if (id != updatedOrder.Id)
+            // {
+            //     return BadRequest("ID không khớp với Order");
+            // }
+            try
+            {
+                await _OrderService.UpdateQuantityorder( updatedOrder);
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                // Trả về mã trạng thái 500 kèm thông điệp lỗi
+                return StatusCode(500, $"Lỗi cập nhật đơn hàng: {ex.Message}");
+            }
+        }
 
     }
 }

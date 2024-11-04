@@ -10,15 +10,16 @@ namespace BackEnd.Repository
         Task<List<Order>> GetAllOrderStateNotAsync(OrderState state);
         Task ChangeOrderPaymentState(long id, PaymentState state);
         Task ChangeOrderState(long id, string state);
-        Task ChangeOrderShippingState(long orderId,ShippingState shippingState);
+        Task ChangeOrderShippingState(long orderId, ShippingState shippingState);
         Task Cancel(long id);
         Task SaveAsync(Order order);
         Task<List<Order>> GetAllAsync();
         Task<Order> GetByUserAndStateAsync(long userId, OrderState state);
         Task<List<Order>> GetAllOrderAndState(OrderState state);
-        Task AddNewCartAsync (Order order);
+        Task AddNewCartAsync(Order order);
 
         Task<List<OrderDetail>> GetOrderDetail(long orderId);
         Task UpdateInfoOrder(long orderId, UpdateOrderRequest updateOrder);
+        Task UpdateQuantityOrder( List<UpdateQuantityOrder> updateOrder);
     }
 }

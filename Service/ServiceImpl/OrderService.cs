@@ -125,5 +125,10 @@ namespace BackEnd.Service.ServiceImpl
         {
             await _orderRepository.UpdateInfoOrder(orderId, updateOrder);
         }
+
+        public async Task UpdateQuantityorder( List<UpdateQuantityOrder> updateOrder)
+        {
+            await _orderRepository.UpdateQuantityOrder( updateOrder);
+        }
     }
 }
