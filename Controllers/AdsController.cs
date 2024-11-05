@@ -17,7 +17,6 @@ namespace BackEnd.Controllers
         {
             _adsService = adsService;
         }
-        [Authorize(Policy = "AdminRole")]
         [HttpGet]
         public async Task<IActionResult> GetAds()
         {
@@ -29,7 +28,6 @@ namespace BackEnd.Controllers
             return Ok(ads);
         }
 
-        [Authorize(Policy = "AdminRole")]
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAdsById(int id)
