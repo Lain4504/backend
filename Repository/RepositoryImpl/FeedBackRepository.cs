@@ -15,9 +15,24 @@ namespace BackEnd.Repository.RepositoryImpl
         {
             var feedBack = await _context.Feedbacks
                   .Where(f => f.BookId == bookId)
-                  .OrderBy(f => f.CreatedAt)
+                  .OrderByDescending(f => f.CreatedAt)
                   .ToListAsync();
-            return feedBack;      
+            return feedBack;
+        }
+
+        public async Task SaveFeedback(long bookId, long userId, string commentContent)
+        {
+            var newFeedBack = new Feedback
+            {
+                BookId = bookId,
+                UserId = userId,
+                Comment = commentContent,
+                CreatedAt = DateTime.Now,
+                State = "active"
+            };
+
+            await _context.Feedbacks.AddAsync(newFeedBack);
+            await _context.SaveChangesAsync();
         }
     }
 }

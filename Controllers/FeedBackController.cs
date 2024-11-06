@@ -1,7 +1,9 @@
 ﻿using BackEnd.Models;
 using BackEnd.Service;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BackEnd.Controllers
 {
@@ -11,9 +13,11 @@ namespace BackEnd.Controllers
     public class FeedbackController : ControllerBase
     {
         private readonly IFeedBackService _feedBackService;
-        public FeedbackController(IFeedBackService feedBackService)
+        private readonly IHubContext<CommentHub> _commentHub;
+        public FeedbackController(IFeedBackService feedBackService, IHubContext<CommentHub> hubContext)
         {
             _feedBackService = feedBackService;
+            _commentHub = hubContext;
         }
 
         [HttpGet("{bookId}")]
@@ -28,13 +32,25 @@ namespace BackEnd.Controllers
                 }
                 return Ok(collection);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Ghi lại thông báo lỗi nếu cần
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
 
-
+        [HttpPost]
+        public async Task<IActionResult> PostComment(Feedback feedback)
+        {
+            try
+            {
+                await _feedBackService.SaveFeedback(feedback.BookId, feedback.UserId, feedback.Comment);
+                await _commentHub.Clients.Group(feedback.BookId.ToString()).SendAsync("ReceivedComment", feedback.UserId, feedback.Comment);
+                return Ok();  // Return status code 200 when comment is posted
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
+        }
     }
 }

@@ -11,7 +11,11 @@ namespace BackEnd.Service.ServiceImpl
         }
         public async Task<List<Feedback>> GetFeedBack(long bookId)
         {
-           return await _repository.GetFeedBack(bookId);
+            return await _repository.GetFeedBack(bookId);
+        }
+        public async Task SaveFeedback(long bookId, long userId, string commentContent)
+        {
+            await _repository.SaveFeedback(bookId, userId, commentContent);
         }
     }
 
