@@ -4,30 +4,13 @@ using System.Text.RegularExpressions;
 
 public class CommentHub : Hub
 {
-    private readonly BookStoreContext _context;
 
-    public CommentHub(BookStoreContext context)
-    {
-        _context = context;
-    }
-
-    public async Task SendComment(long bookId, long userId, string commentContent)
+    public async Task SendComment(long bookId, string userId, string commentContent)
     {
         try
         {
-            var newFeedBack = new Feedback
-            {
-                BookId = bookId,
-                UserId = userId,
-                Comment = commentContent,
-                CreatedAt = DateTime.Now,
-                State = "active"
-            };
-
-            await _context.Feedbacks.AddAsync(newFeedBack);
-            await _context.SaveChangesAsync();
-
-            await Clients.Group(bookId.ToString()).SendAsync("ReceiveComment", newFeedBack);
+            await Clients.Group(bookId.ToString()).SendAsync("ReceiveComment", userId, commentContent);
+        
         }
         catch (Exception ex)
         {
@@ -36,25 +19,18 @@ public class CommentHub : Hub
             // Optionally, you can throw an exception or handle it in some other way
         }
     }
-
-
-    public async Task JoinBookRoom(string bookId)
+    
+    public override async Task OnConnectedAsync()
     {
-        if (string.IsNullOrEmpty(bookId))
-        {
-            throw new ArgumentException("Book ID cannot be null or empty");
-        }
-
-        await Groups.AddToGroupAsync(Context.ConnectionId, bookId);
+        var bookId = Context.GetHttpContext().Request.Query["bookId"];
+        await Groups.AddToGroupAsync(Context.ConnectionId, bookId.ToString());
+        await base.OnConnectedAsync();
     }
 
-    public async Task LeaveBookRoom(string bookId)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (string.IsNullOrEmpty(bookId))
-        {
-            throw new ArgumentException("Book ID cannot be null or empty");
-        }
-
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, bookId);
+        var bookId = Context.GetHttpContext().Request.Query["bookId"];
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, bookId.ToString());
+        await base.OnDisconnectedAsync(exception);
     }
 }
