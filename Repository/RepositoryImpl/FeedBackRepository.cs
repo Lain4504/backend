@@ -12,11 +12,23 @@ namespace BackEnd.Repository.RepositoryImpl
             _context = context;
         }
 
-        public async Task DeleteFeedback(long feedbackId)
+        public async Task<bool> DeleteFeedback(long feedbackId)
         {
             var feedBackDelete = await _context.Feedbacks.FindAsync(feedbackId);
+            if (feedBackDelete == null)
+            {
+                return false;
+            }
             _context.Feedbacks.Remove(feedBackDelete);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<List<Feedback>> GetFeedBack(long bookId)
@@ -41,6 +53,10 @@ namespace BackEnd.Repository.RepositoryImpl
 
             await _context.Feedbacks.AddAsync(newFeedBack);
             await _context.SaveChangesAsync();
+        }
+        public async Task<Feedback> GetFeedbackById(long id)
+        {
+            return await _context.Feedbacks.FindAsync(id);
         }
     }
 }

@@ -10,9 +10,9 @@ namespace BackEnd.Service.ServiceImpl
             _repository = repository;
         }
 
-        public async Task DeleteFeedback(long feedbackId)
+        public async Task<bool> DeleteFeedback(long feedbackId)
         {
-            await _repository.DeleteFeedback(feedbackId);
+            return await _repository.DeleteFeedback(feedbackId);
         }
 
         public async Task<List<Feedback>> GetFeedBack(long bookId)
@@ -22,6 +22,10 @@ namespace BackEnd.Service.ServiceImpl
         public async Task SaveFeedback(long bookId, long userId, string commentContent)
         {
             await _repository.SaveFeedback(bookId, userId, commentContent);
+        }
+        public async Task<Feedback> GetFeedbackById(long id)
+        {
+            return await _repository.GetFeedbackById(id);
         }
     }
 

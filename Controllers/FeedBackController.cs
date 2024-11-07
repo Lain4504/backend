@@ -51,17 +51,30 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
-        [HttpDelete]
-        public async Task DeleteFeedback(long feedBackId)
+        [HttpDelete("{feedBackId}")]
+        public async Task<IActionResult> DeleteFeedback(long feedBackId, [FromQuery] long userId)
         {
             try
             {
-                await _feedBackService.DeleteFeedback(feedBackId);
-                Ok();
+                var feedBack = await _feedBackService.GetFeedbackById(feedBackId);
+                if (feedBack == null)
+                {
+                    return NotFound("Feedback not found");
+                }
+                if (feedBack.UserId != userId)
+                {
+                    return StatusCode(403, "You are not authorized to delete this feedback");
+                }
+                var result = await _feedBackService.DeleteFeedback(feedBackId);
+                if (!result)
+                {
+                    StatusCode(404, "Feedback not found");
+                }
+                return Ok();
             }
             catch (Exception)
             {
-                StatusCode(500, "Internal server error, Please try again later");
+                return StatusCode(500, "Internal server error, Please try again later");
             }
         }
     }
