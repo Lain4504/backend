@@ -9,6 +9,12 @@ namespace BackEnd.Service.ServiceImpl
         {
             _repository = repository;
         }
+
+        public async Task DeleteFeedback(long feedbackId)
+        {
+            await _repository.DeleteFeedback(feedbackId);
+        }
+
         public async Task<List<Feedback>> GetFeedBack(long bookId)
         {
             return await _repository.GetFeedBack(bookId);

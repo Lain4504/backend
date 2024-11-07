@@ -69,20 +69,21 @@ namespace BackEnd.Service.ServiceImpl
                 };
 
                 await _orderDetailRepository.AddAsync(bookInCart);
+                existingBook.Stock = existingBook.Stock - quantity;
             }
             else
             {
                 // Cập nhật số lượng sách trong giỏ hàng
                 bookInCart.Amount += quantity;
-            }
+                existingBook.Stock = existingBook.Stock - 1;
 
+            }
             // Kiểm tra số lượng sách trong giỏ hàng không vượt quá số lượng tồn kho
             if (bookInCart.Amount > existingBook.Stock)
             {
                 bookInCart.Amount = existingBook.Stock;
                 throw new Exception("Số lượng của sản phẩm trong giỏ hàng vượt quá mức cho phép");
             }
-
             // Lưu thay đổi vào cơ sở dữ liệu
             await _orderDetailRepository.SaveChangesAsync();
         }
@@ -96,13 +97,13 @@ namespace BackEnd.Service.ServiceImpl
         {
             var existingUser = await GetExistingUserAsync(userId);
             var existingCart = await _orderRepository.GetByUserAndStateAsync(existingUser.Id, OrderState.Cart);
-            
+
             if (existingCart == null)
             {
                 // Creating a new cart if no existing cart is found
                 existingCart = new Order()
                 {
-                    UserId = existingUser.Id, 
+                    UserId = existingUser.Id,
                     FullName = existingUser.FullName,
                     Address = existingUser.Address,
                     Email = existingUser.Email,
@@ -117,7 +118,7 @@ namespace BackEnd.Service.ServiceImpl
                 await _orderRepository.AddNewCartAsync(existingCart);      // Save changes
             }
 
-            return existingCart; 
+            return existingCart;
         }
 
 

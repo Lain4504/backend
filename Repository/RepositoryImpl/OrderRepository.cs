@@ -105,7 +105,15 @@ namespace BackEnd.Repository.RepositoryImpl
 
         public async Task AddNewCartAsync(Order order)
         {
+            //Find order detail for order
+            // var orderDetailForBookInCart =await (from o in _context.OrderDetails
+            //                                where o.OrderId == order.Id
+            //                                select o).FirstOrDefaultAsync();
+            // //Find book in cart
+            // var typeBookInCart =await _context.Books.FindAsync(orderDetailForBookInCart.BookId);
+            // typeBookInCart.Stock = typeBookInCart.Stock -1;     //set stock -1
             await _context.Orders.AddAsync(order);
+
             await _context.SaveChangesAsync();
         }
 
@@ -139,36 +147,80 @@ namespace BackEnd.Repository.RepositoryImpl
             if (updateOrders == null || updateOrders.Count == 0)
                 return;
 
-            // Find the order
-            var order = await _context.Orders.FindAsync(updateOrders[0].orderId);
-            if (order == null)
-                throw new Exception("Order not found");
+            // Group update orders by OrderId to process each order separately
+            var ordersGrouped = updateOrders.GroupBy(uo => uo.orderId);
 
-            // Initialize total price
-            long? totalPrice = 0;
-
-            // Process each update order
-            foreach (var updateOrder in updateOrders)
+            foreach (var orderGroup in ordersGrouped)
             {
-                var orderDetail = await _context.OrderDetails
-                    .Where(od => od.OrderId == updateOrder.orderId) // Assuming ProductId is part of UpdateQuantityOrder
-                    .FirstOrDefaultAsync();
+                var orderId = orderGroup.Key;
+                var order = await _context.Orders.FindAsync(orderId);
+                if (order == null)
+                    throw new Exception($"Order with ID {orderId} not found");
 
-                if (orderDetail != null)
+                // Initialize total price for the current order
+                long? totalPrice = 0;
+
+                foreach (var updateOrder in orderGroup)
                 {
-                    // Update the amount
-                    orderDetail.Amount = updateOrder.quantity;
+                    // Find the specific OrderDetail using orderDetailId
+                    var orderDetail = await _context.OrderDetails
+                        .Where(od => od.OrderId == updateOrder.orderId && od.Id == updateOrder.orderDetailId)
+                        .FirstOrDefaultAsync();
 
-                    // Recalculate total price based on the item's price
-                    totalPrice += orderDetail.SalePrice * updateOrder.quantity; // Assuming OrderDetail has a Price property
+                    if (orderDetail != null)
+                    {
+                        var book = await _context.Books.FindAsync(orderDetail.BookId);
+                        var stockOfBook = book.Stock;
+                        if (orderDetail.Amount < updateOrder.quantity)
+                        {
+                            book.Stock = stockOfBook - (updateOrder.quantity - orderDetail.Amount);
+                            await _context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            book.Stock = stockOfBook + (orderDetail.Amount - updateOrder.quantity);
+                            await _context.SaveChangesAsync();
+                        }
+
+                        // Update the quantity
+                        orderDetail.Amount = updateOrder.quantity;
+
+                        // Recalculate total price based on the item's sale price
+                        totalPrice += updateOrder.SalePrice * updateOrder.quantity;
+
+                        //Update stock for book
+
+                    }
                 }
-                await _context.SaveChangesAsync();
+
+                // Update the order's total price
+                order.TotalPrice = totalPrice;
             }
 
-            // Update the order's total price
-            order.TotalPrice = totalPrice;
-
             // Save all changes at once
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteOrder(long orderId)
+        {
+            // Find the order by orderId
+            var orderToDelete = await _context.Orders.FindAsync(orderId);
+            if (orderToDelete == null)
+                throw new Exception("Order not found");
+
+            // Find the single order detail associated with this orderId
+            var orderDetailToDelete = await _context.OrderDetails
+                .FirstOrDefaultAsync(od => od.OrderId == orderId);
+
+            // If an associated order detail is found, remove it
+            if (orderDetailToDelete != null)
+            {
+                _context.OrderDetails.Remove(orderDetailToDelete);
+            }
+
+            _context.Orders.Remove(orderToDelete);
+            var bookInOrder = await _context.Books.FindAsync(orderDetailToDelete.BookId);
+            bookInOrder.Stock = bookInOrder.Stock + orderDetailToDelete.Amount;
             await _context.SaveChangesAsync();
         }
 

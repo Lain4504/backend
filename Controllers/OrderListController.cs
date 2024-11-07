@@ -172,7 +172,23 @@ namespace BackEnd.Controllers
             // }
             try
             {
-                await _OrderService.UpdateQuantityorder( updatedOrder);
+                await _OrderService.UpdateQuantityorder(updatedOrder);
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                // Trả về mã trạng thái 500 kèm thông điệp lỗi
+                return StatusCode(500, $"Lỗi cập nhật đơn hàng: {ex.Message}");
+            }
+        }
+
+
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteOrder(long orderId)
+        {
+            try
+            {
+                await _OrderService.DeleteOrder(orderId);
                 return Ok(true);
             }
             catch (Exception ex)
