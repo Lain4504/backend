@@ -7,5 +7,7 @@ namespace BackEnd.Repository
     {
         Task<List<Feedback>> GetFeedBack(long bookId);
         Task SaveFeedback(long bookId, long userId, string commentContent);
+        Task DeleteFeedback(long feedbackId);
+
     }
 }

@@ -11,6 +11,14 @@ namespace BackEnd.Repository.RepositoryImpl
         {
             _context = context;
         }
+
+        public async Task DeleteFeedback(long feedbackId)
+        {
+            var feedBackDelete = await _context.Feedbacks.FindAsync(feedbackId);
+            _context.Feedbacks.Remove(feedBackDelete);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<Feedback>> GetFeedBack(long bookId)
         {
             var feedBack = await _context.Feedbacks

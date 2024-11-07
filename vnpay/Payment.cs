@@ -31,7 +31,7 @@ public class Payment
         string vnp_HashSecret = _configuration["VNPay:vnp_HashSecret"];
 
         VnPayLibrary vnpay = new VnPayLibrary();
-        var price = (long)order.TotalPrice;
+        var price = order.TotalPrice *100;
         vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
         vnpay.AddRequestData("vnp_Command", "pay");
         vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);

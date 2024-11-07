@@ -37,7 +37,6 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
-
         [HttpPost]
         public async Task<IActionResult> PostComment(Feedback feedback)
         {
@@ -50,6 +49,19 @@ namespace BackEnd.Controllers
             catch (Exception)
             {
                 return StatusCode(500, "Internal server error. Please try again later.");
+            }
+        }
+        [HttpDelete]
+        public async Task DeleteFeedback(long feedBackId)
+        {
+            try
+            {
+                await _feedBackService.DeleteFeedback(feedBackId);
+                Ok();
+            }
+            catch (Exception)
+            {
+                StatusCode(500, "Internal server error, Please try again later");
             }
         }
     }
