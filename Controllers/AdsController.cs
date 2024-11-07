@@ -1,5 +1,6 @@
 using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,6 @@ namespace BackEnd.Controllers
         {
             _adsService = adsService;
         }
-
         [HttpGet]
         public async Task<IActionResult> GetAds()
         {
@@ -28,6 +28,7 @@ namespace BackEnd.Controllers
             return Ok(ads);
         }
 
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAdsById(int id)
         {
@@ -38,6 +39,7 @@ namespace BackEnd.Controllers
             }
             return Ok(ads);
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpPost]
         public async Task<IActionResult> AddAds([FromBody] Ads ads)
@@ -49,6 +51,7 @@ namespace BackEnd.Controllers
             await _adsService.AddAdsAsync(ads);
             return CreatedAtAction(nameof(GetAdsById), new { id = ads.Id }, ads);
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpPut("{id}")]   
         public async Task<IActionResult> UpdateAds(int id, [FromBody] Ads ads)
@@ -67,6 +70,7 @@ namespace BackEnd.Controllers
             await _adsService.UpdateAdsAsync(ads);
             return Ok(new { message = "Update successful!" });
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAds(int id)

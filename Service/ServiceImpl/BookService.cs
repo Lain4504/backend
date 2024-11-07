@@ -56,10 +56,16 @@ namespace BackEnd.Service.ServiceImpl
             return await _bookRepository.AddBookToCollectionAsync(bookId, collectionId);
         }
 
-
-        public Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
+        public async Task<(IEnumerable<Book> Books, int TotalPages)> GetPaginatedBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
-            return _bookRepository.GetAllBooksAsync(page, size, sortBy, isAscending);
+            // Lấy danh sách sách phân trang từ Repository
+            var books = await _bookRepository.GetAllBooksAsync(page, size, sortBy, isAscending);
+
+            // Đếm tổng số sách để tính tổng số trang
+            int totalBooks = await _bookRepository.GetTotalBooksCountAsync();
+            int totalPages = (int)Math.Ceiling(totalBooks / (double)size);
+
+            return (books, totalPages);
         }
 
         public async Task<IEnumerable<Book>> GetBooksByCollectionAsync(int? collectionId, string sortBy, string sortOrder)

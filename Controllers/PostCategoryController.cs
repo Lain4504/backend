@@ -1,5 +1,6 @@
 using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,7 @@ namespace BackEnd.Controllers
         {
             _PostCategoryService = PostCategoryService;
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpPost]
         public async Task<IActionResult> AddPostCategory([FromBody] PostCategory postCategory)
@@ -56,6 +58,7 @@ namespace BackEnd.Controllers
 
             }
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpDelete("{id}")]    
         public async Task<IActionResult> DeletePostCategory(long id)
@@ -63,7 +66,8 @@ namespace BackEnd.Controllers
             await _PostCategoryService.DeletePostCategoryAsync(id);
             return NoContent();
         }
-       
+
+        [Authorize(Policy = "AdminRole")]
 
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePostCategory(long id, [FromBody] PostCategory postCategory)

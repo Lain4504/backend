@@ -1,5 +1,6 @@
 ﻿using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -54,6 +55,7 @@ namespace BackEnd.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpPost]
         public async Task<IActionResult> AddSlider([FromBody] Slider slider)
@@ -73,6 +75,7 @@ namespace BackEnd.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSlider(long id, [FromBody] Slider slider)
@@ -98,6 +101,7 @@ namespace BackEnd.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [Authorize(Policy = "AdminRole")]
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSlider(long id)
