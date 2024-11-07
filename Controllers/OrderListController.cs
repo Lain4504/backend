@@ -1,6 +1,7 @@
 using BackEnd.DTO.Request;
 using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +67,7 @@ namespace BackEnd.Controllers
                 _OrderService.ProcessOrderAsync(order);
             }
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpGet("get-all")]
         public async Task<ActionResult> getAll()
         {

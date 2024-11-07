@@ -1,5 +1,6 @@
 ﻿using BackEnd.Models;
 using BackEnd.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,6 +54,8 @@ namespace BackEnd.Controllers
 
 
         }
+        [Authorize(Policy = "AdminRole")]
+
         [HttpPost("create")]
         public async Task<ActionResult> SaveCollection([FromBody] Collection collection)
         {
@@ -63,6 +66,8 @@ namespace BackEnd.Controllers
             await _collectionService.SaveCollectionAsync(collection); ;
             return CreatedAtAction(nameof(GetCollectionById), new { id = collection.Id }, collection);
         }
+        [Authorize(Policy = "AdminRole")]
+
         [HttpPut("update/{id}")]
         public async Task<ActionResult> UpdateCollection(long id, [FromBody] Collection collection)
         {
@@ -79,6 +84,8 @@ namespace BackEnd.Controllers
             await _collectionService.UpdateCollectionAsync(collection);
             return Ok(new { message = "Update successful!" });
         }
+                [Authorize(Policy = "AdminRole")]
+
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCollection(long id)
         {
@@ -94,10 +101,10 @@ namespace BackEnd.Controllers
 
         [HttpGet("sorted-and-paged")]
         public async Task<IActionResult> GetAllBookCollections(
-       [FromQuery] string sortBy = "Id",
-       [FromQuery] int page = 0,
-       [FromQuery] int size = 5,
-       [FromQuery] string sortOrder = "asc")
+        [FromQuery] string sortBy = "Id",
+        [FromQuery] int page = 0,
+        [FromQuery] int size = 5,
+        [FromQuery] string sortOrder = "asc")
         {
             bool isAscending = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase);
             var bookCollections = await _collectionService.GetAllBookCollectionsAsync(page, size, sortBy, isAscending);

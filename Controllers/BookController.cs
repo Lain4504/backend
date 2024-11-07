@@ -103,25 +103,27 @@ namespace BackEnd.Controllers
 
         [HttpGet("sorted-and-paged")]
         public async Task<IActionResult> GetAllBooks(
-    [FromQuery] string sortBy = "Id",
-    [FromQuery] int page = 0,
-    [FromQuery] int size = 5,
-    [FromQuery] string sortOrder = "asc")
+         [FromQuery] string sortBy = "Id",
+         [FromQuery] int page = 0,
+         [FromQuery] int size = 5,
+         [FromQuery] string sortOrder = "asc")
         {
             bool isAscending = sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase);
-            var paginatedBooks = await _bookService.GetAllBooksAsync(page, size, sortBy, isAscending);
 
-            // Trả về dữ liệu với thuộc tính 'content'
+            // Gọi service để lấy dữ liệu phân trang và tổng số trang
+            var (books, totalPages) = await _bookService.GetPaginatedBooksAsync(page, size, sortBy, isAscending);
+
+            // Trả về kết quả
             var response = new
             {
-                content = paginatedBooks, 
-                totalPages = paginatedBooks.TotalPages,
+                content = books,
+                totalPages = totalPages,
                 pageIndex = page
             };
 
             return Ok(response);
         }
-        
+
         [HttpGet("sorted-and-paged/by-collection")]
         public async Task<ActionResult<object>> GetBooksByCollection(
         [FromQuery] int? collection,

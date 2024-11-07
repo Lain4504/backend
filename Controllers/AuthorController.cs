@@ -30,7 +30,7 @@ namespace BackEnd.Controllers
             }
             return Ok(authors);
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAuthorById(long id)
         {
@@ -65,7 +65,7 @@ namespace BackEnd.Controllers
             await _authorService.AddAuthor(author);
             return CreatedAtAction(nameof(GetAuthorById), new { id = author.Id }, author);
         }
-
+        [Authorize(Policy = "AdminRole")]
         [HttpPost("add-book-to-author")]
         public async Task<IActionResult> AddBookToAuthor([FromBody] AddBookToAuthorRequest request)
         {
@@ -83,6 +83,7 @@ namespace BackEnd.Controllers
 
             return BadRequest("Failed to add book to author. Please ensure the book and author exist.");
         }
+        [Authorize(Policy = "AdminRole")]
         [HttpDelete("{bookId}/author/{authorId}")]
         public async Task<IActionResult> RemoveAuthorFromBook(long bookId, long authorId)
         {
