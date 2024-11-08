@@ -158,9 +158,11 @@ app.UseAuthorization();
 app.UseMiddleware<TokenValidationMiddleware>();
 
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    endpoints.MapHub<CommentHub>("/commentHub");
-});
+// app.UseEndpoints(endpoints =>
+// {
+//     endpoints.MapControllers();
+//     endpoints.MapHub<CommentHub>("/commentHub");
+// });
+app.MapControllers();
+app.MapHub<CommentHub>("/commentHub");
 app.Run();

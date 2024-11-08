@@ -13,9 +13,9 @@ public partial class Feedback
 
     public string? State { get; set; }
 
-    public long? BookId { get; set; }
+    public long BookId { get; set; }
 
-    public long? UserId { get; set; }
+    public long UserId { get; set; }
 
     public virtual Book? Book { get; set; }
 
