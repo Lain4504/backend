@@ -21,8 +21,6 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Book> Books { get; set; }
 
-    public virtual DbSet<BookCategory> BookCategories { get; set; }
-
     public virtual DbSet<BookCollection> BookCollections { get; set; }
 
     public virtual DbSet<Collection> Collections { get; set; }
@@ -97,7 +95,6 @@ public partial class BookStoreContext : DbContext
             entity.HasIndex(e => e.Isbn, "UK_ehpdfjpu1jm3hijhj4mm0hx9h").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Cover)
                 .HasMaxLength(255)
                 .IsUnicode(true)
@@ -129,27 +126,9 @@ public partial class BookStoreContext : DbContext
                 .IsUnicode(true)
                 .HasColumnName("title");
             entity.Property(e => e.Weight).HasColumnName("weight");
-
-            entity.HasOne(d => d.Category).WithMany(p => p.Books)
-                .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK5jgwecmfn1vyn9jtld3o64v4x");
-
             entity.HasOne(d => d.Publisher).WithMany(p => p.Books)
                 .HasForeignKey(d => d.PublisherId)
                 .HasConstraintName("FKgtvt7p649s4x80y6f4842pnfq");
-        });
-
-        modelBuilder.Entity<BookCategory>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__book_cat__3213E83F882BB774");
-
-            entity.ToTable("book_category");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .IsUnicode(true)
-                .HasColumnName("name");
         });
 
         modelBuilder.Entity<BookCollection>(entity =>

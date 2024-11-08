@@ -34,11 +34,7 @@ public partial class Book
 
     public int? Weight { get; set; }
 
-    public long? CategoryId { get; set; }
-
     public long? PublisherId { get; set; }
-
-    public virtual BookCategory? Category { get; set; }
 
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
