@@ -404,14 +404,14 @@ namespace BackEnd.Controllers
                     await _userService.RegisterAsync(user.Email);
                 }
 
-                //var existUser = await _userService.GetUserByEmailAsync(user.Email);
+                var existUser = await _userService.GetUserByEmailAsync(user.Email);
 
                 // Tạo JWT token cho người dùng
-                var token = _jWTService.GenerateJwtToken(user.Email, user.Id, user.Role);
+                var token = _jWTService.GenerateJwtToken(existUser.Email, existUser.Id, existUser.Role);
                 var refreshToken = _jWTService.GenerateRefreshToken();
 
                 // Lưu refresh token vào cơ sở dữ liệu và lấy ExpirationDate
-                var expirationDate = await _refreshTokenService.GenerateRefreshToken(user, refreshToken);
+                var expirationDate = await _refreshTokenService.GenerateRefreshToken(existUser, refreshToken);
 
                 // Trả về cả access token, refresh token, thời gian hết hạn
                 return Ok(new
