@@ -52,38 +52,41 @@ namespace BackEnd.Service.ServiceImpl
 
             // Lấy thông tin sách dựa trên bookId
             var existingBook = await GetExistingBookAsync(bookId);
-
+            Console.WriteLine(existingBook.Stock);
             // Tìm kiếm sách trong giỏ hàng
             var bookInCart = await _orderDetailRepository.FindByOrderAndBookAsync(existingCart, existingBook);
 
-            // Nếu sách chưa có trong giỏ hàng
-            if (bookInCart == null)
+            // Kiểm tra số lượng sách trong giỏ hàng không vượt quá số lượng tồn kho
+            if (quantity > existingBook.Stock)
             {
-                bookInCart = new OrderDetail
-                {
-                    Amount = quantity,
-                    Book = existingBook,
-                    Order = existingCart,
-                    OriginalPrice = existingBook.Price,
-                    SalePrice = existingBook.SalePrice
-                };
+                throw new Exception("Số lượng của sản phẩm trong giỏ hàng vượt quá mức cho phép");
 
-                await _orderDetailRepository.AddAsync(bookInCart);
-                existingBook.Stock = existingBook.Stock - quantity;
             }
             else
             {
-                // Cập nhật số lượng sách trong giỏ hàng
-                bookInCart.Amount += quantity;
-                existingBook.Stock = existingBook.Stock - 1;
 
+                // Nếu sách chưa có trong giỏ hàng
+                if (bookInCart == null)
+                {
+                    bookInCart = new OrderDetail
+                    {
+                        Amount = quantity,
+                        Book = existingBook,
+                        Order = existingCart,
+                        OriginalPrice = existingBook.Price,
+                        SalePrice = existingBook.SalePrice
+                    };
+                    await _orderDetailRepository.AddAsync(bookInCart);
+                }
+                else
+                {
+                    // Cập nhật số lượng sách trong giỏ hàng
+                    bookInCart.Amount += quantity;
+                }
             }
-            // Kiểm tra số lượng sách trong giỏ hàng không vượt quá số lượng tồn kho
-            if (bookInCart.Amount > existingBook.Stock)
-            {
-                bookInCart.Amount = existingBook.Stock;
-                throw new Exception("Số lượng của sản phẩm trong giỏ hàng vượt quá mức cho phép");
-            }
+            Console.WriteLine(existingBook.Stock);
+            Console.WriteLine(bookInCart.Amount);
+
             // Lưu thay đổi vào cơ sở dữ liệu
             await _orderDetailRepository.SaveChangesAsync();
         }
