@@ -179,19 +179,7 @@ namespace BackEnd.Repository.RepositoryImpl
 
                     if (orderDetail != null)
                     {
-                        var book = await _context.Books.FindAsync(orderDetail.BookId);
-                        var stockOfBook = book.Stock;
-                        if (orderDetail.Amount < updateOrder.quantity)
-                        {
-                            book.Stock = stockOfBook - (updateOrder.quantity - orderDetail.Amount);
-                            await _context.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            book.Stock = stockOfBook + (orderDetail.Amount - updateOrder.quantity);
-                            await _context.SaveChangesAsync();
-                        }
-
+                        var book = await _context.Books.FindAsync(orderDetail.BookId);                
                         // Update the quantity
                         orderDetail.Amount = updateOrder.quantity;
 
