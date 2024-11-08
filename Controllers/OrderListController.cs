@@ -184,12 +184,12 @@ namespace BackEnd.Controllers
         }
 
 
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteOrder(long orderId)
+        [HttpDelete("delete/{orderDetailId}")]
+        public async Task<IActionResult> DeleteOrder(long orderDetailId)
         {
             try
             {
-                await _OrderService.DeleteOrder(orderId);
+                await _OrderService.DeleteOrder(orderDetailId);
                 return Ok(true);
             }
             catch (Exception ex)

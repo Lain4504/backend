@@ -201,26 +201,15 @@ namespace BackEnd.Repository.RepositoryImpl
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteOrder(long orderId)
+        public async Task DeleteOrder(long orderDetailId)
         {
-            // Find the order by orderId
-            var orderToDelete = await _context.Orders.FindAsync(orderId);
-            if (orderToDelete == null)
+            // Find the orderdetail by orderDetailId
+            var orderDetailsToDelete = await _context.OrderDetails.FindAsync(orderDetailId);
+            if (orderDetailsToDelete == null)
                 throw new Exception("Order not found");
-
-            // Find the single order detail associated with this orderId
-            var orderDetailToDelete = await _context.OrderDetails
-                .FirstOrDefaultAsync(od => od.OrderId == orderId);
-
-            // If an associated order detail is found, remove it
-            if (orderDetailToDelete != null)
-            {
-                _context.OrderDetails.Remove(orderDetailToDelete);
-            }
-
-            _context.Orders.Remove(orderToDelete);
-            var bookInOrder = await _context.Books.FindAsync(orderDetailToDelete.BookId);
-            bookInOrder.Stock = bookInOrder.Stock + orderDetailToDelete.Amount;
+            _context.OrderDetails.Remove(orderDetailsToDelete);
+            var bookInOrder = await _context.Books.FindAsync(orderDetailsToDelete.BookId);
+            bookInOrder.Stock = bookInOrder.Stock + orderDetailsToDelete.Amount;
             await _context.SaveChangesAsync();
         }
 
