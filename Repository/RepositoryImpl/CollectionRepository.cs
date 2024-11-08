@@ -49,22 +49,20 @@ namespace BackEnd.Repository.RepositoryImpl
             _context.Collections.Update(collection);
             await _context.SaveChangesAsync();
         }
-        public async Task<PaginatedList<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
+        public async Task<IEnumerable<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
         {
-            var source = _context.Collections.AsQueryable();
+            var query = _context.Collections.AsQueryable();
 
             // Apply sorting
-            if (isAscending)
-            {
-                source = source.OrderBy(b => EF.Property<object>(b, sortBy));
-            }
-            else
-            {
-                source = source.OrderByDescending(b => EF.Property<object>(b, sortBy));
-            }
+            query = isAscending
+                ? query.OrderBy(b => EF.Property<object>(b, sortBy))
+                : query.OrderByDescending(b => EF.Property<object>(b, sortBy));
 
-            // Get paginated results
-            return await PaginatedList<Collection>.CreateAsync(source, pageIndex, pageSize);
+            // Apply pagination
+            return await query
+                .Skip(pageIndex * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
         public async Task<bool> RemoveCollectionFromBook(long bookId, long collectionId)
         {

@@ -21,5 +21,6 @@ namespace BackEnd.Repository
         Task<List<OrderDetail>> GetOrderDetail(long orderId);
         Task UpdateInfoOrder(long orderId, UpdateOrderRequest updateOrder);
         Task UpdateQuantityOrder( List<UpdateQuantityOrder> updateOrder);
+        Task DeleteOrder(long orderDetailId);
     }
 }

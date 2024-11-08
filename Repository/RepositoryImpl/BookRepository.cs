@@ -153,22 +153,27 @@ namespace BackEnd.Repository.RepositoryImpl
             return true; // Successfully added
         }
 
-        public async Task<PaginatedList<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
+        public async Task<IEnumerable<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending)
         {
-            var source = _context.Books
+            var query = _context.Books
                 .Include(b => b.Images)
                 .AsQueryable();
 
-            if (isAscending)
-            {
-                source = source.OrderBy(book => EF.Property<object>(book, sortBy));
-            }
-            else
-            {
-                source = source.OrderByDescending(book => EF.Property<object>(book, sortBy));
-            }
+            // Sắp xếp dựa trên `sortBy` và `sortOrder`
+            query = isAscending
+                ? query.OrderBy(book => EF.Property<object>(book, sortBy))
+                : query.OrderByDescending(book => EF.Property<object>(book, sortBy));
 
-            return await PaginatedList<Book>.CreateAsync(source, page, size);
+            // Áp dụng phân trang
+            return await query
+                .Skip(page * size)
+                .Take(size)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalBooksCountAsync()
+        {
+            return await _context.Books.CountAsync();
         }
         public IQueryable<Book> GetBooksByCollection(int collectionId)
         {

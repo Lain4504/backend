@@ -130,5 +130,10 @@ namespace BackEnd.Service.ServiceImpl
         {
             await _orderRepository.UpdateQuantityOrder( updateOrder);
         }
+
+        public async Task DeleteOrder(long orderDetailId)
+        {
+            await _orderRepository.DeleteOrder(orderDetailId);
+        }
     }
 }

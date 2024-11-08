@@ -14,11 +14,12 @@ namespace BackEnd.Repository
         Task<bool> ExistsByISBNAsync(string isbn);
         Task<IEnumerable<Book>> FindByTitleAsync(string title);
         Task<bool> AddBookToCollectionAsync(long bookId, long collectionId);
-        Task<PaginatedList<Book>> GetAllBooksAsync(int pageIndex, int pageSize, string sortBy, bool isAscending);
         IQueryable<Book> GetBooksByCollection(int collectionId);
         IQueryable<Book> GetBooks();
         IEnumerable<BookCollection> GetAllBookCollectionsByBookId(long bookId);
         IEnumerable<AuthorBook> GetAllAuthorsByBookId(long bookId);
         Task<List<Book>> GetBooksByAuthorIdAsync(long authorId);
+        Task<IEnumerable<Book>> GetAllBooksAsync(int page, int size, string sortBy, bool isAscending);
+        Task<int> GetTotalBooksCountAsync();
     }
 }

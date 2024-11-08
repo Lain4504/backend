@@ -37,7 +37,7 @@ namespace BackEnd.Service.ServiceImpl
         {
             return _repository.UpdateCollectionAsync(collection);
         }
-        public Task<PaginatedList<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
+        public Task<IEnumerable<Collection>> GetAllBookCollectionsAsync(int pageIndex, int pageSize, string sortBy, bool isAscending)
         {
             return _repository.GetAllBookCollectionsAsync(pageIndex, pageSize, sortBy, isAscending);
         }
