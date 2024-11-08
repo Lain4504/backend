@@ -49,17 +49,19 @@ namespace BackEnd.Repository.RepositoryImpl
             order.PaymentState = state.ToString();
             await _context.SaveChangesAsync();
         }
-        public async Task ChangeOrderState( long id, string state)
+        public async Task ChangeOrderState(long id, string state)
         {
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return;
             order.State = state;
-            var ListOrderDetail =await _context.OrderDetails.Where(f => f.OrderId == order.Id).ToListAsync();
+
+            var ListOrderDetail = await _context.OrderDetails.Where(f => f.OrderId == order.Id).ToListAsync();
             foreach (var orderDetail in ListOrderDetail)
             {
                 var numberBooktoBy = orderDetail.Amount;
-                var book =await _context.Books.Where(b => b.Id == orderDetail.BookId).FirstOrDefaultAsync();
+                var book = await _context.Books.Where(b => b.Id == orderDetail.BookId).FirstOrDefaultAsync();
                 book.Stock = book.Stock - numberBooktoBy;
+                book.Sold = book.Sold + numberBooktoBy;
             }
             await _context.SaveChangesAsync();
         }
@@ -145,6 +147,7 @@ namespace BackEnd.Repository.RepositoryImpl
             order.Phone = updateOrder.Phone;
             order.Address = updateOrder.Address;
             order.TotalPrice = updateOrder.TotalPrice;
+            order.ShopNote = updateOrder.Note;
             await _context.SaveChangesAsync();
         }
 
@@ -178,14 +181,22 @@ namespace BackEnd.Repository.RepositoryImpl
                     {
                         var book = await _context.Books.FindAsync(orderDetail.BookId);
                         var stockOfBook = book.Stock;
+                        if (orderDetail.Amount < updateOrder.quantity)
+                        {
+                            book.Stock = stockOfBook - (updateOrder.quantity - orderDetail.Amount);
+                            await _context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            book.Stock = stockOfBook + (orderDetail.Amount - updateOrder.quantity);
+                            await _context.SaveChangesAsync();
+                        }
+
                         // Update the quantity
                         orderDetail.Amount = updateOrder.quantity;
 
                         // Recalculate total price based on the item's sale price
                         totalPrice += updateOrder.SalePrice * updateOrder.quantity;
-
-                        //Update stock for book
-
                     }
                 }
 
@@ -197,26 +208,15 @@ namespace BackEnd.Repository.RepositoryImpl
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteOrder(long orderId)
+        public async Task DeleteOrder(long orderDetailId)
         {
-            // Find the order by orderId
-            var orderToDelete = await _context.Orders.FindAsync(orderId);
-            if (orderToDelete == null)
+            // Find the orderdetail by orderDetailId
+            var orderDetailsToDelete = await _context.OrderDetails.FindAsync(orderDetailId);
+            if (orderDetailsToDelete == null)
                 throw new Exception("Order not found");
-
-            // Find the single order detail associated with this orderId
-            var orderDetailToDelete = await _context.OrderDetails
-                .FirstOrDefaultAsync(od => od.OrderId == orderId);
-
-            // If an associated order detail is found, remove it
-            if (orderDetailToDelete != null)
-            {
-                _context.OrderDetails.Remove(orderDetailToDelete);
-            }
-
-            _context.Orders.Remove(orderToDelete);
-            var bookInOrder = await _context.Books.FindAsync(orderDetailToDelete.BookId);
-            bookInOrder.Stock = bookInOrder.Stock + orderDetailToDelete.Amount;
+            _context.OrderDetails.Remove(orderDetailsToDelete);
+            var bookInOrder = await _context.Books.FindAsync(orderDetailsToDelete.BookId);
+            bookInOrder.Stock = bookInOrder.Stock + orderDetailsToDelete.Amount;
             await _context.SaveChangesAsync();
         }
 
