@@ -65,11 +65,15 @@ namespace BackEnd.Controllers
                 {
                     return StatusCode(403, "You are not authorized to delete this feedback");
                 }
+
                 var result = await _feedBackService.DeleteFeedback(feedBackId);
                 if (!result)
                 {
-                    StatusCode(404, "Feedback not found");
+                    return NotFound("Feedback not found");
                 }
+
+                await _commentHub.Clients.Group(feedBack.BookId.ToString()).SendAsync("DeletedComment", feedBackId);
+
                 return Ok();
             }
             catch (Exception)
@@ -77,5 +81,6 @@ namespace BackEnd.Controllers
                 return StatusCode(500, "Internal server error, Please try again later");
             }
         }
+
     }
 }
