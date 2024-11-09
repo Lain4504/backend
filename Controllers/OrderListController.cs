@@ -16,23 +16,21 @@ namespace BackEnd.Controllers
     public class OrderController : ControllerBase
     {
         private static readonly object _lock = new object();
-        private readonly IOrderService _OrderService;
-        private readonly BookStoreContext _context;
+        private readonly IOrderService _orderService;
+        private readonly IEmailService _emailService;
 
-        public OrderController(IOrderService OrderService, BookStoreContext content)
+        public OrderController(IOrderService OrderService, IEmailService emailService)
         {
-            _OrderService = OrderService;
-            _context = content;
+            _orderService = OrderService;
+            _emailService = emailService;
         }
-
-
 
         [HttpGet("user/{id}")]
         public async Task<IActionResult> getOrderByUser(long id)
         {
             try
             {
-                List<Order> orders = await _OrderService.GetOrderByUser(id);
+                List<Order> orders = await _orderService.GetOrderByUser(id);
                 if (orders.Count == 0)
                 {
                     return NotFound("userId not exits, please inter correct userId");
@@ -49,7 +47,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                List<OrderDetail> detail = await _OrderService.GetOrderDetail(orderId);
+                List<OrderDetail> detail = await _orderService.GetOrderDetail(orderId);
                 return Ok(detail);
             }
             catch (Exception)
@@ -61,11 +59,12 @@ namespace BackEnd.Controllers
         [HttpPost("process")]
         public async Task processOrder(Order order)
         {
-            await _OrderService.ChangeOrderState(order.Id, OrderState.Processing);
+            await _orderService.ChangeOrderState(order.Id, OrderState.Processing);
             lock (_lock)
             {
-                _OrderService.ProcessOrderAsync(order);
+                _orderService.ProcessOrderAsync(order);
             }
+            await _emailService.SendOrderConfirmationEmail(order.Email, order);
         }
         [Authorize(Policy = "AdminRole")]
         [HttpGet("get-all")]
@@ -73,7 +72,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var Orders = await _OrderService.GetAll();
+                var Orders = await _orderService.GetAll();
                 if (Orders == null || Orders.Count() == 0)
                 {
                     return NoContent();
@@ -91,7 +90,7 @@ namespace BackEnd.Controllers
         [HttpGet("{id}")]
         public Task<Order> getOrderById(long id)
         {
-            return _OrderService.GetOrderById(id);
+            return _orderService.GetOrderById(id);
         }
 
         [HttpPut("update-shipping/{id}/{state}")]
@@ -99,7 +98,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                await _OrderService.ChangeOrderShippingState(id, state);
+                await _orderService.ChangeOrderShippingState(id, state);
                 return NoContent();
             }
             catch (Exception)
@@ -114,7 +113,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                await _OrderService.ChangeOrderState(id, state);
+                await _orderService.ChangeOrderState(id, state);
                 return NoContent();
             }
             catch (Exception)
@@ -129,7 +128,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var existingOrder = await _OrderService.GetOrderById(id);
+                var existingOrder = await _orderService.GetOrderById(id);
                 if (existingOrder.ShippingState == null) throw new Exception("Cannot found shipping state");
 
                 if (existingOrder.ShippingState.Equals(ShippingState.SHIPPING))
@@ -137,7 +136,7 @@ namespace BackEnd.Controllers
                     return Ok("Không thể hủy đơn hàng đang trong quá trình vận chuyển");
                 }
 
-                await _OrderService.Cancel(id);
+                await _orderService.Cancel(id);
                 return NoContent();
             }
             catch (Exception)
@@ -154,7 +153,7 @@ namespace BackEnd.Controllers
             }
             try
             {
-                await _OrderService.UpdateOrderInfo(id, updatedOrder);
+                await _orderService.UpdateOrderInfo(id, updatedOrder);
                 return Ok(true);
             }
             catch (Exception ex)
@@ -173,7 +172,7 @@ namespace BackEnd.Controllers
             // }
             try
             {
-                await _OrderService.UpdateQuantityorder(updatedOrder);
+                await _orderService.UpdateQuantityorder(updatedOrder);
                 return Ok(true);
             }
             catch (Exception ex)
@@ -189,7 +188,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                await _OrderService.DeleteOrder(orderDetailId);
+                await _orderService.DeleteOrder(orderDetailId);
                 return Ok(true);
             }
             catch (Exception ex)
